@@ -1,0 +1,149 @@
+<!-- BOTÃO PARA ABRIR DICIONÁRIO -->
+<button onclick="abrirDicionario()">Abrir Dicionário</button>
+
+<!-- OVERLAY MODAL -->
+<div id="overlayModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.7); z-index:1000; justify-content:center; align-items:center;">
+    <div id="overlayBody" style="background:white; width:80%; max-width:700px; max-height:80%; padding:20px; border-radius:10px; overflow-y:auto; position:relative;">
+        <button onclick="fecharDicionario()" style="position:absolute; top:10px; right:10px; background:red; color:white; border:none; border-radius:5px; padding:5px 10px; cursor:pointer;">Fechar</button>
+        <!-- O conteúdo do dicionário será injetado aqui -->
+    </div>
+</div>
+
+<script>
+function abrirDicionario() {
+    const overlay = document.getElementById('overlayModal');
+    const content = document.getElementById('overlayBody');
+
+    content.innerHTML = `
+        <button onclick="fecharDicionario()" style="position:absolute; top:10px; right:10px; background:red; color:white; border:none; border-radius:5px; padding:5px 10px; cursor:pointer;">Fechar</button>
+
+        <h2>Словáрь — Dicionário Russo-Português</h2>
+
+        <h3>1. Cumprimentos e Expressões Básicas</h3>
+        <ul>
+            <li>Привет — Olá</li>
+            <li>Доброе утро — Bom dia</li>
+            <li>Добрый день — Boa tarde</li>
+            <li>Добрый вечер — Boa noite</li>
+            <li>Пока — Tchau</li>
+            <li>До свидания — Adeus</li>
+            <li>Пожалуйста — Por favor</li>
+            <li>Спасибо — Obrigado</li>
+            <li>Большое спасибо — Muito obrigado</li>
+            <li>Извините — Desculpe</li>
+            <li>Прошу прощения — Peço desculpa</li>
+            <li>Ничего — De nada</li>
+            <li>Как дела? — Como vai?</li>
+            <li>Хорошо — Bem</li>
+            <li>Плохо — Mal</li>
+            <li>Так себе — Mais ou menos</li>
+            <li>Рад тебя видеть — Prazer em ver você</li>
+            <li>Приятно познакомиться — Prazer em conhecer</li>
+            <li>Добро пожаловать — Bem-vindo</li>
+            <li>Спокойной ночи — Boa noite (ao se despedir)</li>
+        </ul>
+
+        <h3>2. Perguntas Comuns</h3>
+        <ul>
+            <li>Что это? — O que é isto?</li>
+            <li>Кто это? — Quem é?</li>
+            <li>Где туалет? — Onde fica o banheiro?</li>
+            <li>Сколько стоит? — Quanto custa?</li>
+            <li>Когда? — Quando?</li>
+            <li>Почему? — Por que?</li>
+            <li>Как? — Como?</li>
+            <li>Кто? — Quem?</li>
+            <li>Что случилось? — O que aconteceu?</li>
+            <li>Вы говорите по-русски? — Você fala russo?</li>
+            <li>Вы говорите по-португальски? — Você fala português?</li>
+            <li>Можете помочь? — Pode ajudar?</li>
+            <li>Что вы посоветуете? — O que você recomenda?</li>
+            <li>Где я могу найти…? — Onde posso encontrar…?</li>
+            <li>Сколько времени? — Que horas são?</li>
+            <li>Как пройти к…? — Como chegar a…?</li>
+            <li>Можно ли…? — É possível…?</li>
+            <li>Какая цена? — Qual é o preço?</li>
+            <li>Можно ли платить картой? — Posso pagar com cartão?</li>
+            <li>Есть ли здесь Wi-Fi? — Há Wi-Fi aqui?</li>
+        </ul>
+
+        <h3>3. Números Básicos</h3>
+        <ul>
+            <li>Один — Um</li>
+            <li>Два — Dois</li>
+            <li>Три — Três</li>
+            <li>Четыре — Quatro</li>
+            <li>Пять — Cinco</li>
+            <li>Шесть — Seis</li>
+            <li>Семь — Sete</li>
+            <li>Восемь — Oito</li>
+            <li>Девять — Nove</li>
+            <li>Десять — Dez</li>
+            <li>Одиннадцать — Onze</li>
+            <li>Двенадцать — Doze</li>
+            <li>Тринадцать — Treze</li>
+            <li>Четырнадцать — Quatorze</li>
+            <li>Пятнадцать — Quinze</li>
+            <li>Шестнадцать — Dezesseis</li>
+            <li>Семнадцать — Dezessete</li>
+            <li>Восемнадцать — Dezoito</li>
+            <li>Девятнадцать — Dezenove</li>
+            <li>Двадцать — Vinte</li>
+        </ul>
+
+        <h3>4. Cores</h3>
+        <ul>
+            <li>Красный — Vermelho</li>
+            <li>Синий — Azul</li>
+            <li>Зелёный — Verde</li>
+            <li>Жёлтый — Amarelo</li>
+            <li>Чёрный — Preto</li>
+            <li>Белый — Branco</li>
+            <li>Серый — Cinza</li>
+            <li>Оранжевый — Laranja</li>
+            <li>Фиолетовый — Roxo</li>
+            <li>Розовый — Rosa</li>
+            <li>Коричневый — Marrom</li>
+            <li>Голубой — Azul claro</li>
+            <li>Тёмно-синий — Azul escuro</li>
+            <li>Бежевый — Bege</li>
+            <li>Бирюзовый — Turquesa</li>
+            <li>Лаймовый — Verde limão</li>
+            <li>Золотой — Dourado</li>
+            <li>Серебряный — Prateado</li>
+            <li>Бордовый — Bordô</li>
+            <li>Малиновый — Framboesa</li>
+        </ul>
+
+        <h3>5. Frases Úteis no Dia a Dia</h3>
+        <ul>
+            <li>Я не понимаю — Não entendo</li>
+            <li>Говорите медленнее — Fale mais devagar</li>
+            <li>Повторите, пожалуйста — Repita, por favor</li>
+            <li>Можете помочь? — Pode ajudar?</li>
+            <li>Я хочу… — Eu quero…</li>
+            <li>Где находится…? — Onde fica…?</li>
+            <li>Как добраться до…? — Como chegar a…?</li>
+            <li>Можно ли…? — É possível…?</li>
+            <li>Я потерялся — Estou perdido</li>
+            <li>Сколько стоит? — Quanto custa?</li>
+            <li>Можно оплатить картой? — Posso pagar com cartão?</li>
+            <li>Есть ли здесь Wi-Fi? — Tem Wi-Fi aqui?</li>
+            <li>Я забронировал — Eu reservei</li>
+            <li>Можете рекомендовать ресторан? — Pode recomendar um restaurante?</li>
+            <li>Я вегетарианец — Sou vegetariano</li>
+            <li>Мне нужна помощь — Preciso de ajuda</li>
+            <li>Где ближайшая аптека? — Onde fica a farmácia mais próxima?</li>
+            <li>Я не говорю по-португальски — Não falo português</li>
+            <li>Как это называется? — Como se chama isso?</li>
+            <li>Можно ли мне меню, пожалуйста? — Posso ver o cardápio, por favor?</li>
+        </ul>
+    `;
+
+    overlay.style.display = 'flex';
+}
+
+function fecharDicionario() {
+    document.getElementById('overlayModal').style.display = 'none';
+}
+</script>

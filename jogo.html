@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🎮 Jogos - Славянский клуб</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden; /* Remove scroll */
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      color: #333;
+    }
+
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    main .content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      width: 90vw;
+      height: 90vh; /* Ajusta altura total */
+      max-width: 900px;
+      max-height: 700px;
+      padding: 10px;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    }
+
+    #gameArea { 
+      display: grid; 
+      grid-template-columns: repeat(4, 60px); 
+      grid-template-rows: repeat(4, 60px); 
+      gap: 10px; 
+      justify-content: center; 
+      margin: 10px 0; 
+    }
+
+    .square { 
+      width: 100%; 
+      height: 100%; 
+      border-radius: 8px; 
+      cursor: pointer; 
+      border: 2px solid #333; 
+      transition: all 0.3s; 
+      display: flex;
+      flex-direction: column;
+      align-items: center; 
+      justify-content: center;
+      overflow: hidden;
+      background: #222;
+      color: #fff;
+      font-weight: bold;
+    }
+
+    .square span { font-size: 1.2em; }
+    .square .itemName { font-size: 0.9em; margin-top: 4px; display: block; text-align: center; }
+    .square.wrong { background-color: #ffcdd2; border-color: #f44336; }
+    .square.correct { background-color: #c8e6c9; border-color: #4CAF50; }
+    .neon { box-shadow: 0 0 8px #fff,0 0 12px #0ff,0 0 20px #0ff,0 0 30px #0ff; transform: scale(1.1); transition: all 0.3s; }
+
+    #gameInfo { text-align: center; font-size: 1em; font-weight: bold; }
+    #score { text-align: center; font-size: 0.9em; margin-top: 5px; }
+    #timerBarContainer { width: 70%; height: 10px; background: #ccc; margin: 5px auto; border-radius: 8px; overflow: hidden; }
+    #timerBar { height: 100%; width: 100%; background: #0ff; transition: width 0.1s linear; }
+    #controls { text-align: center; margin-top: 8px; }
+    #controls button { padding: 4px 10px; margin: 0 3px; font-size: 0.9em; cursor: pointer; }
+
+    /* ===== Dimitri ao lado direito ===== */
+    #dimitri {
+      position: absolute;
+      top: 50%;
+      right: -70px;
+      transform: translateY(-50%);
+      width: 100px;
+      height: 150px;
+      z-index: 1000;
+    }
+
+    /* ===== Chat Flutuante ===== */
+    #chatBtn {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      background: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      font-size: 1.2em;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      z-index: 2000;
+    }
+
+    #chatWindow {
+      position: absolute;
+      bottom: 70px;
+      right: 10px;
+      width: 250px;
+      height: 300px;
+      background: white;
+      border: 2px solid #4CAF50;
+      border-radius: 12px;
+      display: none;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      z-index: 2000;
+    }
+
+    #chatMessages {
+      flex: 1;
+      padding: 10px;
+      overflow-y: auto;
+      font-size: 0.8em;
+      display: flex;
+      flex-direction: column;
+    }
+
+    #chatMessages p {
+      margin: 5px 0;
+      padding: 6px;
+      border-radius: 6px;
+      max-width: 80%;
+    }
+
+    .userMsg { background: #e0f7e9; align-self: flex-end; }
+    .botMsg { background: #f0f0f0; align-self: flex-start; }
+
+    #chatInput { display: flex; border-top: 1px solid #ddd; }
+    #chatInput input { flex: 1; border: none; padding: 6px; outline: none; font-size: 0.9em; }
+    #chatInput button { background: #4CAF50; color: white; border: none; padding: 6px 10px; cursor: pointer; font-size: 0.9em; }
+    #chatInput button:hover { background: #45a049; }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header>
+    <h1 id="siteTitle">Славянский клуб</h1>
+    <button id="languageToggle" style="margin-left:20px;">PT</button>
+  </header>
+
+  <!-- Sidebar -->
+  <aside>
+    <nav>
+      <a href="index.html">🏠 Início</a>
+      <a href="exercicio.html">📝 Exercícios</a>
+      <a href="jogo.html" class="active">🎮 Jogos</a>
+      <a href="#">ℹ Quem somos</a>
+    </nav>
+    <div class="mascote">🐻 Dimitry</div>
+  </aside>
+
+  <!-- Main -->
+  <main>
+    <div class="content">
+      <h2>🎮 <span id="gameTitle">Jogo Interativo</span></h2>
+      <div id="gameInfo"></div>
+      <div id="timerBarContainer"><div id="timerBar"></div></div>
+      <div id="gameArea"></div>
+      <div id="score">❤️ 5 | ✅ 0 | ❌ 0 | Nível 1 | Rodada 1/10 | Acertos: 0%</div>
+      <div id="controls">
+        <button id="playBtn">▶ Play</button>
+        <button id="restartBtn">Recomeçar</button>
+        <button id="stopBtn">Parar</button>
+        <div id="backButtonContainer" style="margin-top:10px;">
+          <button id="backBtn" onclick="window.location.href='index.html'">🔙 Voltar</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Dimitri -->
+  <div id="dimitri">
+    <div class="head">
+      <div class="ushanka">
+        <div class="ear left"></div>
+        <div class="ear right"></div>
+      </div>
+      <div class="eye left"></div>
+      <div class="eye right"></div>
+      <div class="eyebrow left"></div>
+      <div class="eyebrow right"></div>
+      <div class="mouth"></div>
+    </div>
+    <div class="body">
+      <div class="arm left"></div>
+      <div class="arm right"></div>
+    </div>
+  </div>
+
+  <!-- Chat Flutuante -->
+  <button id="chatBtn">💬</button>
+  <div id="chatWindow">
+    <div id="chatMessages">
+      <p class="botMsg">👋 Olá! Eu sou o Dimitri, seu assistente.</p>
+    </div>
+    <div id="chatInput">
+      <input type="text" id="msgInput" placeholder="Digite sua mensagem...">
+      <button id="sendBtn">➤</button>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="jogo.js"></script>
+  <script src="chat.js"></script>
+</body> <!-- Dimitri -->
+  <div id="dimitri">
+    <div class="head">
+      <div class="ushanka">
+        <div class="ear left"></div>
+        <div class="ear right"></div>
+      </div>
+      <div class="eye left"></div>
+      <div class="eye right"></div>
+      <div class="eyebrow left"></div>
+      <div class="eyebrow right"></div>
+      <div class="mouth"></div>
+    </div>
+    <div class="body">
+      <div class="arm left"></div>
+      <div class="arm right"></div>
+    </div>
+  </div>
+
+  <!-- Chat Flutuante -->
+  <button id="chatBtn">💬</button>
+  <div id="chatWindow">
+    <div id="chatMessages">
+      <p class="botMsg">👋 Olá! Eu sou o Dimitri, seu assistente.</p>
+    </div>
+    <div id="chatInput">
+      <input type="text" id="msgInput" placeholder="Digite sua mensagem...">
+      <button id="sendBtn">➤</button>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="jogo.js"></script>
+  <script src="chat.js"></script>
+</html>

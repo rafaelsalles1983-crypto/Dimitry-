@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Славянский клуб - Exercícios</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="chat.css">
+  <link rel="icon" type="image/png" href="images/dimitri-favicon.png">
+</head>
+
+<body>
+  <!-- Header -->
+  <header>
+    <h1 id="siteTitle">Славянский клуб</h1>
+    <button id="languageToggle">PT</button>
+  </header>
+
+  <!-- Sidebar -->
+  <aside>
+    <nav>
+      <a href="index.html">🏠 Selecionar</a>
+      <a href="exercicio.html" class="active">📝 Exercícios</a>
+      <a href="jogo.html">🎮 Jogos</a>
+      <a href="#">ℹ Quem somos</a>
+    </nav>
+    <div class="mascote">🐻 Dimitry</div>
+  </aside>
+
+  <!-- Main -->
+  <main>
+    <div class="content">
+      <h2>📝 Exercício Interativo</h2>
+
+      <!-- Barra de progresso -->
+      <div id="progressContainer">
+        <div id="progressText"></div>
+        <div id="progressBarContainer">
+          <div id="progressBar"></div>
+        </div>
+      </div>
+
+      <!-- Exercício -->
+      <div id="cruzadoContainer" class="container">
+        <div class="column" id="words"></div>
+        <div class="column" id="placeholders"></div>
+      </div>
+
+      <!-- Botão voltar -->
+      <div id="backButtonContainer">
+        <button id="backBtn" onclick="window.location.href='index.html'">🔙 Voltar</button>
+      </div>
+    </div>
+  </main>
+
+  <!-- Mascote Dimitri -->
+  <div id="dimitri">
+    <div class="head">
+      <div class="ushanka">
+        <div class="ear left"></div>
+        <div class="ear right"></div>
+      </div>
+      <div class="eye left"></div>
+      <div class="eye right"></div>
+      <div class="eyebrow left"></div>
+      <div class="eyebrow right"></div>
+      <div class="mouth"></div>
+    </div>
+    <div class="body">
+      <div class="arm left"></div>
+      <div class="arm right"></div>
+    </div>
+  </div>
+
+  <!-- Chat Flutuante -->
+  <button id="chatBtn">💬</button>
+  <div id="chatWindow">
+    <div id="chatMessages">
+      <p class="botMsg">👋 Olá! Eu sou o Dimitri, seu assistente.</p>
+    </div>
+    <div id="chatInput">
+      <input type="text" id="msgInput" placeholder="Digite sua mensagem...">
+      <button id="sendBtn">➤</button>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="chat.js"></script>
+  <script src="exercicio.js"></script>
+</body>
+</html>

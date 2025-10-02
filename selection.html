@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Славянский клуб</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="chat.css">
+  <style>
+    /* ===== Overlay com animação ===== */
+    .overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.7);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .overlay.show {
+      display: flex;
+      opacity: 1;
+    }
+
+    .overlay-content {
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      max-width: 90%;
+      max-height: 90%;
+      overflow-y: auto;
+      position: relative;
+      transform: scale(0.8);
+      transition: transform 0.3s ease;
+    }
+
+    .overlay.show .overlay-content {
+      transform: scale(1);
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      font-size: 1.5em;
+      cursor: pointer;
+    }
+
+    .lesson-card {
+      cursor: pointer;
+    }
+
+    .lesson-card.locked {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* ===== Chat ===== */
+    #chatBtn {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      font-size: 2em;
+      background: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      cursor: pointer;
+      z-index: 1001;
+    }
+
+    #chatWindow {
+      position: fixed;
+      bottom: 90px;
+      right: 20px;
+      width: 300px;
+      max-height: 400px;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+      display: none;
+      flex-direction: column;
+      z-index: 1001;
+    }
+
+    #chatMessages {
+      flex: 1;
+      padding: 10px;
+      overflow-y: auto;
+    }
+
+    #chatMessages p {
+      margin: 5px 0;
+    }
+
+    #chatInput {
+      display: flex;
+      border-top: 1px solid #ccc;
+    }
+
+    #chatInput input {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      border-radius: 0 0 0 10px;
+      outline: none;
+    }
+
+    #chatInput button {
+      padding: 10px;
+      border: none;
+      background: #4CAF50;
+      color: #fff;
+      cursor: pointer;
+      border-radius: 0 0 10px 0;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Славянский клуб</h1>
+    <button class="login" id="loginBtn">Login</button>
+  </header>
+
+  <aside>
+    <nav>
+      <a href="index.html">📈 Selecionar</a>
+      <a href="exercicio.html">📝 Exercícios</a>
+      <a href="jogo.html">🎨 Jogos</a>
+      <a href="#">ℹ Quem somos</a>
+    </nav>
+    <div class="mascote">🐻 Dimitri</div>
+  </aside>
+
+<main>
+  <div class="cards">
+    <div class="card lesson-card" data-key="possessivos">
+      <h3>📘 Притяжательные прилагательные</h3>
+      <p>Complete este módulo.</p>
+    </div>
+    <div class="card lesson-card locked" data-key="numerais">
+      <h3>📘 Числительные</h3>
+      <p>Complete este módulo.</p>
+    </div>
+    <div class="card lesson-card locked" data-key="verboSer">
+      <h3>📘 Глагол "ser" (настоящее время)</h3>
+      <p>Complete este módulo.</p>
+    </div>
+    <div class="card lesson-card locked" data-key="verboEstar">
+      <h3>📘 Глагол "estar" (настоящее время)</h3>
+      <p>Complete este módulo.</p>
+    </div>
+    <div class="card lesson-card locked" data-key="verboSerPassado">
+      <h3>📘 Глагол "ser" (прошедшее время)</h3>
+      <p>Complete este módulo.</p>
+    </div>
+    <div class="card lesson-card locked" data-key="verboEstarPassado">
+      <h3>📘 Глагол "estar" (прошедшее время)</h3>
+      <p>Complete este módulo.</p>
+    </div>
+    <div class="card lesson-card locked" data-key="verboSerFuturo">
+      <h3>📘 Глагол "ser" (будущее время)</h3>
+      <p>Complete este módulo.</p>
+    </div>
+    <div class="card lesson-card locked" data-key="verboEstarFuturo">
+      <h3>📘 Глагол "estar" (будущее время)</h3>
+      <p>Complete este módulo.</p>
+    </div>
+    <div class="card lesson-card locked" data-key="quantidades">
+      <h3>📘 Количественные выражения</h3>
+      <p>Complete este módulo.</p>
+    </div>
+    <div class="card lesson-card locked" data-key="objetoDireto">
+      <h3>📘 Прямое дополнение</h3>
+      <p>Complete este módulo.</p>
+    </div>
+    <div class="card lesson-card locked" data-key="tempoPresente">
+      <h3>📘 Настоящее время</h3>
+      <p>Complete este módulo.</p>
+    </div>
+    <div class="card lesson-card locked" data-key="infinitivo">
+      <h3>📘 Инфинитив</h3>
+      <p>Complete este módulo.</p>
+    </div>
+    <div class="card lesson-card locked" data-key="lugares">
+      <h3>📘 Описание мест</h3>
+      <p>Complete este módulo.</p>
+    </div>
+    <div class="card lesson-card locked" data-key="profissoes">
+      <h3>📘 Профессии</h3>
+      <p>Complete este módulo.</p>
+    </div>
+    <div class="card lesson-card locked" data-key="viagem">
+      <h3>📘 Путешествия</h3>
+      <p>Complete este módulo.</p>
+    </div>
+    <div class="card lesson-card locked" data-key="familia">
+      <h3>📘 Семья</h3>
+      <p>Complete este módulo.</p>
+    </div>
+    <div class="card lesson-card locked" data-key="verbosMovimento">
+      <h3>📘 Глаголы движения</h3>
+      <p>Complete este módulo.</p>
+    </div>
+    <div class="card lesson-card locked" data-key="FrasesDeConvercacao">
+      <h3>📘 Разговорные фразы</h3>
+      <p>Complete este módulo.</p>
+    </div>
+  </div>
+</main>
+
+  <!-- Overlay Modal -->
+  <div id="overlayModal" class="overlay">
+    <div class="overlay-content">
+      <span class="close-btn" onclick="closeOverlay()">&times;</span>
+      <div id="overlayBody"></div>
+    </div>
+  </div>
+
+  <!-- Chat Flutuante -->
+  <button id="chatBtn">💬</button>
+  <div id="chatWindow">
+    <div id="chatMessages">
+      <p class="botMsg">👋 Olá! Eu sou o Dimitri, seu assistente.</p>
+    </div>
+    <div id="chatInput">
+      <input type="text" id="msgInput" placeholder="Digite sua mensagem...">
+      <button id="sendBtn">➤</button>
+    </div>
+  </div>
+
+<script>
+  // Funções do Overlay
+  function openOverlay(url) {
+    const overlay = document.getElementById('overlayModal');
+    const content = document.getElementById('overlayBody');
+
+    fetch(url)
+      .then(res => {
+        if (!res.ok) throw new Error("Arquivo não encontrado");
+        return res.text();
+      })
+      .then(html => {
+        content.innerHTML = html;
+        overlay.classList.add('show');
+      })
+      .catch(err => {
+        console.error("Erro ao abrir overlay:", err);
+        content.innerHTML = "<p>Erro ao carregar conteúdo.</p>";
+        overlay.classList.add('show');
+      });
+  }
+
+  function closeOverlay() {
+    const overlay = document.getElementById('overlayModal');
+    overlay.classList.remove('show');
+    setTimeout(() => {
+      document.getElementById('overlayBody').innerHTML = '';
+    }, 300);
+  }
+
+  // Adiciona clique em todos os cards desbloqueados
+  document.addEventListener('DOMContentLoaded', () => {
+    const lessonCards = document.querySelectorAll('.lesson-card');
+
+    lessonCards.forEach(card => {
+      // Só adiciona clique se não estiver bloqueado
+      if (!card.classList.contains('locked')) {
+        card.addEventListener('click', () => {
+          const key = card.dataset.key;
+          if (!key) {
+            console.warn("Card sem data-key:", card);
+            return;
+          }
+          const url = key + '.html';
+          console.log("Abrindo módulo:", url);
+          openOverlay(url);
+        });
+      }
+    });
+  });
+
+  // Função para desbloquear o próximo módulo
+  function unlockNextModule(currentKey) {
+    const cards = document.querySelectorAll('.lesson-card');
+    for (let i = 0; i < cards.length; i++) {
+      if (cards[i].dataset.key === currentKey && i < cards.length - 1) {
+        cards[i + 1].classList.remove('locked');
+        break;
+      }
+    }
+  }
+
+    // Chat
+    const chatBtn = document.getElementById('chatBtn');
+    const chatWindow = document.getElementById('chatWindow');
+    const sendBtn = document.getElementById('sendBtn');
+    const msgInput = document.getElementById('msgInput');
+    const chatMessages = document.getElementById('chatMessages');
+
+    chatBtn.addEventListener('click', () => {
+      chatWindow.style.display = chatWindow.style.display === 'flex' ? 'none' : 'flex';
+      chatWindow.style.flexDirection = 'column';
+    });
+
+    sendBtn.addEventListener('click', sendMessage);
+    msgInput.addEventListener('keypress', (e) => { if(e.key==='Enter') sendMessage(); });
+
+    function sendMessage() {
+      const msg = msgInput.value.trim();
+      if (!msg) return;
+      const userMsg = document.createElement('p');
+      userMsg.textContent = "🧑 " + msg;
+      chatMessages.appendChild(userMsg);
+      msgInput.value = '';
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+
+      // Resposta automática
+      setTimeout(() => {
+        const botMsg = document.createElement('p');
+        botMsg.textContent = "🤖 Dimitri: Ainda estou aprendendo, mas você digitou: " + msg;
+        chatMessages.appendChild(botMsg);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      }, 500);
+    }
+
+    // Login fictício
+    const loginBtn = document.getElementById('loginBtn');
+    loginBtn.addEventListener('click', () => {
+      alert('Login realizado com sucesso!');
+    });
+  </script>
+
+
+</script>
+
+<!-- BOTÃO PARA ABRIR DICIONÁRIO -->
+<button onclick="abrirDicionario()">Abrir Dicionário</button>
+
+<!-- OVERLAY MODAL -->
+<div id="overlayModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.7); z-index:1000; justify-content:center; align-items:center;">
+    <div id="overlayBody" style="background:white; width:80%; max-width:700px; max-height:80%; padding:20px; border-radius:10px; overflow-y:auto; position:relative;">
+        <button onclick="fecharDicionario()" style="position:absolute; top:10px; right:10px; background:red; color:white; border:none; border-radius:5px; padding:5px 10px; cursor:pointer;">Fechar</button>
+        <!-- O conteúdo do dicionário será injetado aqui -->
+    </div>
+</div>
+
+<script>
+function abrirDicionario() {
+    const overlay = document.getElementById('overlayModal');
+    const content = document.getElementById('overlayBody');
+
+    content.innerHTML = `
+        <button onclick="fecharDicionario()" style="position:absolute; top:10px; right:10px; background:red; color:white; border:none; border-radius:5px; padding:5px 10px; cursor:pointer;">Fechar</button>
+
+        <h2>Словáрь — Dicionário Russo-Português</h2>
+
+        <h3>1. Cumprimentos e Expressões Básicas</h3>
+        <ul>
+            <li>Привет — Olá</li>
+            <li>Доброе утро — Bom dia</li>
+            <li>Добрый день — Boa tarde</li>
+            <li>Добрый вечер — Boa noite</li>
+            <li>Пока — Tchau</li>
+            <li>До свидания — Adeus</li>
+            <li>Пожалуйста — Por favor</li>
+            <li>Спасибо — Obrigado</li>
+            <li>Большое спасибо — Muito obrigado</li>
+            <li>Извините — Desculpe</li>
+            <li>Прошу прощения — Peço desculpa</li>
+            <li>Ничего — De nada</li>
+            <li>Как дела? — Como vai?</li>
+            <li>Хорошо — Bem</li>
+            <li>Плохо — Mal</li>
+            <li>Так себе — Mais ou menos</li>
+            <li>Рад тебя видеть — Prazer em ver você</li>
+            <li>Приятно познакомиться — Prazer em conhecer</li>
+            <li>Добро пожаловать — Bem-vindo</li>
+            <li>Спокойной ночи — Boa noite (ao se despedir)</li>
+        </ul>
+
+        <h3>2. Perguntas Comuns</h3>
+        <ul>
+            <li>Что это? — O que é isto?</li>
+            <li>Кто это? — Quem é?</li>
+            <li>Где туалет? — Onde fica o banheiro?</li>
+            <li>Сколько стоит? — Quanto custa?</li>
+            <li>Когда? — Quando?</li>
+            <li>Почему? — Por que?</li>
+            <li>Как? — Como?</li>
+            <li>Кто? — Quem?</li>
+            <li>Что случилось? — O que aconteceu?</li>
+            <li>Вы говорите по-русски? — Você fala russo?</li>
+            <li>Вы говорите по-португальски? — Você fala português?</li>
+            <li>Можете помочь? — Pode ajudar?</li>
+            <li>Что вы посоветуете? — O que você recomenda?</li>
+            <li>Где я могу найти…? — Onde posso encontrar…?</li>
+            <li>Сколько времени? — Que horas são?</li>
+            <li>Как пройти к…? — Como chegar a…?</li>
+            <li>Можно ли…? — É possível…?</li>
+            <li>Какая цена? — Qual é o preço?</li>
+            <li>Можно ли платить картой? — Posso pagar com cartão?</li>
+            <li>Есть ли здесь Wi-Fi? — Há Wi-Fi aqui?</li>
+        </ul>
+
+        <h3>3. Números Básicos</h3>
+        <ul>
+            <li>Один — Um</li>
+            <li>Два — Dois</li>
+            <li>Три — Três</li>
+            <li>Четыре — Quatro</li>
+            <li>Пять — Cinco</li>
+            <li>Шесть — Seis</li>
+            <li>Семь — Sete</li>
+            <li>Восемь — Oito</li>
+            <li>Девять — Nove</li>
+            <li>Десять — Dez</li>
+            <li>Одиннадцать — Onze</li>
+            <li>Двенадцать — Doze</li>
+            <li>Тринадцать — Treze</li>
+            <li>Четырнадцать — Quatorze</li>
+            <li>Пятнадцать — Quinze</li>
+            <li>Шестнадцать — Dezesseis</li>
+            <li>Семнадцать — Dezessete</li>
+            <li>Восемнадцать — Dezoito</li>
+            <li>Девятнадцать — Dezenove</li>
+            <li>Двадцать — Vinte</li>
+        </ul>
+
+        <h3>4. Cores</h3>
+        <ul>
+            <li>Красный — Vermelho</li>
+            <li>Синий — Azul</li>
+            <li>Зелёный — Verde</li>
+            <li>Жёлтый — Amarelo</li>
+            <li>Чёрный — Preto</li>
+            <li>Белый — Branco</li>
+            <li>Серый — Cinza</li>
+            <li>Оранжевый — Laranja</li>
+            <li>Фиолетовый — Roxo</li>
+            <li>Розовый — Rosa</li>
+            <li>Коричневый — Marrom</li>
+            <li>Голубой — Azul claro</li>
+            <li>Тёмно-синий — Azul escuro</li>
+            <li>Бежевый — Bege</li>
+            <li>Бирюзовый — Turquesa</li>
+            <li>Лаймовый — Verde limão</li>
+            <li>Золотой — Dourado</li>
+            <li>Серебряный — Prateado</li>
+            <li>Бордовый — Bordô</li>
+            <li>Малиновый — Framboesa</li>
+        </ul>
+
+        <h3>5. Frases Úteis no Dia a Dia</h3>
+        <ul>
+            <li>Я не понимаю — Não entendo</li>
+            <li>Говорите медленнее — Fale mais devagar</li>
+            <li>Повторите, пожалуйста — Repita, por favor</li>
+            <li>Можете помочь? — Pode ajudar?</li>
+            <li>Я хочу… — Eu quero…</li>
+            <li>Где находится…? — Onde fica…?</li>
+            <li>Как добраться до…? — Como chegar a…?</li>
+            <li>Можно ли…? — É possível…?</li>
+            <li>Я потерялся — Estou perdido</li>
+            <li>Сколько стоит? — Quanto custa?</li>
+            <li>Можно оплатить картой? — Posso pagar com cartão?</li>
+            <li>Есть ли здесь Wi-Fi? — Tem Wi-Fi aqui?</li>
+            <li>Я забронировал — Eu reservei</li>
+            <li>Можете рекомендовать ресторан? — Pode recomendar um restaurante?</li>
+            <li>Я вегетарианец — Sou vegetariano</li>
+            <li>Мне нужна помощь — Preciso de ajuda</li>
+            <li>Где ближайшая аптека? — Onde fica a farmácia mais próxima?</li>
+            <li>Я не говорю по-португальски — Não falo português</li>
+            <li>Как это называется? — Como se chama isso?</li>
+            <li>Можно ли мне меню, пожалуйста? — Posso ver o cardápio, por favor?</li>
+        </ul>
+    `;
+
+    overlay.style.display = 'flex';
+}
+
+function fecharDicionario() {
+    document.getElementById('overlayModal').style.display = 'none';
+}
+</script>
+
+
+<script src="script.js"></script>
+
+</body>
+</html>

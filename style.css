@@ -1,0 +1,353 @@
+/* ===== Reset ===== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  background: #f5f5f5;
+  color: #333;
+}
+
+/* ===== Header ===== */
+header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 60px;
+  background: #fff;
+  border-bottom: 2px solid #4CAF50;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  z-index: 1000;
+}
+
+header h1 {
+  font-size: 1.5em;
+  color: #4CAF50;
+}
+
+header .login {
+  font-size: 0.9em;
+  cursor: pointer;
+  padding: 6px 12px;
+  border: 1px solid #4CAF50;
+  border-radius: 5px;
+  background: #fff;
+  color: #4CAF50;
+  transition: 0.3s;
+}
+
+header .login:hover {
+  background: #4CAF50;
+  color: #fff;
+}
+
+/* ===== Sidebar ===== */
+aside {
+  position: fixed;
+  top: 60px;
+  left: 0;
+  width: 220px;
+  height: calc(100% - 60px);
+  background: #388E3C;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 20px 0;
+}
+
+aside nav a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 20px;
+  text-decoration: none;
+  color: white;
+  font-size: 1em;
+  transition: background 0.3s;
+}
+
+aside nav a:hover {
+  background: #2e7d32;
+}
+
+.mascote {
+  text-align: center;
+  padding: 20px;
+  font-size: 2em;
+}
+
+/* ===== Main Content ===== */
+main {
+  margin-left: 220px;
+  margin-top: 60px;
+  padding: 20px;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.card {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s;
+  cursor: pointer;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+}
+
+.card h3 {
+  margin-bottom: 10px;
+  color: #4CAF50;
+}
+
+
+
+
+
+
+
+* Mascote */
+#dimitri {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 120px;
+  height: 180px;
+  z-index: 1000;
+}
+#dimitri .head {
+  width: 80px;
+  height: 80px;
+  background: #ffcc99;
+  border-radius: 50%;
+  position: relative;
+  margin: 0 auto;
+  border: 2px solid #333;
+}
+.ushanka {
+  width: 100%;
+  height: 30px;
+  background: #800000;
+  position: absolute;
+  top: -10px;
+  border-radius: 50% 50% 0 0;
+}
+.ushanka .ear {
+  width: 20px;
+  height: 20px;
+  background: #800000;
+  position: absolute;
+  top: 10px;
+  border-radius: 50%;
+}
+.ushanka .ear.left { left: -10px; }
+.ushanka .ear.right { right: -10px; }
+#dimitri .eye {
+  width: 15px;
+  height: 15px;
+  background: #000;
+  border-radius: 50%;
+  position: absolute;
+  top: 25px;
+  animation: blink 4s infinite;
+}
+#dimitri .eye.left { left: 18px; }
+#dimitri .eye.right { right: 18px; }
+#dimitri .eyebrow {
+  width: 18px;
+  height: 3px;
+  background: #333;
+  position: absolute;
+  top: 18px;
+}
+#dimitri .eyebrow.left { left: 15px; transform: rotate(-10deg); }
+#dimitri .eyebrow.right { right: 15px; transform: rotate(10deg); }
+#dimitri .mouth {
+  width: 40px;
+  height: 10px;
+  border-bottom: 3px solid #000;
+  border-radius: 0 0 20px 20px;
+  position: absolute;
+  bottom: 15px;
+  left: 50%;
+  transform: translateX(-50%);
+  transition: all 0.3s;
+}
+#dimitri .body {
+  width: 70px;
+  height: 80px;
+  background: #0055aa;
+  position: relative;
+  margin: 0 auto;
+  top: 10px;
+  border-radius: 10px;
+}
+#dimitri .arm {
+  width: 15px;
+  height: 50px;
+  background: #0055aa;
+  position: absolute;
+  top: 10px;
+  border-radius: 10px;
+  transform-origin: top center;
+  transition: transform 0.3s;
+}
+#dimitri .arm.left { left: -15px; }
+#dimitri .arm.right { right: -15px; }
+
+/* Piscando olhos */
+@keyframes blink {
+  0%, 90%, 100% { height: 15px; }
+  95% { height: 2px; }
+}
+
+/* Acenando e pulso corpo */
+.acenando .arm.left { transform: rotate(-30deg); }
+.acenando .arm.right { transform: rotate(30deg); }
+.acenando .body { animation: pulse 0.3s infinite alternate; }
+.triste .mouth {
+  border-bottom: none;
+  border-top: 3px solid #000;
+  border-radius: 20px 20px 0 0;
+}
+
+/* Pulso corpo */
+@keyframes pulse {
+  0% { transform: scale(1); }
+  100% { transform: scale(1.05); }
+}
+
+/* Neon do chapéu e corpo */
+.neon .body { animation: neonPulse 0.5s infinite alternate; }
+.neon .ushanka { animation: neonPulse 0.5s infinite alternate; }
+@keyframes neonPulse {
+  0% { background-color: #0055aa; box-shadow: none; }
+  50% { background-color: #0f0; box-shadow: 0 0 10px #0f0, 0 0 20px #0f0; }
+  100% { background-color: #0055aa; box-shadow: none; }
+}
+
+.lesson-card.locked {
+  pointer-events: none;
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Overlay geral */
+.overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.8);
+  z-index: 3000;
+  overflow-y: auto;
+}
+
+/* Conteúdo do overlay */
+.overlay-content {
+  background: #fff;
+  margin: 50px auto;
+  padding: 20px;
+  border-radius: 10px;
+  width: 90%;
+  max-width: 900px;
+  position: relative;
+}
+
+/* Botão fechar */
+.overlay .close-btn {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-size: 28px;
+  font-weight: bold;
+  color: #333;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+.overlay .close-btn:hover {
+  color: #000;
+}
+
+/* ===== Exercícios ===== */
+#backBtn {
+  padding: 5px 12px;
+  font-size: 0.95em;
+  cursor: pointer;
+  background-color: #f0f0f0;
+  border: 2px solid #333;
+  border-radius: 6px;
+  transition: all 0.3s;
+}
+#backBtn:hover {
+  background-color: #ddd;
+  transform: scale(1.05);
+}
+
+.correct {
+  background-color: #c8e6c9;
+}
+.wrong {
+  background-color: #ffcdd2;
+}
+
+.container {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 15px;
+}
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.word,
+.placeholder {
+  padding: 5px;
+  border: 1px solid #999;
+  border-radius: 4px;
+  cursor: pointer;
+  min-width: 120px;
+  text-align: center;
+}
+
+#progressBarContainer {
+  height: 15px;
+  background: #eee;
+  border-radius: 6px;
+  margin: 10px 0;
+}
+#progressBar {
+  height: 100%;
+  background: #4CAF50;
+  width: 0%;
+  border-radius: 6px;
+}
+#progressText {
+  font-size: 0.9em;
+  margin-bottom: 5px;
+}
+
+#backButtonContainer {
+  text-align: center;
+  margin-top: 15px;
+}
+
+
