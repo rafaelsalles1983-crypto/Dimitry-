@@ -5,13 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>🎮 Jogos - Славянский клуб</title>
   <link rel="stylesheet" href="style.css">
-
   <style>
     html, body {
       height: 100%;
       margin: 0;
       padding: 0;
-      overflow: hidden;
+      overflow: hidden; /* Remove scroll */
       font-family: Arial, sans-serif;
       background: #f5f5f5;
       color: #333;
@@ -25,27 +24,18 @@
 
     main .content {
       display: flex;
-      flex-direction: row;
-      align-items: center;
-      justify-content: space-between;
-      position: relative;
-      width: 90vw;
-      height: 90vh;
-      max-width: 900px;
-      max-height: 700px;
-      padding: 20px;
-      background: #fff;
-      border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-    }
-
-    /* ===== Área de jogo ===== */
-    .game-section {
-      flex: 1;
-      display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
+      position: relative;
+      width: 90vw;
+      height: 90vh; /* Ajusta altura total */
+      max-width: 900px;
+      max-height: 700px;
+      padding: 10px;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
     }
 
     #gameArea { 
@@ -85,21 +75,17 @@
     #timerBarContainer { width: 70%; height: 10px; background: #ccc; margin: 5px auto; border-radius: 8px; overflow: hidden; }
     #timerBar { height: 100%; width: 100%; background: #0ff; transition: width 0.1s linear; }
     #controls { text-align: center; margin-top: 8px; }
-    #controls button { padding: 6px 12px; margin: 4px; font-size: 0.9em; cursor: pointer; border-radius: 6px; border: none; background: #4CAF50; color: white; }
-    #controls button:hover { background: #45a049; }
+    #controls button { padding: 4px 10px; margin: 0 3px; font-size: 0.9em; cursor: pointer; }
 
-    /* ===== Mascote Dimitri dentro da área ===== */
-    .mascote-section {
-      width: 120px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
+    /* ===== Dimitri ao lado direito ===== */
     #dimitri {
-      position: relative;
-      transform: scale(0.8);
-      transform-origin: center;
+      position: absolute;
+      top: 50%;
+      right: -70px;
+      transform: translateY(-50%);
+      width: 100px;
+      height: 150px;
+      z-index: 1000;
     }
 
     /* ===== Chat Flutuante ===== */
@@ -159,19 +145,41 @@
     #chatInput button { background: #4CAF50; color: white; border: none; padding: 6px 10px; cursor: pointer; font-size: 0.9em; }
     #chatInput button:hover { background: #45a049; }
 
-    /* ===== Responsivo ===== */
-    @media screen and (max-width: 768px) {
-      .content {
-        flex-direction: column;
-      }
+@media screen and (max-width: 768px) {
+  aside {
+    position: fixed;
+    left: -100%;  /* fora da tela */
+    top: 0;
+    width: 250px;
+    height: 100%;
+    background: #fff;
+    transition: left 0.3s;
+    z-index: 1000;
+  }
 
-      .mascote-section {
-        display: none; /* esconder Dimitri no mobile */
-      }
-    }
+  aside.show {
+    left: 0;
+  }
+
+  #menuBtn {
+    display: block; /* mostrar botão no mobile */
+    background: #4CAF50;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    font-size: 1.5em;
+    cursor: pointer;
+    border-radius: 4px;
+    margin-right: 10px;
+  }
+}
+
+
+
+
+
   </style>
 </head>
-
 <body>
   <!-- Header -->
   <header>
@@ -193,44 +201,40 @@
   <!-- Main -->
   <main>
     <div class="content">
-      <div class="game-section">
-        <h2>🎮 <span id="gameTitle">Jogo Interativo</span></h2>
-        <div id="gameInfo"></div>
-        <div id="timerBarContainer"><div id="timerBar"></div></div>
-        <div id="gameArea"></div>
-        <div id="score">❤️ 5 | ✅ 0 | ❌ 0 | Nível 1 | Rodada 1/10 | Acertos: 0%</div>
-        <div id="controls">
-          <button id="playBtn">▶ Play</button>
-          <button id="restartBtn">Recomeçar</button>
-          <button id="stopBtn">Parar</button>
-          <div id="backButtonContainer" style="margin-top:10px;">
-            <button id="backBtn" onclick="window.location.href='index.html'">🔙 Voltar</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Mascote Dimitri dentro da área -->
-      <div class="mascote-section">
-        <div id="dimitri">
-          <div class="head">
-            <div class="ushanka">
-              <div class="ear left"></div>
-              <div class="ear right"></div>
-            </div>
-            <div class="eye left"></div>
-            <div class="eye right"></div>
-            <div class="eyebrow left"></div>
-            <div class="eyebrow right"></div>
-            <div class="mouth"></div>
-          </div>
-          <div class="body">
-            <div class="arm left"></div>
-            <div class="arm right"></div>
-          </div>
+      <h2>🎮 <span id="gameTitle">Jogo Interativo</span></h2>
+      <div id="gameInfo"></div>
+      <div id="timerBarContainer"><div id="timerBar"></div></div>
+      <div id="gameArea"></div>
+      <div id="score">❤️ 5 | ✅ 0 | ❌ 0 | Nível 1 | Rodada 1/10 | Acertos: 0%</div>
+      <div id="controls">
+        <button id="playBtn">▶ Play</button>
+        <button id="restartBtn">Recomeçar</button>
+        <button id="stopBtn">Parar</button>
+        <div id="backButtonContainer" style="margin-top:10px;">
+          <button id="backBtn" onclick="window.location.href='index.html'">🔙 Voltar</button>
         </div>
       </div>
     </div>
   </main>
+
+  <!-- Dimitri -->
+  <div id="dimitri">
+    <div class="head">
+      <div class="ushanka">
+        <div class="ear left"></div>
+        <div class="ear right"></div>
+      </div>
+      <div class="eye left"></div>
+      <div class="eye right"></div>
+      <div class="eyebrow left"></div>
+      <div class="eyebrow right"></div>
+      <div class="mouth"></div>
+    </div>
+    <div class="body">
+      <div class="arm left"></div>
+      <div class="arm right"></div>
+    </div>
+  </div>
 
   <!-- Chat Flutuante -->
   <button id="chatBtn">💬</button>
@@ -247,5 +251,47 @@
   <!-- Scripts -->
   <script src="jogo.js"></script>
   <script src="chat.js"></script>
+</body> <!-- Dimitri -->
+  <div id="dimitri">
+    <div class="head">
+      <div class="ushanka">
+        <div class="ear left"></div>
+        <div class="ear right"></div>
+      </div>
+      <div class="eye left"></div>
+      <div class="eye right"></div>
+      <div class="eyebrow left"></div>
+      <div class="eyebrow right"></div>
+      <div class="mouth"></div>
+    </div>
+    <div class="body">
+      <div class="arm left"></div>
+      <div class="arm right"></div>
+    </div>
+  </div>
+
+  <!-- Chat Flutuante -->
+  <button id="chatBtn">💬</button>
+  <div id="chatWindow">
+    <div id="chatMessages">
+      <p class="botMsg">👋 Olá! Eu sou o Dimitri, seu assistente.</p>
+    </div>
+    <div id="chatInput">
+      <input type="text" id="msgInput" placeholder="Digite sua mensagem...">
+      <button id="sendBtn">➤</button>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="jogo.js"></script>
+  <script src="chat.js"></script>
+
+<script>
+  const aside = document.querySelector('aside');
+  const menuBtn = document.getElementById('menuBtn');
+  menuBtn.addEventListener('click', () => aside.classList.toggle('show'));
+</script>
+
+
 </body>
 </html>
