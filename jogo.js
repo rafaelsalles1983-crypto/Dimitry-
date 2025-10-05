@@ -53,7 +53,7 @@ const uiTexts = {
   }
 };
 
-let currentLang="pt", currentMode="colors", correctItem="", targetCount=0, selectedCorrect=0;
+let currentLang = "ru", currentMode="colors", correctItem="", targetCount=0, selectedCorrect=0;
 let score={correct:0,wrong:0}, level=1, round=1, maxRounds=10, maxLevel=3;
 let gameActive=false, waitingNextLevel=false, timerInterval;
 let lives = 5, streak = 0; // Vidas e acertos consecutivos
