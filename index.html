@@ -722,5 +722,12 @@ window.addEventListener('load', () => {
   }
 });
 </script>
+<button id="menuBtn">☰</button>
+<script>
+  const aside = document.querySelector('aside');
+  const menuBtn = document.getElementById('menuBtn');
+  menuBtn.addEventListener('click', () => aside.classList.toggle('show'));
+</script>
 </body>
 </html>
+
