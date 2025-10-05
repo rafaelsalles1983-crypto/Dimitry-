@@ -29,7 +29,7 @@
       justify-content: center;
       position: relative;
       width: 90vw;
-      height: 90vh; /* Ajusta altura total */
+      height: 90vh;
       max-width: 900px;
       max-height: 700px;
       padding: 10px;
@@ -76,17 +76,6 @@
     #timerBar { height: 100%; width: 100%; background: #0ff; transition: width 0.1s linear; }
     #controls { text-align: center; margin-top: 8px; }
     #controls button { padding: 4px 10px; margin: 0 3px; font-size: 0.9em; cursor: pointer; }
-
-    /* ===== Dimitri ao lado direito ===== */
-    #dimitri {
-      position: absolute;
-      top: 50%;
-      right: -70px;
-      transform: translateY(-50%);
-      width: 100px;
-      height: 150px;
-      z-index: 1000;
-    }
 
     /* ===== Chat Flutuante ===== */
     #chatBtn {
@@ -144,40 +133,6 @@
     #chatInput input { flex: 1; border: none; padding: 6px; outline: none; font-size: 0.9em; }
     #chatInput button { background: #4CAF50; color: white; border: none; padding: 6px 10px; cursor: pointer; font-size: 0.9em; }
     #chatInput button:hover { background: #45a049; }
-
-@media screen and (max-width: 768px) {
-  aside {
-    position: fixed;
-    left: -100%;  /* fora da tela */
-    top: 0;
-    width: 250px;
-    height: 100%;
-    background: #fff;
-    transition: left 0.3s;
-    z-index: 1000;
-  }
-
-  aside.show {
-    left: 0;
-  }
-
-  #menuBtn {
-    display: block; /* mostrar botão no mobile */
-    background: #4CAF50;
-    color: white;
-    border: none;
-    padding: 8px 12px;
-    font-size: 1.5em;
-    cursor: pointer;
-    border-radius: 4px;
-    margin-right: 10px;
-  }
-}
-
-
-
-
-
   </style>
 </head>
 <body>
@@ -187,16 +142,7 @@
     <button id="languageToggle" style="margin-left:20px;">PT</button>
   </header>
 
-  <!-- Sidebar -->
-  <aside>
-    <nav>
-      <a href="index.html">🏠 Início</a>
-      <a href="exercicio.html">📝 Exercícios</a>
-      <a href="jogo.html" class="active">🎮 Jogos</a>
-      <a href="#">ℹ Quem somos</a>
-    </nav>
-    <div class="mascote">🐻 Dimitry</div>
-  </aside>
+
 
   <!-- Main -->
   <main>
@@ -217,25 +163,6 @@
     </div>
   </main>
 
-  <!-- Dimitri -->
-  <div id="dimitri">
-    <div class="head">
-      <div class="ushanka">
-        <div class="ear left"></div>
-        <div class="ear right"></div>
-      </div>
-      <div class="eye left"></div>
-      <div class="eye right"></div>
-      <div class="eyebrow left"></div>
-      <div class="eyebrow right"></div>
-      <div class="mouth"></div>
-    </div>
-    <div class="body">
-      <div class="arm left"></div>
-      <div class="arm right"></div>
-    </div>
-  </div>
-
   <!-- Chat Flutuante -->
   <button id="chatBtn">💬</button>
   <div id="chatWindow">
@@ -251,47 +178,5 @@
   <!-- Scripts -->
   <script src="jogo.js"></script>
   <script src="chat.js"></script>
-</body> <!-- Dimitri -->
-  <div id="dimitri">
-    <div class="head">
-      <div class="ushanka">
-        <div class="ear left"></div>
-        <div class="ear right"></div>
-      </div>
-      <div class="eye left"></div>
-      <div class="eye right"></div>
-      <div class="eyebrow left"></div>
-      <div class="eyebrow right"></div>
-      <div class="mouth"></div>
-    </div>
-    <div class="body">
-      <div class="arm left"></div>
-      <div class="arm right"></div>
-    </div>
-  </div>
-
-  <!-- Chat Flutuante -->
-  <button id="chatBtn">💬</button>
-  <div id="chatWindow">
-    <div id="chatMessages">
-      <p class="botMsg">👋 Olá! Eu sou o Dimitri, seu assistente.</p>
-    </div>
-    <div id="chatInput">
-      <input type="text" id="msgInput" placeholder="Digite sua mensagem...">
-      <button id="sendBtn">➤</button>
-    </div>
-  </div>
-
-  <!-- Scripts -->
-  <script src="jogo.js"></script>
-  <script src="chat.js"></script>
-
-<script>
-  const aside = document.querySelector('aside');
-  const menuBtn = document.getElementById('menuBtn');
-  menuBtn.addEventListener('click', () => aside.classList.toggle('show'));
-</script>
-
-
 </body>
 </html>
