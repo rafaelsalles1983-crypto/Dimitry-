@@ -29,9 +29,11 @@ const exercises = [
   { russian: ['Стул','Окно','Дверь'], portuguese: ['Cadeira','Janela','Porta'] }
 ];
 
+
 let currentExercise = 0;
 let selectedRus = null;
 
+// Função principal
 function loadExercise() {
   const container = document.getElementById("cruzadoContainer");
   container.innerHTML = "";
@@ -43,8 +45,6 @@ function loadExercise() {
   }
 
   const { russian, portuguese } = exercises[currentExercise];
-
-  // embaralhar português
   const shuffledPt = [...portuguese].sort(() => Math.random() - 0.5);
 
   const rusCol = document.createElement("div");
@@ -73,10 +73,10 @@ function loadExercise() {
   row.appendChild(ptCol);
 
   container.appendChild(row);
-
   updateProgress();
 }
 
+// Selecionar palavras
 function selectRus(div, word) {
   if (selectedRus) selectedRus.classList.remove("selected");
   selectedRus = div;
@@ -106,10 +106,10 @@ function selectPt(div, word) {
 
   selectedRus.classList.remove("selected");
   selectedRus = null;
-
   checkCompletion();
 }
 
+// Verifica fim do exercício
 function checkCompletion() {
   const done = [...document.querySelectorAll(".correct")].length;
   const total = exercises[currentExercise].russian.length * 2;
@@ -120,12 +120,33 @@ function checkCompletion() {
   }
 }
 
+// Atualiza progresso
 function updateProgress() {
   document.getElementById("progressText").textContent =
     `Exercício ${currentExercise + 1} de ${exercises.length}`;
-
   const percent = ((currentExercise) / exercises.length) * 100;
   document.getElementById("progressBar").style.width = percent + "%";
 }
 
-window.onload = loadExercise;
+// Cria o botão inicial
+window.onload = () => {
+  const container = document.getElementById("cruzadoContainer");
+  container.innerHTML = `
+    <div id="startButtonContainer" style="text-align:center; margin-top:40px;">
+      <button id="startBtn" style="
+        padding:12px 20px;
+        font-size:1em;
+        background-color:#4CAF50;
+        color:white;
+        border:none;
+        border-radius:8px;
+        cursor:pointer;
+      ">▶ Iniciar Exercício</button>
+    </div>
+  `;
+
+  const startBtn = document.getElementById("startBtn");
+  startBtn.addEventListener("click", () => {
+    loadExercise();
+  });
+};
