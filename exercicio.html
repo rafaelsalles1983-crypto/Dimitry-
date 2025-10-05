@@ -7,6 +7,52 @@
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="chat.css">
   <link rel="icon" type="image/png" href="images/dimitri-favicon.png">
+
+<style>
+/* ===== Correção mobile para botões Exercício ===== */
+@media (max-width: 768px) {
+  /* Garante que o conteúdo do exercício fique acima do mascote e do menu */
+  main, .content, #cruzadoContainer, #backButtonContainer {
+    position: relative;
+    z-index: 10;
+  }
+
+  /* Ajusta espaçamento para o botão não colar nas bordas */
+  #backButtonContainer, #startButtonContainer {
+    text-align: center;
+    margin-top: 20px;
+  }
+
+  /* Garante que o botão apareça grande e centralizado */
+  #backBtn, #startBtn, #selectBtn {
+    display: inline-block;
+    padding: 12px 20px;
+    font-size: 1em;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+
+  #backBtn:hover, #startBtn:hover, #selectBtn:hover {
+    background-color: #45A049;
+  }
+
+  /* Evita que o mascote tape o conteúdo */
+  #dimitri {
+    z-index: 1;
+  }
+
+  /* Evita sobreposição do menu lateral */
+  aside {
+    z-index: 2;
+  }
+}
+
+
+</style>
+
 </head>
 
 <body>
