@@ -3,11 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Login - Славянский клуб</title>
+<title>Вход - Славянский клуб</title>
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="chat.css">
 <style>
-  /* ===== Tela de Login ===== */
   body {
     margin: 0;
     font-family: Arial, sans-serif;
@@ -47,32 +46,49 @@
   .login-container button {
     width: 100%;
     padding: 12px;
-    margin-top: 15px;
+    margin-top: 12px;
     border: none;
     border-radius: 8px;
-    background: #4CAF50;
     color: white;
     font-size: 1em;
     cursor: pointer;
     transition: 0.3s;
   }
 
-  .login-container button:hover {
+  #loginBtn {
+    background: #4CAF50;
+  }
+
+  #loginBtn:hover {
     background: #45a049;
   }
 
-  .login-container .signup-btn {
+  #signupBtn {
     background: #2196F3;
-    margin-top: 10px;
   }
 
-  .login-container .signup-btn:hover {
+  #signupBtn:hover {
     background: #1976D2;
+  }
+
+  #backBtn {
+    background: #9E9E9E;
+  }
+
+  #backBtn:hover {
+    background: #757575;
   }
 
   .error-msg {
     color: red;
     margin-top: 10px;
+    font-size: 0.9em;
+  }
+
+  .success-msg {
+    color: green;
+    margin-top: 10px;
+    font-size: 0.9em;
   }
 </style>
 </head>
@@ -80,59 +96,95 @@
 
 <div class="login-container">
   <h2>Славянский клуб</h2>
-  <input type="email" id="email" placeholder="Email">
-  <input type="password" id="password" placeholder="Senha">
-  <button id="loginBtn">Login</button>
-  <button id="signupBtn" class="signup-btn">Criar Conta</button>
+  <input type="email" id="email" placeholder="Электронная почта">
+  <input type="password" id="password" placeholder="Пароль">
+  <button id="loginBtn">Войти</button>
+  <button id="signupBtn">Создать аккаунт</button>
+  <button id="backBtn">🔙 Вернуться в меню</button>
   <p class="error-msg" id="errorMsg"></p>
+  <p class="success-msg" id="successMsg"></p>
 </div>
 
+<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script>
-  // Configuração Firebase
+  // 🔧 Configuração Firebase
   const firebaseConfig = {
-    apiKey: "SUA_API_KEY",
-    authDomain: "SEU_AUTH_DOMAIN",
-    projectId: "SEU_PROJECT_ID",
-    storageBucket: "SEU_BUCKET",
-    messagingSenderId: "SEU_MESSAGING_ID",
-    appId: "SEU_APP_ID"
+    apiKey: "AIzaSyCYJCgfil5HKrCWtB14zwdicDaEcldHU6A",
+    authDomain: "dimitry-rusian.firebaseapp.com",
+    projectId: "dimitry-rusian",
+    storageBucket: "dimitry-rusian.firebasestorage.app",
+    messagingSenderId: "449029666805",
+    appId: "1:449029666805:web:feaf575a7b7e6f234a52bc",
+    measurementId: "G-6DLM398X84"
   };
+
   firebase.initializeApp(firebaseConfig);
   const auth = firebase.auth();
 
   const loginBtn = document.getElementById('loginBtn');
   const signupBtn = document.getElementById('signupBtn');
+  const backBtn = document.getElementById('backBtn');
   const errorMsg = document.getElementById('errorMsg');
+  const successMsg = document.getElementById('successMsg');
 
+  // === Login ===
   loginBtn.addEventListener('click', () => {
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value.trim();
+
+    errorMsg.textContent = "";
+    successMsg.textContent = "";
+
+    if (!email || !password) {
+      errorMsg.textContent = "⚠️ Пожалуйста, введите электронную почту и пароль.";
+      return;
+    }
 
     auth.signInWithEmailAndPassword(email, password)
-      .then((userCredential) => {
-        // Login bem-sucedido
-        window.location.href = 'index.html';
+      .then(() => {
+        successMsg.textContent = "✅ Добро пожаловать!";
+        setTimeout(() => window.location.href = 'index.html', 1000);
       })
-      .catch((error) => {
-        errorMsg.textContent = error.message;
+      .catch(error => {
+        if (error.code === "auth/wrong-password") {
+          errorMsg.textContent = "❌ Неверный пароль.";
+        } else if (error.code === "auth/user-not-found") {
+          errorMsg.textContent = "❌ Пользователь не найден.";
+        } else {
+          errorMsg.textContent = "❌ Ошибка: " + error.message;
+        }
       });
   });
 
+  // === Criar nova conta ===
   signupBtn.addEventListener('click', () => {
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value.trim();
+
+    errorMsg.textContent = "";
+    successMsg.textContent = "";
+
+    if (!email || !password) {
+      errorMsg.textContent = "⚠️ Введите электронную почту и пароль для регистрации.";
+      return;
+    }
 
     auth.createUserWithEmailAndPassword(email, password)
-      .then((userCredential) => {
-        window.location.href = 'index.html';
+      .then(() => {
+        successMsg.textContent = "✅ Аккаунт создан успешно!";
+        setTimeout(() => window.location.href = 'index.html', 1000);
       })
-      .catch((error) => {
-        errorMsg.textContent = error.message;
+      .catch(err => {
+        errorMsg.textContent = "❌ Ошибка при создании аккаунта: " + err.message;
       });
   });
 
+  // === Voltar ao menu principal ===
+  backBtn.addEventListener('click', () => {
+    window.location.href = "index.html";
+  });
 </script>
 
 </body>
