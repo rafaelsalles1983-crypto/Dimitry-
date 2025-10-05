@@ -11,6 +11,23 @@ body {
   color: #333;
 }
 
+
+@media screen and (max-width: 768px) {
+  aside {
+    position: fixed;
+    left: -100%;  /* fora da tela */
+    top: 0;
+    width: 250px;
+    height: 100%;
+    background: #fff;
+    transition: left 0.3s;
+    z-index: 1000;
+  }
+  aside.show {
+    left: 0;
+  }
+}
+
 /* ===== Header ===== */
 header {
   position: fixed;
@@ -357,33 +374,33 @@ main {
 }
 
 
-/* ===== Menu topo em 2 colunas para celular ===== */
+/* ===== Menu topo em 2 colunas para celular + rodapé ===== */
 @media (max-width: 768px) {
   aside {
     position: static;       /* Sai do fixed */
     width: 100%;            /* Ocupa toda a largura */
     height: auto;           /* Ajusta altura */
-    flex-direction: row;    /* Linha principal */
-    flex-wrap: wrap;        /* Permite quebrar em múltiplas linhas */
-    justify-content: space-around;
+    display: flex;
+    flex-direction: column; /* Coloca nav e rodapé em coluna */
     padding: 10px 0;
     background: #388E3C;
   }
 
   aside nav {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr); /* 2 colunas */
-    gap: 5px;                              /* Espaço entre links */
-    width: 100%;
-    padding: 0 10px;
-  }
+  display: flex;
+  flex-direction: column;
+  max-height: 80vh; /* limita à tela */
+  overflow-y: auto;  /* adiciona scroll se necessário */
+  padding: 10px;
+}
 
-  aside nav a {
-    padding: 10px;
-    font-size: 0.95em;
-    justify-content: center;
-    text-align: center;
-  }
+aside nav a {
+  margin-bottom: 10px;
+  text-decoration: none;
+  display: block;
+  font-size: 1.2em;
+}
+
 
   .mascote {
     display: none; /* Oculta mascote para celular */
@@ -391,8 +408,18 @@ main {
 
   main {
     margin-left: 0;
-    margin-top: 10px; /* Ajusta topo para não ficar colado no menu */
+    margin-top: 10px;
     padding: 15px;
   }
-}
 
+  /* ===== Rodapé Mobile ===== */
+  aside .footer-mobile {
+    display: block;
+    text-align: center;
+    color: #fff;
+    padding: 10px;
+    font-size: 0.85em;
+    border-top: 1px solid rgba(255,255,255,0.3);
+    margin-top: 10px;
+  }
+}
