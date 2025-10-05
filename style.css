@@ -355,3 +355,44 @@ main {
   text-align: center;
   margin-top: 15px;
 }
+
+
+/* ===== Menu topo em 2 colunas para celular ===== */
+@media (max-width: 768px) {
+  aside {
+    position: static;       /* Sai do fixed */
+    width: 100%;            /* Ocupa toda a largura */
+    height: auto;           /* Ajusta altura */
+    flex-direction: row;    /* Linha principal */
+    flex-wrap: wrap;        /* Permite quebrar em múltiplas linhas */
+    justify-content: space-around;
+    padding: 10px 0;
+    background: #388E3C;
+  }
+
+  aside nav {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* 2 colunas */
+    gap: 5px;                              /* Espaço entre links */
+    width: 100%;
+    padding: 0 10px;
+  }
+
+  aside nav a {
+    padding: 10px;
+    font-size: 0.95em;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .mascote {
+    display: none; /* Oculta mascote para celular */
+  }
+
+  main {
+    margin-left: 0;
+    margin-top: 10px; /* Ajusta topo para não ficar colado no menu */
+    padding: 15px;
+  }
+}
+
