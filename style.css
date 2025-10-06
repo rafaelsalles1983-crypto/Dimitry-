@@ -423,3 +423,44 @@ aside nav a {
     margin-top: 10px;
   }
 }
+
+@media (max-width: 768px) {
+  #startButtonContainer {
+    text-align: center;
+    margin-top: 30px;
+    z-index: 10;
+  }
+
+  #startBtn {
+    display: inline-block;
+    padding: 12px 20px;
+    font-size: 1.1em;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+  }
+
+  #startBtn:hover {
+    background-color: #45A049;
+  }
+}
+
+
+
+
+
+/* ===== Esconder Dimitri no mobile ===== */
+@media screen and (max-width: 768px) {
+  #dimitri {
+    display: none !important;
+  }
+}
+
+
+.overlay-content .word.selected {
+  background-color: #4CAF50 !important;
+  color: white !important;
+}
+
