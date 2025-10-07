@@ -11,7 +11,6 @@ body {
   color: #333;
 }
 
-
 @media screen and (max-width: 768px) {
   aside {
     position: fixed;
@@ -245,7 +244,7 @@ main {
 
 .triste .mouth {
   border-bottom: none;
-  border-top: 3px solid #000;
+  border-top:3px solid #000;
   border-radius: 20px 20px 0 0;
 }
 
@@ -373,37 +372,35 @@ main {
   margin-top: 15px;
 }
 
-
 /* ===== Menu topo em 2 colunas para celular + rodapé ===== */
 @media (max-width: 768px) {
   aside {
-    position: static;       /* Sai do fixed */
-    width: 100%;            /* Ocupa toda a largura */
-    height: auto;           /* Ajusta altura */
+    position: static;
+    width: 100%;
+    height: auto;
     display: flex;
-    flex-direction: column; /* Coloca nav e rodapé em coluna */
+    flex-direction: column;
     padding: 10px 0;
     background: #388E3C;
   }
 
   aside nav {
-  display: flex;
-  flex-direction: column;
-  max-height: 80vh; /* limita à tela */
-  overflow-y: auto;  /* adiciona scroll se necessário */
-  padding: 10px;
-}
+    display: flex;
+    flex-direction: column;
+    max-height: 80vh;
+    overflow-y: auto;
+    padding: 10px;
+  }
 
-aside nav a {
-  margin-bottom: 10px;
-  text-decoration: none;
-  display: block;
-  font-size: 1.2em;
-}
-
+  aside nav a {
+    margin-bottom: 10px;
+    text-decoration: none;
+    display: block;
+    font-size: 1.2em;
+  }
 
   .mascote {
-    display: none; /* Oculta mascote para celular */
+    display: none;
   }
 
   main {
@@ -412,7 +409,6 @@ aside nav a {
     padding: 15px;
   }
 
-  /* ===== Rodapé Mobile ===== */
   aside .footer-mobile {
     display: block;
     text-align: center;
@@ -447,10 +443,6 @@ aside nav a {
   }
 }
 
-
-
-
-
 /* ===== Esconder Dimitri no mobile ===== */
 @media screen and (max-width: 768px) {
   #dimitri {
@@ -458,30 +450,75 @@ aside nav a {
   }
 }
 
-
 .overlay-content .word.selected {
   background-color: #4CAF50 !important;
   color: white !important;
 }
 
-
-
 /* ===== Itens selecionáveis maiores para fácil leitura ===== */
 #cruzadoContainer .word,
 #cruzadoContainer .placeholder {
-  font-size: 1.2em;      /* aumenta o texto */
-  padding: 10px 15px;    /* mais espaço interno */
-  min-width: 150px;      /* largura mínima maior */
-  border-width: 2px;     /* borda mais visível */
+  font-size: 1.2em;
+  padding: 10px 15px;
+  min-width: 150px;
+  border-width: 2px;
 }
 
-/* ===== Ajuste extra para mobile ===== */
 @media (max-width: 768px) {
   #cruzadoContainer .word,
   #cruzadoContainer .placeholder {
-    font-size: 1.4em;    /* ainda maior no celular */
+    font-size: 1.4em;
     padding: 12px 18px;
     min-width: 140px;
   }
 }
 
+/* ===== Pré-visualização em 2x2 ===== */
+.preview {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* 2 colunas */
+  grid-template-rows: repeat(2, 1fr);    /* 2 linhas */
+  gap: 15px;
+  justify-items: center;
+  align-items: center;
+  margin: 20px 0;
+}
+
+.preview .square,
+.preview .numSquare {
+  width: 120px;
+  height: 120px;
+  font-size: 1.6em;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  transition: transform 0.3s, background 0.3s;
+}
+
+.preview .square span {
+  color: white;
+  font-size: 1.2em;
+  text-shadow: 1px 1px 2px #000;
+}
+
+@media (max-width: 768px) {
+  .preview {
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .preview .square,
+  .preview .numSquare {
+    width: 90px;
+    height: 90px;
+    font-size: 1.3em;
+  }
+
+  .preview .square span {
+    font-size: 1.1em;
+  }
+}
