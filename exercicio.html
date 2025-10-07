@@ -8,51 +8,112 @@
   <link rel="stylesheet" href="chat.css">
   <link rel="icon" type="image/png" href="images/dimitri-favicon.png">
 
-<style>
-/* ===== Correção mobile para botões Exercício ===== */
-@media (max-width: 768px) {
-  /* Garante que o conteúdo do exercício fique acima do mascote e do menu */
-  main, .content, #cruzadoContainer, #backButtonContainer {
-    position: relative;
-    z-index: 10;
-  }
+  <style>
+    /* ======== MODO ESCURO ======== */
+    body.dark-mode {
+      background-color: #121212;
+      color: #f5f5f5;
+    }
+    body.dark-mode header {
+      background-color: #222;
+      color: #fff;
+    }
+    body.dark-mode aside {
+      background-color: #1e1e1e;
+    }
+    body.dark-mode footer {
+      background-color: #222;
+      color: #f5f5f5;
+    }
 
-  /* Ajusta espaçamento para o botão não colar nas bordas */
-  #backButtonContainer, #startButtonContainer {
-    text-align: center;
-    margin-top: 20px;
-  }
+    /* ===== Botões modo escuro e idioma em verde ===== */
+    #darkModeToggle, #languageToggle {
+      background-color: #4CAF50;
+      color: white;
+    }
+    #darkModeToggle:hover, #languageToggle:hover {
+      background-color: #45A049;
+    }
 
-  /* Garante que o botão apareça grande e centralizado */
-  #backBtn, #startBtn, #selectBtn {
-    display: inline-block;
-    padding: 12px 20px;
-    font-size: 1em;
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-  }
+    /* ====== Layout e Rodapé ====== */
+    html, body {
+      height: 100%;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+    }
 
-  #backBtn:hover, #startBtn:hover, #selectBtn:hover {
-    background-color: #45A049;
-  }
+    main {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      box-sizing: border-box;
+    }
 
-  /* Evita que o mascote tape o conteúdo */
-  #dimitri {
-    z-index: 1;
-  }
+    /* ===== FOOTER ===== */
+    footer {
+      background: white;
+      color: #555;
+      text-align: center;
+      padding: 8px 0;
+      font-size: 0.85em;
+      box-shadow: 0 -2px 6px rgba(0,0,0,0.1);
+      transition: background-color 0.3s, color 0.3s;
+    }
 
-  /* Evita sobreposição do menu lateral */
-  aside {
-    z-index: 2;
-  }
-}
+    /* ===== Correção mobile ===== */
+    @media (max-width: 768px) {
+      main, .content, #cruzadoContainer, #backButtonContainer {
+        position: relative;
+        z-index: 10;
+      }
+      #backButtonContainer {
+        text-align: center;
+        margin-top: 20px;
+      }
+      #backBtn {
+        display: inline-block;
+        padding: 12px 20px;
+        font-size: 1em;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+      }
+      #backBtn:hover {
+        background-color: #45A049;
+      }
+      #dimitri { z-index: 1; }
+      aside { z-index: 2; }
+    }
 
+    /* ===== Botão do modo escuro ===== */
+    #darkModeToggle {
+      position: absolute;
+      right: 70px;
+      top: 15px;
+      border: none;
+      padding: 6px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
 
-</style>
-
+    /* ===== Botão de idioma ===== */
+    #languageToggle {
+      position: absolute;
+      right: 15px;
+      top: 15px;
+      border: none;
+      padding: 6px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+  </style>
 </head>
 
 <body>
@@ -60,6 +121,7 @@
   <header>
     <h1 id="siteTitle">Славянский клуб</h1>
     <button id="languageToggle">PT</button>
+    <button id="darkModeToggle">🌙</button>
   </header>
 
   <!-- Sidebar -->
@@ -99,6 +161,11 @@
     </div>
   </main>
 
+  <!-- Rodapé fixo -->
+  <footer>
+    © 2025 Славянский клуб | Desenvolvido por Rafael Salles
+  </footer>
+
   <!-- Mascote Dimitri -->
   <div id="dimitri">
     <div class="head">
@@ -133,5 +200,37 @@
   <!-- Scripts -->
   <script src="chat.js"></script>
   <script src="exercicio.js"></script>
+
+  <script>
+    const darkModeToggle = document.getElementById('darkModeToggle');
+    const languageToggle = document.getElementById('languageToggle');
+
+    // === Verifica o tema salvo no localStorage ===
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark') {
+      document.body.classList.add('dark-mode');
+      darkModeToggle.textContent = '☀️';
+    } else {
+      document.body.classList.remove('dark-mode');
+      darkModeToggle.textContent = '🌙';
+    }
+
+    // === Alternância do modo escuro com persistência ===
+    darkModeToggle.addEventListener('click', () => {
+      document.body.classList.toggle('dark-mode');
+      const isDark = document.body.classList.contains('dark-mode');
+      darkModeToggle.textContent = isDark ? '☀️' : '🌙';
+      localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    });
+
+    // === Alternância do idioma (igual ao jogo.html) ===
+    languageToggle.addEventListener('click', () => {
+      if (languageToggle.textContent === 'PT') {
+        languageToggle.textContent = 'РУ';
+      } else {
+        languageToggle.textContent = 'PT';
+      }
+    });
+  </script>
 </body>
 </html>
