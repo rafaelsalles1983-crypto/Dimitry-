@@ -5,45 +5,103 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Chat Dimitri 🌍</title>
 
-<!-- Firebase compat SDK -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
 <style>
+:root {
+  --color-bg-light: #f5f5f5;
+  --color-bg-dark: #1e1e1e;
+  --color-text-light: #333;
+  --color-text-dark: #eee;
+  --color-primary: #4CAF50;
+  --color-primary-hover: #45a049;
+  --color-msg-user-light: #e0f7e9;
+  --color-msg-other-light: #fff8dc;
+  --color-msg-user-dark: #2a5d3f;
+  --color-msg-other-dark: #3e3e3e;
+}
+
+* { box-sizing: border-box; margin:0; padding:0; }
+
 body {
   font-family: Arial, sans-serif;
-  background: #f5f5f5;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  margin: 0;
+  height: 100vh;
+  background: var(--color-bg-light);
+  color: var(--color-text-light);
+  transition: all 0.3s;
 }
-h2 { margin-top: 20px; color: #333; }
 
-#loginBtn, #logoutBtn {
-  background: #4CAF50;
+header {
+  background: var(--color-primary);
   color: white;
+  text-align: center;
+  padding: 15px;
+  font-size: 1.8em;
+  font-weight: bold;
+}
+
+#modeToggle {
+  position: fixed;
+  top: 15px;
+  right: 15px;
+  background: white;
+  color: var(--color-primary);
   border: none;
-  padding: 10px 15px;
+  padding: 8px 12px;
   cursor: pointer;
   border-radius: 5px;
-  margin: 0 5px;
+  z-index: 1000;
 }
-#loginBtn:hover, #logoutBtn:hover { background: #45a049; }
+
+#topBar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  flex-wrap: wrap;
+}
+
+#topBar button {
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+#topBar button:hover { background: var(--color-primary-hover); }
+
+#topBar span { font-size: 0.9em; color: var(--color-text-light); }
+body.dark #topBar span { color: var(--color-text-dark); }
+
+#mainContent {
+  display: flex;
+  flex: 1; /* Ocupa espaço restante entre header/topbar e footer */
+  margin: 10px;
+  overflow: hidden; /* scroll apenas nas mensagens */
+}
+
+#chatContainer {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
 
 #chatWindow {
   display: flex;
   flex-direction: column;
-  width: 380px;
-  height: 520px;
-  border: 2px solid #4CAF50;
+  flex: 1;
+  border: 2px solid var(--color-primary);
   border-radius: 12px;
   background: white;
   overflow: hidden;
   box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-  margin-bottom: 20px;
 }
+
 #chatMessages {
   flex: 1;
   padding: 10px;
@@ -52,6 +110,7 @@ h2 { margin-top: 20px; color: #333; }
   flex-direction: column;
   font-size: 0.9em;
 }
+
 .msg {
   margin: 5px 0;
   padding: 8px;
@@ -61,178 +120,173 @@ h2 { margin-top: 20px; color: #333; }
   display: flex;
   align-items: flex-start;
   gap: 8px;
+  transition: background 0.3s;
 }
-.msg img {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-}
-.userMsg { background: #e0f7e9; align-self: flex-end; }
-.otherMsg { background: #fff8dc; align-self: flex-start; }
-#chatInput { display: flex; border-top: 1px solid #ddd; }
-#chatInput input {
-  flex: 1;
-  border: none;
-  padding: 10px;
-  outline: none;
-}
-#chatInput button {
-  background: #4CAF50;
-  color: white;
-  border: none;
-  padding: 10px 15px;
-  cursor: pointer;
-}
-#chatInput button:hover { background: #45a049; }
 
-.time { font-size: 0.7em; color: #555; margin-left: 5px; }
-#alertaLogin {
-  color: #a00;
-  font-size: 0.9em;
-  margin-bottom: 10px;
-  display: none;
+.msg img { width:28px; height:28px; border-radius:50%; }
+.userMsg { align-self: flex-end; background: var(--color-msg-user-light); }
+.otherMsg { align-self: flex-start; background: var(--color-msg-other-light); }
+
+#chatInput { display:flex; border-top:1px solid #ddd; }
+#chatInput input { flex:1; border:none; padding:10px; outline:none; }
+#chatInput button { background: var(--color-primary); color:white; border:none; padding:10px 15px; cursor:pointer; }
+#chatInput button:hover { background: var(--color-primary-hover); }
+
+body.dark { background: var(--color-bg-dark); color: var(--color-text-dark); }
+body.dark #chatWindow { background:#2a2a2a; border-color: var(--color-primary); }
+body.dark .userMsg { background: var(--color-msg-user-dark); }
+body.dark .otherMsg { background: var(--color-msg-other-dark); }
+
+#adSidebar {
+  width: 300px;
+  background: #f1f1f1;
+  border-left: 1px dashed #ccc;
+  padding: 10px;
+  text-align: center;
+  overflow: auto;
 }
-#onlineCount {
-  font-size: 0.9em;
-  color: #333;
-  margin-bottom: 10px;
+
+/* Footer fixo ao final */
+footer {
+  background: var(--color-primary);
+  color:white;
+  text-align:center;
+  padding:10px;
+  font-size:0.9em;
+}
+
+@media(max-width:768px){
+  #mainContent { flex-direction: column; }
+  #chatContainer { width:100%; }
+  #adSidebar { display:none; }
 }
 </style>
 </head>
 
 <body>
 
-<h2>💬 Chat Dimitri Global</h2>
+<header>💬 Chat Dimitri Global</header>
+<button id="modeToggle">🌙 Dark/Light</button>
 
-<div style="text-align:center; margin-bottom:10px;">
+<div id="topBar">
+  <button id="backBtn" onclick="window.location.href='index.html'">⬅ Voltar</button>
   <button id="loginBtn">Login com Google</button>
+  <span id="onlineCount">👥 Usuários online: 0</span>
+  <span id="alertaLogin">⚠️ Faça login para enviar mensagens.</span>
   <button id="logoutBtn" style="display:none;">Logout</button>
 </div>
 
-<div id="onlineCount">👥 Usuários online: 0</div>
-<div id="alertaLogin">⚠️ Faça login para enviar mensagens.</div>
-
-<div id="chatWindow">
-  <div id="chatMessages"></div>
-  <div id="chatInput">
-    <input type="text" id="msgInput" placeholder="Digite sua mensagem..." disabled>
-    <button id="sendBtn" disabled>Enviar</button>
+<div id="mainContent">
+  <div id="chatContainer">
+    <div id="chatWindow">
+      <div id="chatMessages"></div>
+      <div id="chatInput">
+        <input type="text" id="msgInput" placeholder="Digite sua mensagem..." disabled>
+        <button id="sendBtn" disabled>Enviar</button>
+      </div>
+    </div>
   </div>
+  <div id="adSidebar">Publicidade aqui (Adsense)</div>
 </div>
+
+<footer>Славянский клуб</footer>
 
 <audio id="notifySound" src="https://cdn.pixabay.com/download/audio/2023/02/28/audio_144c8b3b18.mp3?filename=notification-3-126509.mp3"></audio>
 
 <script>
-  // === CONFIGURAÇÃO FIREBASE ===
-  const firebaseConfig = {
-    apiKey: "AIzaSyCYJCgfil5HKrCWtB14zwdicDaEcldHU6A",
-    authDomain: "dimitry-rusian.firebaseapp.com",
-    databaseURL: "https://dimitry-rusian-default-rtdb.firebaseio.com",
-    projectId: "dimitry-rusian",
-    storageBucket: "dimitry-rusian.appspot.com",
-    messagingSenderId: "449029666805",
-    appId: "1:449029666805:web:feaf575a7b7e6f234a52bc",
-    measurementId: "G-6DLM398X84"
-  };
+// Firebase config
+const firebaseConfig = {
+  apiKey: "AIzaSyCYJCgfil5HKrCWtB14zwdicDaEcldHU6A",
+  authDomain: "dimitry-rusian.firebaseapp.com",
+  databaseURL: "https://dimitry-rusian-default-rtdb.firebaseio.com",
+  projectId: "dimitry-rusian",
+  storageBucket: "dimitry-rusian.appspot.com",
+  messagingSenderId: "449029666805",
+  appId: "1:449029666805:web:feaf575a7b7e6f234a52bc",
+  measurementId: "G-6DLM398X84"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.database();
 
-  firebase.initializeApp(firebaseConfig);
-  const auth = firebase.auth();
-  const db = firebase.database();
+const loginBtn = document.getElementById("loginBtn");
+const logoutBtn = document.getElementById("logoutBtn");
+const msgInput = document.getElementById("msgInput");
+const sendBtn = document.getElementById("sendBtn");
+const chatMessages = document.getElementById("chatMessages");
+const alertaLogin = document.getElementById("alertaLogin");
+const onlineCount = document.getElementById("onlineCount");
+const notifySound = document.getElementById("notifySound");
+const modeToggle = document.getElementById("modeToggle");
 
-  const loginBtn = document.getElementById("loginBtn");
-  const logoutBtn = document.getElementById("logoutBtn");
-  const msgInput = document.getElementById("msgInput");
-  const sendBtn = document.getElementById("sendBtn");
-  const chatMessages = document.getElementById("chatMessages");
-  const alertaLogin = document.getElementById("alertaLogin");
-  const onlineCount = document.getElementById("onlineCount");
-  const notifySound = document.getElementById("notifySound");
+// Dark/Light
+modeToggle.addEventListener("click",()=>document.body.classList.toggle("dark"));
 
-  // === LOGIN COM GOOGLE ===
-  loginBtn.addEventListener("click", () => {
-    const provider = new firebase.auth.GoogleAuthProvider();
-    auth.signInWithPopup(provider)
-      .then(() => console.log("✅ Login efetuado"))
-      .catch(err => alert("Erro ao logar: " + err.message));
-  });
+// Login
+loginBtn.addEventListener("click",()=>{
+  const provider=new firebase.auth.GoogleAuthProvider();
+  auth.signInWithPopup(provider).catch(err=>alert(err.message));
+});
+logoutBtn.addEventListener("click",()=>auth.signOut());
 
-  logoutBtn.addEventListener("click", () => auth.signOut());
-
-  // === GERENCIAR LOGIN ===
-  auth.onAuthStateChanged(user => {
-    if (user) {
-      loginBtn.style.display = "none";
-      logoutBtn.style.display = "inline-block";
-      alertaLogin.style.display = "none";
-      msgInput.disabled = false;
-      sendBtn.disabled = false;
-
-      // Adiciona usuário à lista de online
-      const userRef = db.ref("online/" + user.uid);
-      userRef.set({ name: user.displayName, photo: user.photoURL });
-      userRef.onDisconnect().remove();
-
-    } else {
-      loginBtn.style.display = "inline-block";
-      logoutBtn.style.display = "none";
-      alertaLogin.style.display = "block";
-      msgInput.disabled = true;
-      sendBtn.disabled = true;
-    }
-  });
-
-  // === CONTADOR DE USUÁRIOS ONLINE ===
-  db.ref("online").on("value", snapshot => {
-    const count = snapshot.numChildren();
-    onlineCount.textContent = `👥 Usuários online: ${count}`;
-  });
-
-  // === ENVIAR MENSAGEM ===
-  function sendMessage() {
-    const msg = msgInput.value.trim();
-    const user = auth.currentUser;
-    if (!msg || !user) return;
-
-    db.ref('chatGlobal').push({
-      user: user.displayName,
-      photo: user.photoURL || "",
-      text: msg,
-      timestamp: Date.now()
-    })
-    .then(() => msgInput.value = "")
-    .catch(err => console.error("Erro ao enviar:", err));
+auth.onAuthStateChanged(user=>{
+  if(user){
+    loginBtn.style.display="none";
+    logoutBtn.style.display="inline-block";
+    alertaLogin.style.display="none";
+    msgInput.disabled=false;
+    sendBtn.disabled=false;
+    const userRef=db.ref("online/"+user.uid);
+    userRef.set({name:user.displayName, photo:user.photoURL});
+    userRef.onDisconnect().remove();
+  } else{
+    loginBtn.style.display="inline-block";
+    logoutBtn.style.display="none";
+    alertaLogin.style.display="block";
+    msgInput.disabled=true;
+    sendBtn.disabled=true;
   }
+});
 
-  sendBtn.addEventListener("click", sendMessage);
-  msgInput.addEventListener("keypress", e => {
-    if (e.key === "Enter") sendMessage();
-  });
+// Online users
+db.ref("online").on("value", snapshot=>{
+  onlineCount.textContent=`👥 Usuários online: ${snapshot.numChildren()}`;
+});
 
-  // === RECEBER MENSAGENS EM TEMPO REAL ===
-  db.ref('chatGlobal').orderByChild('timestamp').on('child_added', snapshot => {
-    const msg = snapshot.val();
-    const div = document.createElement("div");
-    div.classList.add("msg");
+// Send
+function sendMessage(){
+  const msg=msgInput.value.trim();
+  const user=auth.currentUser;
+  if(!msg||!user)return;
+  db.ref('chatGlobal').push({
+    user:user.displayName,
+    photo:user.photoURL||"",
+    text:msg,
+    timestamp:Date.now()
+  }).then(()=>msgInput.value="");
+}
+sendBtn.addEventListener("click",sendMessage);
+msgInput.addEventListener("keypress",e=>{if(e.key==="Enter")sendMessage();});
 
-    const currentUser = auth.currentUser?.displayName;
-    if (msg.user === currentUser) div.classList.add("userMsg");
-    else div.classList.add("otherMsg");
-
-    const img = document.createElement("img");
-    img.src = msg.photo || "https://cdn-icons-png.flaticon.com/512/847/847969.png";
-
-    const content = document.createElement("div");
-    const time = new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    content.innerHTML = `<strong>${msg.user}:</strong> ${msg.text} <br><span class="time">${time}</span>`;
-
-    div.appendChild(img);
-    div.appendChild(content);
-    chatMessages.appendChild(div);
-    chatMessages.scrollTop = chatMessages.scrollHeight;
-
-    // 🔔 Notificação sonora para novas mensagens (de outros usuários)
-    if (msg.user !== currentUser) notifySound.play().catch(()=>{});
-  });
+// Receive
+db.ref('chatGlobal').orderByChild('timestamp').on('child_added', snapshot=>{
+  const msg=snapshot.val();
+  const div=document.createElement("div");
+  div.classList.add("msg");
+  const currentUser=auth.currentUser?.displayName;
+  if(msg.user===currentUser) div.classList.add("userMsg");
+  else div.classList.add("otherMsg");
+  const img=document.createElement("img");
+  img.src=msg.photo||"https://cdn-icons-png.flaticon.com/512/847/847969.png";
+  const content=document.createElement("div");
+  const time=new Date(msg.timestamp).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+  content.innerHTML=`<strong>${msg.user}:</strong> ${msg.text} <br><span class="time">${time}</span>`;
+  div.appendChild(img);
+  div.appendChild(content);
+  chatMessages.appendChild(div);
+  chatMessages.scrollTop=chatMessages.scrollHeight;
+  if(msg.user!==currentUser) notifySound.play().catch(()=>{});
+});
 </script>
 
 </body>
