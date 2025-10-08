@@ -114,12 +114,15 @@
   bottom: 0;            /* Alinhado à parte inferior */
   left: 0;
   width: 100%;          /* Ocupa toda a largura */
-  background: #4CAF50;  /* Mesma cor do header, se quiser */
-  color: white;
+  background: white;  
+  color: #555;
   text-align: center;
-  padding: 10px 0;
+  padding: 8px 0;
   z-index: 999;         /* Fica acima de outros elementos */
-  font-size: 1em;
+  font-size: 0.85emm;
+  box-shadow: 0 -2px 6px rgba(0,0,0,0.1);
+
+
 }
 body {
   padding-bottom: 50px; /* Garante que o conteúdo não fique escondido atrás do rodapé */
@@ -178,7 +181,7 @@ body.dark-mode footer {
     <a href="index.html">📈 Selecionar</a>
     <a href="exercicio.html">📝 Exercícios</a>
     <a href="jogo.html">🎨 Jogos</a>
-    <a href="chat.html">💬 Chats</a>
+    <a href="chat.html">💬 Chat</a>
   </nav>
   <div class="mascote"> Dimitry</div>
 </aside>
@@ -316,8 +319,7 @@ function closeOverlay() {
   </div>
 </div>
 
-<!-- Botão Dicionário -->
-<button onclick="abrirDicionario()">Abrir Dicionário</button>
+
 
 <script>
   // Dados dos módulos
@@ -632,19 +634,7 @@ FrasesDeConvercacao: [
     }
   }
 
-  // ===== Dicionário =====
-  function abrirDicionario() {
-    const overlay = document.getElementById('overlayModal');
-    const content = document.getElementById('overlayBody');
-    content.innerHTML = `
-      <button onclick="closeOverlay()" style="position:absolute; top:10px; right:10px;">Fechar</button>
-      <h2>Dicionário</h2>
-      <p>Aqui vai o conteúdo do dicionário.</p>
-    `;
-    overlay.classList.add('show');
-  }
-
-  // ===== Inicialização =====
+    // ===== Inicialização =====
   document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.lesson-card').forEach(card => {
       card.addEventListener('click', () => {
@@ -652,28 +642,7 @@ FrasesDeConvercacao: [
       });
     });
 
-    // Chat
-    const chatBtn = document.getElementById('chatBtn');
-    const chatWindow = document.getElementById('chatWindow');
-    const sendBtn = document.getElementById('sendBtn');
-    const msgInput = document.getElementById('msgInput');
-    const chatMessages = document.getElementById('chatMessages');
-
-    chatBtn.addEventListener('click', () => {
-      chatWindow.style.display = chatWindow.style.display === 'flex' ? 'none' : 'flex';
-      chatWindow.style.flexDirection = 'column';
-    });
-
-    function sendMessage() {
-      const msg = msgInput.value.trim(); if (!msg) return;
-      chatMessages.innerHTML += `<p>🧑 ${msg}</p>`; msgInput.value='';
-      chatMessages.scrollTop = chatMessages.scrollHeight;
-      setTimeout(() => {
-        chatMessages.innerHTML += `<p>🤖 Dimitri: Ainda estou aprendendo, mas você digitou: ${msg}</p>`;
-        chatMessages.scrollTop = chatMessages.scrollHeight;
-      }, 500);
-    }
-
+    
     sendBtn.addEventListener('click', sendMessage);
     msgInput.addEventListener('keypress', e => { if(e.key==='Enter') sendMessage(); });
 
@@ -844,11 +813,8 @@ document.getElementById('modoBtn').addEventListener('click', () => {
 <script src="overlay.js"></script>
 
 <footer id="siteFooter">
-  <p>© 2025 Славянский клуб — Aprenda Russo e Português com diversão!</p>
+  © 2025 Славянский клуб — Aprenda Russo e Português com diversão!
 </footer>
 
 </body>
 </html>
-
-
-
