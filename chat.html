@@ -20,6 +20,7 @@ body {
   margin: 0;
 }
 h2 { margin-top: 20px; color: #333; }
+
 #loginBtn, #logoutBtn {
   background: #4CAF50;
   color: white;
@@ -30,11 +31,12 @@ h2 { margin-top: 20px; color: #333; }
   margin: 0 5px;
 }
 #loginBtn:hover, #logoutBtn:hover { background: #45a049; }
+
 #chatWindow {
   display: flex;
   flex-direction: column;
-  width: 350px;
-  height: 500px;
+  width: 380px;
+  height: 520px;
   border: 2px solid #4CAF50;
   border-radius: 12px;
   background: white;
@@ -50,15 +52,22 @@ h2 { margin-top: 20px; color: #333; }
   flex-direction: column;
   font-size: 0.9em;
 }
-#chatMessages p {
+.msg {
   margin: 5px 0;
   padding: 8px;
   border-radius: 8px;
   max-width: 80%;
   word-wrap: break-word;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+.msg img {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
 }
 .userMsg { background: #e0f7e9; align-self: flex-end; }
-.botMsg { background: #f0f0f0; align-self: flex-start; }
 .otherMsg { background: #fff8dc; align-self: flex-start; }
 #chatInput { display: flex; border-top: 1px solid #ddd; }
 #chatInput input {
@@ -75,25 +84,43 @@ h2 { margin-top: 20px; color: #333; }
   cursor: pointer;
 }
 #chatInput button:hover { background: #45a049; }
+
 .time { font-size: 0.7em; color: #555; margin-left: 5px; }
+#alertaLogin {
+  color: #a00;
+  font-size: 0.9em;
+  margin-bottom: 10px;
+  display: none;
+}
+#onlineCount {
+  font-size: 0.9em;
+  color: #333;
+  margin-bottom: 10px;
+}
 </style>
 </head>
 
 <body>
 
 <h2>💬 Chat Dimitri Global</h2>
+
 <div style="text-align:center; margin-bottom:10px;">
   <button id="loginBtn">Login com Google</button>
   <button id="logoutBtn" style="display:none;">Logout</button>
 </div>
 
+<div id="onlineCount">👥 Usuários online: 0</div>
+<div id="alertaLogin">⚠️ Faça login para enviar mensagens.</div>
+
 <div id="chatWindow">
   <div id="chatMessages"></div>
   <div id="chatInput">
-    <input type="text" id="msgInput" placeholder="Digite sua mensagem...">
-    <button id="sendBtn">Enviar</button>
+    <input type="text" id="msgInput" placeholder="Digite sua mensagem..." disabled>
+    <button id="sendBtn" disabled>Enviar</button>
   </div>
 </div>
+
+<audio id="notifySound" src="https://cdn.pixabay.com/download/audio/2023/02/28/audio_144c8b3b18.mp3?filename=notification-3-126509.mp3"></audio>
 
 <script>
   // === CONFIGURAÇÃO FIREBASE ===
@@ -117,6 +144,9 @@ h2 { margin-top: 20px; color: #333; }
   const msgInput = document.getElementById("msgInput");
   const sendBtn = document.getElementById("sendBtn");
   const chatMessages = document.getElementById("chatMessages");
+  const alertaLogin = document.getElementById("alertaLogin");
+  const onlineCount = document.getElementById("onlineCount");
+  const notifySound = document.getElementById("notifySound");
 
   // === LOGIN COM GOOGLE ===
   loginBtn.addEventListener("click", () => {
@@ -128,37 +158,49 @@ h2 { margin-top: 20px; color: #333; }
 
   logoutBtn.addEventListener("click", () => auth.signOut());
 
+  // === GERENCIAR LOGIN ===
   auth.onAuthStateChanged(user => {
     if (user) {
       loginBtn.style.display = "none";
       logoutBtn.style.display = "inline-block";
-      console.log("Usuário logado:", user.displayName);
+      alertaLogin.style.display = "none";
+      msgInput.disabled = false;
+      sendBtn.disabled = false;
+
+      // Adiciona usuário à lista de online
+      const userRef = db.ref("online/" + user.uid);
+      userRef.set({ name: user.displayName, photo: user.photoURL });
+      userRef.onDisconnect().remove();
+
     } else {
       loginBtn.style.display = "inline-block";
       logoutBtn.style.display = "none";
-      console.log("Nenhum usuário logado");
+      alertaLogin.style.display = "block";
+      msgInput.disabled = true;
+      sendBtn.disabled = true;
     }
+  });
+
+  // === CONTADOR DE USUÁRIOS ONLINE ===
+  db.ref("online").on("value", snapshot => {
+    const count = snapshot.numChildren();
+    onlineCount.textContent = `👥 Usuários online: ${count}`;
   });
 
   // === ENVIAR MENSAGEM ===
   function sendMessage() {
     const msg = msgInput.value.trim();
-    if (!msg) return;
-    const user = auth.currentUser?.displayName || "Anônimo";
+    const user = auth.currentUser;
+    if (!msg || !user) return;
 
     db.ref('chatGlobal').push({
-      user: user,
+      user: user.displayName,
+      photo: user.photoURL || "",
       text: msg,
       timestamp: Date.now()
     })
-    .then(() => {
-      console.log("💬 Mensagem enviada!");
-      msgInput.value = "";
-    })
+    .then(() => msgInput.value = "")
     .catch(err => console.error("Erro ao enviar:", err));
-
-    // Envia resposta automática do bot
-    setTimeout(() => sendBotResponse(msg), 600);
   }
 
   sendBtn.addEventListener("click", sendMessage);
@@ -166,39 +208,30 @@ h2 { margin-top: 20px; color: #333; }
     if (e.key === "Enter") sendMessage();
   });
 
-  // === BOT AUTOMÁTICO ===
-  function sendBotResponse(userMsg) {
-    const botText = getBotResponse(userMsg);
-    if (!botText) return;
-    db.ref('chatGlobal').push({
-      user: "🤖 Dimitri",
-      text: botText,
-      timestamp: Date.now()
-    });
-  }
-
-  function getBotResponse(msg) {
-    msg = msg.toLowerCase();
-    if (msg.includes("olá") || msg.includes("oi")) return "Olá! Como vai?";
-    if (msg.includes("russo")) return "Posso te ajudar a aprender russo 🇷🇺";
-    if (msg.includes("obrigado")) return "De nada! 😊";
-    return "Ainda estou aprendendo... pode repetir?";
-  }
-
   // === RECEBER MENSAGENS EM TEMPO REAL ===
   db.ref('chatGlobal').orderByChild('timestamp').on('child_added', snapshot => {
     const msg = snapshot.val();
-    const p = document.createElement("p");
+    const div = document.createElement("div");
+    div.classList.add("msg");
+
     const currentUser = auth.currentUser?.displayName;
+    if (msg.user === currentUser) div.classList.add("userMsg");
+    else div.classList.add("otherMsg");
 
-    if (msg.user === currentUser) p.className = "userMsg";
-    else if (msg.user === "🤖 Dimitri") p.className = "botMsg";
-    else p.className = "otherMsg";
+    const img = document.createElement("img");
+    img.src = msg.photo || "https://cdn-icons-png.flaticon.com/512/847/847969.png";
 
+    const content = document.createElement("div");
     const time = new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    p.innerHTML = `<strong>${msg.user}:</strong> ${msg.text} <span class="time">${time}</span>`;
-    chatMessages.appendChild(p);
+    content.innerHTML = `<strong>${msg.user}:</strong> ${msg.text} <br><span class="time">${time}</span>`;
+
+    div.appendChild(img);
+    div.appendChild(content);
+    chatMessages.appendChild(div);
     chatMessages.scrollTop = chatMessages.scrollHeight;
+
+    // 🔔 Notificação sonora para novas mensagens (de outros usuários)
+    if (msg.user !== currentUser) notifySound.play().catch(()=>{});
   });
 </script>
 
