@@ -64,7 +64,7 @@ const uiTexts = {
 };
 
 // ==================== VARIÁVEIS ====================
-let currentLang = "ru"; // Começa em russo
+let currentLang = "ru";
 let correctItem = "";
 let targetCount = 0;
 let selectedCorrect = 0;
@@ -101,7 +101,13 @@ document.getElementById("playBtn").addEventListener("click", () => {
 // ==================== FUNÇÕES ====================
 function updateLang() {
   const texts = uiTexts[currentLang];
-  document.getElementById("siteTitle").textContent = texts.siteTitle;
+  
+  // Corrigido: mantém o emoji Dimitry ao lado do nome
+  const siteTitle = document.getElementById("siteTitle");
+  const emoji = siteTitle.querySelector("img");
+  siteTitle.textContent = texts.siteTitle + " ";
+  if (emoji) siteTitle.appendChild(emoji);
+
   document.getElementById("gameTitle").textContent = texts.gameTitleColors;
   document.getElementById("languageToggle").textContent = currentLang === "ru" ? "PT" : "RU";
   document.getElementById("playBtn").textContent = texts.controls.play;
@@ -133,7 +139,6 @@ function showPreview() {
   gameArea.innerHTML = "";
   gameArea.classList.add("preview");
 
-  // Seleciona 4 itens aleatórios
   const previewItems = [];
   while (previewItems.length < 4) {
     const item = colors[Math.floor(Math.random() * colors.length)];
@@ -168,7 +173,7 @@ function showPreview() {
   }, 2000);
 }
 
-// ==================== CRIAÇÃO DOS QUADRADOS DO JOGO ====================
+// ==================== CRIAÇÃO DOS QUADRADOS ====================
 function createSquares() {
   gameArea.innerHTML = "";
   const totalSquares = 16;
@@ -221,7 +226,7 @@ function startRound() {
   startTimer();
 }
 
-// ==================== TROCA DE BLOCO DE CORES ====================
+// ==================== TROCA DE BLOCO ====================
 function nextColorBlock() {
   level++;
   round = 1;
@@ -260,7 +265,7 @@ function startTimer() {
   }, interval);
 }
 
-// ==================== VERIFICAÇÃO DE CLIQUE ====================
+// ==================== CLIQUES ====================
 function checkSquare(e) {
   if (!gameActive || waitingNextLevel) return;
   const color = e.currentTarget.dataset.item;
@@ -293,7 +298,7 @@ function checkSquare(e) {
   }
 }
 
-// ==================== ATUALIZA PONTUAÇÃO ====================
+// ==================== PONTUAÇÃO ====================
 function updateScore() {
   const total = score.correct + score.wrong;
   const percent = total ? Math.round((score.correct / total) * 100) : 0;
@@ -309,7 +314,7 @@ function gameOver() {
   timerBar.style.width = "0%";
 }
 
-// ==================== REINICIAR JOGO ====================
+// ==================== REINICIAR ====================
 function restartGame() {
   score = { correct: 0, wrong: 0 };
   lives = 5;
@@ -323,7 +328,7 @@ function restartGame() {
   updateLang();
 }
 
-// ==================== PARAR JOGO ====================
+// ==================== PARAR ====================
 function stopGame() {
   gameActive = false;
   clearInterval(timerInterval);
