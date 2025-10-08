@@ -46,21 +46,20 @@
 
 <script>
   // ======= CONFIGURAÇÃO FIREBASE =======
-  const firebaseConfig = {
+   const firebaseConfig = {
     apiKey: "AIzaSyCYJCgfil5HKrCWtB14zwdicDaEcldHU6A",
     authDomain: "dimitry-rusian.firebaseapp.com",
     databaseURL: "https://dimitry-rusian-default-rtdb.firebaseio.com",
     projectId: "dimitry-rusian",
-    storageBucket: "dimitry-rusian.appspot.com",
+    storageBucket: "dimitry-rusian.firebasestorage.app",
     messagingSenderId: "449029666805",
     appId: "1:449029666805:web:feaf575a7b7e6f234a52bc",
     measurementId: "G-6DLM398X84"
   };
 
-  // Inicializa Firebase compat
-  firebase.initializeApp(firebaseConfig);
-  const auth = firebase.auth();
-  const db = firebase.database();
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
 
   // Elementos
   const loginBtn = document.getElementById("loginBtn");
