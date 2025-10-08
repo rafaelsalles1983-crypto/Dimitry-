@@ -40,13 +40,23 @@ body {
   transition: all 0.3s;
 }
 
-header {
-  background: var(--color-primary);
-  color: white;
-  text-align: center;
-  padding: 15px;
-  font-size: 2em;
-  font-weight: bold;
+/* ===== HEADER ===== */
+header h1 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.5em;
+  color: var(--color-primary);
+  margin: 0;
+  padding: 12px;
+  background: #fff;
+}
+
+/* Emoji estilo */
+.emoji-head {
+  width: 32px;
+  height: 32px;
+  vertical-align: middle;
 }
 
 #modeToggle {
@@ -104,7 +114,7 @@ body.dark #topBar span { color: var(--color-text-dark); }
   flex: 1;
   min-height: 0;
   border: 2px solid var(--color-primary);
-  border-radius: 0; /* fullscreen no mobile */
+  border-radius: 0;
   background: white;
   overflow: hidden;
 }
@@ -115,7 +125,7 @@ body.dark #topBar span { color: var(--color-text-dark); }
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  font-size: 1.1em; /* letras maiores */
+  font-size: 1.1em;
 }
 
 .msg {
@@ -194,7 +204,9 @@ footer {
 
 <body>
 
-<header>чат Димитрий</header>
+<header>
+  <h1>Славянский клуб <img src="emoji_dimitry.png" alt="Dimitry" class="emoji-head"></h1>
+</header>
 
 <button id="modeToggle">🌙</button>
 
@@ -219,7 +231,7 @@ footer {
   <div id="adSidebar">Publicidade aqui (Adsense)</div>
 </div>
 
-<footer>Славянский клуб</footer>
+<footer>© 2025 Славянский клуб — Aprenda Russo e Português com diversão!</footer>
 
 <audio id="notifySound" src="https://cdn.pixabay.com/download/audio/2023/02/28/audio_144c8b3b18.mp3?filename=notification-3-126509.mp3"></audio>
 
