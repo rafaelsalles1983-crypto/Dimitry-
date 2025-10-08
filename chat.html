@@ -71,7 +71,7 @@ h2 { margin-top:20px; color:#333; }
   // LOGIN
   loginBtn.addEventListener("click", () => {
     const provider = new firebase.auth.GoogleAuthProvider();
-    auth.signInWithPopup(provider);
+    auth.signInWithPopup(provider).catch(err=>alert(err.message));
   });
 
   logoutBtn.addEventListener("click", () => auth.signOut());
