@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chat Dimitri</title>
+
+<!-- Firebase compat SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+<style>
+body { font-family: Arial,sans-serif; background:#f5f5f5; display:flex; flex-direction:column; align-items:center; margin:0; }
+h2 { margin-top:20px; color:#333; }
+#loginBtn, #logoutBtn { background:#4CAF50; color:white; border:none; padding:10px 15px; cursor:pointer; border-radius:5px; margin:0 5px; }
+#loginBtn:hover, #logoutBtn:hover { background:#45a049; }
+#chatWindow { display:flex; flex-direction:column; width:350px; height:500px; border:2px solid #4CAF50; border-radius:12px; background:white; overflow:hidden; box-shadow:0 4px 12px rgba(0,0,0,0.2); margin-bottom:20px; }
+#chatMessages { flex:1; padding:10px; overflow-y:auto; display:flex; flex-direction:column; font-size:0.9em; }
+#chatMessages p { margin:5px 0; padding:8px; border-radius:8px; max-width:80%; }
+.userMsg { background:#e0f7e9; align-self:flex-end; }
+.botMsg { background:#f0f0f0; align-self:flex-start; }
+.otherMsg { background:#fff8dc; align-self:flex-start; }
+#chatInput { display:flex; border-top:1px solid #ddd; }
+#chatInput input { flex:1; border:none; padding:10px; outline:none; }
+#chatInput button { background:#4CAF50; color:white; border:none; padding:10px 15px; cursor:pointer; }
+#chatInput button:hover { background:#45a049; }
+.time { font-size:0.7em; color:#555; margin-left:5px; }
+</style>
+</head>
+<body>
+
+<h2>Chat Dimitri</h2>
+<div style="text-align:center; margin-bottom:10px;">
+<button id="loginBtn">Login com Google</button>
+<button id="logoutBtn" style="display:none;">Logout</button>
+</div>
+
+<div id="chatWindow">
+  <div id="chatMessages"></div>
+  <div id="chatInput">
+    <input type="text" id="msgInput" placeholder="Digite sua mensagem...">
+    <button id="sendBtn">Enviar</button>
+  </div>
+</div>
+
+<script>
+  // CONFIGURAÇÃO FIREBASE
+  const firebaseConfig = {
+    apiKey: "AIzaSyCYJCgfil5HKrCWtB14zwdicDaEcldHU6A",
+    authDomain: "dimitry-rusian.firebaseapp.com",
+    databaseURL: "https://dimitry-rusian-default-rtdb.firebaseio.com",
+    projectId: "dimitry-rusian",
+    storageBucket: "dimitry-rusian.appspot.com",
+    messagingSenderId: "449029666805",
+    appId: "1:449029666805:web:feaf575a7b7e6f234a52bc",
+    measurementId: "G-6DLM398X84"
+  };
+
+  // Inicializa Firebase compat
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.database();
+
+  const loginBtn = document.getElementById("loginBtn");
+  const logoutBtn = document.getElementById("logoutBtn");
+  const msgInput = document.getElementById("msgInput");
+  const sendBtn = document.getElementById("sendBtn");
+  const chatMessages = document.getElementById("chatMessages");
+
+  // LOGIN
+  loginBtn.addEventListener("click", () => {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    auth.signInWithPopup(provider);
+  });
+
+  logoutBtn.addEventListener("click", () => auth.signOut());
+
+  auth.onAuthStateChanged(user => {
+    if(user){
+      loginBtn.style.display = "none";
+      logoutBtn.style.display = "inline-block";
+    } else {
+      loginBtn.style.display = "inline-block";
+      logoutBtn.style.display = "none";
+    }
+  });
+
+  // ENVIAR MENSAGEM
+  function sendMessage(){
+    const msg = msgInput.value.trim();
+    if(!msg) return;
+    const user = auth.currentUser?.displayName || "Anônimo";
+    db.ref('chatGlobal').push({
+      user: user,
+      text: msg,
+      timestamp: Date.now()
+    });
+    msgInput.value = "";
+    setTimeout(()=> sendBotResponse(msg), 600);
+  }
+
+  sendBtn.addEventListener("click", sendMessage);
+  msgInput.addEventListener("keypress", e => { if(e.key==="Enter") sendMessage(); });
+
+  // BOT SIMPLES
+  function sendBotResponse(userMsg){
+    const botText = getBotResponse(userMsg);
+    if(!botText) return;
+    db.ref('chatGlobal').push({
+      user: "🤖 Dimitri",
+      text: botText,
+      timestamp: Date.now()
+    });
+  }
+
+  function getBotResponse(msg){
+    msg = msg.toLowerCase();
+    if(msg.includes("olá")||msg.includes("oi")) return "Olá! Como vai?";
+    if(msg.includes("russo")) return "Posso te ajudar a aprender russo 🇷🇺";
+    if(msg.includes("obrigado")) return "De nada! 😊";
+    return "Ainda estou aprendendo... pode repetir?";
+  }
+
+  // RECEBER MENSAGENS EM TEMPO REAL
+  db.ref('chatGlobal').orderByChild('timestamp').on('child_added', snapshot => {
+    const msg = snapshot.val();
+    const p = document.createElement("p");
+    p.className = msg.user===auth.currentUser?.displayName ? "userMsg" : (msg.user==="🤖 Dimitri" ? "botMsg" : "otherMsg");
+    const time = new Date(msg.timestamp).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+    p.innerHTML = `<strong>${msg.user}:</strong> ${msg.text} <span class="time">${time}</span>`;
+    chatMessages.appendChild(p);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  });
+</script>
+
+</body>
+</html>
