@@ -2,8 +2,8 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>чат🌍</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>чат 🌍</title>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
@@ -25,11 +25,16 @@
 
 * { box-sizing: border-box; margin:0; padding:0; }
 
-body {
+html, body {
+  height: 100%;
+  margin:0;
+  padding:0;
   font-family: Arial, sans-serif;
+}
+
+body {
   display: flex;
   flex-direction: column;
-  height: 100vh;
   background: var(--color-bg-light);
   color: var(--color-text-light);
   transition: all 0.3s;
@@ -40,7 +45,7 @@ header {
   color: white;
   text-align: center;
   padding: 15px;
-  font-size: 1.8em;
+  font-size: 2em;
   font-weight: bold;
 }
 
@@ -69,67 +74,89 @@ header {
   background: var(--color-primary);
   color: white;
   border: none;
-  padding: 8px 12px;
+  padding: 10px 14px;
   border-radius: 5px;
   cursor: pointer;
 }
 #topBar button:hover { background: var(--color-primary-hover); }
 
-#topBar span { font-size: 0.9em; color: var(--color-text-light); }
+#topBar span { font-size: 1em; color: var(--color-text-light); }
 body.dark #topBar span { color: var(--color-text-dark); }
 
 #mainContent {
   display: flex;
-  flex: 1; /* Ocupa espaço restante entre header/topbar e footer */
-  margin: 10px;
-  overflow: hidden; /* scroll apenas nas mensagens */
+  flex: 1;
+  margin:0;
+  overflow: hidden;
+  min-height: 0;
 }
 
 #chatContainer {
   flex: 1;
   display: flex;
   flex-direction: column;
+  min-height: 0;
 }
 
 #chatWindow {
   display: flex;
   flex-direction: column;
   flex: 1;
+  min-height: 0;
   border: 2px solid var(--color-primary);
-  border-radius: 12px;
+  border-radius: 0; /* fullscreen no mobile */
   background: white;
   overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 }
 
 #chatMessages {
   flex: 1;
-  padding: 10px;
+  padding: 12px;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  font-size: 0.9em;
+  font-size: 1.1em; /* letras maiores */
 }
 
 .msg {
-  margin: 5px 0;
-  padding: 8px;
+  margin: 6px 0;
+  padding: 10px;
   border-radius: 8px;
   max-width: 80%;
   word-wrap: break-word;
   display: flex;
   align-items: flex-start;
-  gap: 8px;
+  gap: 10px;
   transition: background 0.3s;
 }
 
-.msg img { width:28px; height:28px; border-radius:50%; }
+.msg img { width:32px; height:32px; border-radius:50%; }
 .userMsg { align-self: flex-end; background: var(--color-msg-user-light); }
 .otherMsg { align-self: flex-start; background: var(--color-msg-other-light); }
 
-#chatInput { display:flex; border-top:1px solid #ddd; }
-#chatInput input { flex:1; border:none; padding:10px; outline:none; }
-#chatInput button { background: var(--color-primary); color:white; border:none; padding:10px 15px; cursor:pointer; }
+#chatInput {
+  display:flex;
+  border-top:1px solid #ddd;
+  flex-shrink: 0;
+  background: white;
+}
+
+#chatInput input {
+  flex:1;
+  border:none;
+  padding:12px;
+  outline:none;
+  font-size: 1.1em;
+}
+
+#chatInput button {
+  background: var(--color-primary);
+  color:white;
+  border:none;
+  padding:12px 18px;
+  cursor:pointer;
+  font-size: 1.1em;
+}
 #chatInput button:hover { background: var(--color-primary-hover); }
 
 body.dark { background: var(--color-bg-dark); color: var(--color-text-dark); }
@@ -146,19 +173,21 @@ body.dark .otherMsg { background: var(--color-msg-other-dark); }
   overflow: auto;
 }
 
-/* Footer fixo ao final */
 footer {
   background: var(--color-primary);
   color:white;
   text-align:center;
   padding:10px;
-  font-size:0.9em;
+  font-size:1em;
 }
 
+/* MOBILE */
 @media(max-width:768px){
   #mainContent { flex-direction: column; }
-  #chatContainer { width:100%; }
+  #chatContainer { width:100%; height:100%; }
+  #chatWindow { border-radius:0; height:100%; }
   #adSidebar { display:none; }
+  body, html { padding:0; margin:0; height:100%; }
 }
 </style>
 </head>
@@ -166,7 +195,8 @@ footer {
 <body>
 
 <header>💬 чат Димитрий</header>
-<button id="modeToggle">🌙 </button>
+
+<button id="modeToggle">🌙 Dark/Light</button>
 
 <div id="topBar">
   <button id="backBtn" onclick="window.location.href='index.html'">⬅ Voltar</button>
