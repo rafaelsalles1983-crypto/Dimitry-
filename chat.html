@@ -21,56 +21,18 @@
 html, body { height:100%; font-family:Arial,sans-serif; background: var(--color-bg-light); }
 
 /* HEADER */
-header {
-  background:#fff;
-  padding:10px;
-  border-bottom:1px solid #ddd;
-}
-header h1 {
-  display:flex;
-  align-items:center;
-  gap:8px;
-  color: var(--color-primary);
-  font-size:1.4em;
-}
+header { background:#fff; padding:10px; border-bottom:1px solid #ddd; }
+header h1 { display:flex; align-items:center; gap:8px; color: var(--color-primary); font-size:1.4em; }
 .emoji-head { width:32px; height:32px; }
 
 /* TOPBAR */
-#topBar {
-  display:flex;
-  align-items:center;
-  gap:8px;
-  padding:6px 10px;
-  background:#fafafa;
-  border-bottom:1px solid #ddd;
-  flex-wrap:wrap;
-  overflow-x:auto;
-}
-#topBar button {
-  background:white;
-  color:var(--color-primary);
-  border:1px solid var(--color-primary);
-  padding:6px 10px;
-  border-radius:5px;
-  cursor:pointer;
-  flex-shrink:0;
-}
+#topBar { display:flex; align-items:center; gap:8px; padding:6px 10px; background:#fafafa; border-bottom:1px solid #ddd; flex-wrap:wrap; overflow-x:auto; z-index:100; }
+#topBar button { background:white; color:var(--color-primary); border:1px solid var(--color-primary); padding:6px 10px; border-radius:5px; cursor:pointer; flex-shrink:0; }
 #topBar span { font-size:0.9em; flex-shrink:0; }
 
 /* MOBILE USERS HORIZONTAL */
-#mobileUserLine {
-  display:none;
-  overflow-x:hidden; /* ocultar scrollbar */
-  white-space:nowrap;
-  background:#fafafa;
-  padding:6px 4px;
-  border-bottom:1px solid #ddd;
-}
-.userItemMobile {
-  width:50px; height:50px; border-radius:50%; overflow:hidden;
-  display:inline-block; margin-right:6px; border:2px solid transparent;
-  cursor:pointer; transition: transform 0.2s;
-}
+#mobileUserLine { display:none; overflow-x:hidden; white-space:nowrap; background:#fafafa; padding:6px 4px; border-bottom:1px solid #ddd; }
+.userItemMobile { width:50px; height:50px; border-radius:50%; overflow:hidden; display:inline-block; margin-right:6px; border:2px solid transparent; cursor:pointer; transition: transform 0.2s; }
 .userItemMobile img { width:100%; height:100%; border-radius:50%; object-fit:cover; }
 .userItemMobile:hover { border-color:var(--color-primary); transform:scale(1.1); }
 
@@ -78,9 +40,7 @@ header h1 {
 #mainContent { display:flex; flex:1; overflow:hidden; height: calc(100vh - 108px); }
 
 /* USER LIST (DESKTOP) */
-#userList {
-  width:200px; background:#fff; border-right:1px solid #ddd; overflow-y:auto; padding:8px;
-}
+#userList { width:200px; background:#fff; border-right:1px solid #ddd; overflow-y:auto; padding:8px; }
 .userItem { display:flex; align-items:center; gap:6px; margin-bottom:6px; cursor:pointer; padding:6px; border-radius:5px; }
 .userItem:hover { background:#e0f7e9; }
 .userItem img { width:28px; height:28px; border-radius:50%; }
@@ -106,10 +66,10 @@ footer { background:white; color:#555; text-align:center; padding:6px; font-size
 
 /* MOBILE */
 @media(max-width:768px){
-  #mainContent { flex-direction:column; height: calc(100vh - 160px); }
+  #mainContent { flex-direction:column; height: calc(100vh - 108px - 60px); } /* reserve espaço footer+input+userline */
   #userList, #adSidebar { display:none; }
   #mobileUserLine { display:flex; }
-  #chatWindow { flex:1; overflow-y:auto; margin-bottom:60px; }
+  #chatWindow { flex:1; overflow-y:auto; margin-bottom:60px; width:100%; }
   #chatInput { position:fixed; bottom:0; left:0; right:0; padding:4px; background:white; z-index:50; width:100%; }
   footer { position:fixed; bottom:0; left:0; right:0; }
   html, body { overflow:hidden; }
@@ -148,6 +108,7 @@ footer { background:white; color:#555; text-align:center; padding:6px; font-size
 <footer>© 2025 Славянский клуб — Aprenda Russo e Português com diversão!</footer>
 
 <script>
+// Firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyCYJCgfil5HKrCWtB14zwdicDaEcldHU6A",
   authDomain: "dimitry-rusian.firebaseapp.com",
@@ -285,7 +246,7 @@ generalBtn.onclick=()=>{
   generalBtn.style.display="none";
 };
 
-// FUNÇÃO SCROLL INFINITO MOBILE
+// SCROLL INFINITO MOBILE
 let scrollInterval;
 function startMobileScroll(){
   clearInterval(scrollInterval);
@@ -296,7 +257,7 @@ function startMobileScroll(){
     if(container.scrollLeft >= container.scrollWidth - container.clientWidth){
       container.scrollLeft = 0;
     }
-  },20); // ajuste velocidade
+  },20);
 }
 </script>
 </body>
