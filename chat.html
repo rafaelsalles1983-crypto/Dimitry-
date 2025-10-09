@@ -30,12 +30,6 @@ header h1 { display:flex; align-items:center; gap:8px; color: var(--color-primar
 #topBar button { background:white; color:var(--color-primary); border:1px solid var(--color-primary); padding:6px 10px; border-radius:5px; cursor:pointer; flex-shrink:0; }
 #topBar span { font-size:0.9em; flex-shrink:0; }
 
-/* MOBILE USERS HORIZONTAL */
-#mobileUserLine { display:none; overflow-x:hidden; white-space:nowrap; background:#fafafa; padding:6px 4px; border-bottom:1px solid #ddd; }
-.userItemMobile { width:50px; height:50px; border-radius:50%; overflow:hidden; display:inline-block; margin-right:6px; border:2px solid transparent; cursor:pointer; transition: transform 0.2s; }
-.userItemMobile img { width:100%; height:100%; border-radius:50%; object-fit:cover; }
-.userItemMobile:hover { border-color:var(--color-primary); transform:scale(1.1); }
-
 /* MAIN */
 #mainContent { display:flex; flex:1; overflow:hidden; height: calc(100vh - 108px); }
 
@@ -66,14 +60,14 @@ footer { background:white; color:#555; text-align:center; padding:6px; font-size
 
 /* MOBILE */
 @media(max-width:768px){
-  #mainContent { flex-direction:column; height: calc(100vh - 108px - 60px); } /* reserve espaço footer+input+userline */
-  #userList, #adSidebar { display:none; }
-  #mobileUserLine { display:flex; }
-  #chatWindow { flex:1; overflow-y:auto; margin-bottom:60px; width:100%; }
-  #chatInput { position:fixed; bottom:0; left:0; right:0; padding:4px; background:white; z-index:50; width:100%; }
-  footer { position:fixed; bottom:0; left:0; right:0; }
+  #mainContent { flex-direction:row; height: calc(100vh - 52px); } /* todo o topo fixo 52px */
+  #userList { display:flex; flex-direction:column; width:60px; border-right:1px solid #ddd; overflow-y:auto; } /* vertical lateral direita */
+  #chatContainer { flex:1; display:flex; flex-direction:column; }
+  #chatWindow { flex:1; overflow-y:auto; padding:10px; margin-right:0; margin-bottom:60px; }
+  #chatInput { position:fixed; bottom:0; left:60px; right:0; padding:4px; background:white; z-index:50; width:calc(100% - 60px); }
+  footer { position:fixed; bottom:0; left:0; width:60px; writing-mode:vertical-rl; text-align:center; padding:4px; font-size:0.75em; background:#fff; border-left:1px solid #ddd; height:100%; z-index:49; }
   html, body { overflow:hidden; }
-  #topBar { position:fixed; top:52px; left:0; right:0; z-index:100; }
+  #topBar { position:fixed; top:0; left:0; right:0; z-index:100; height:52px; }
 }
 </style>
 </head>
@@ -91,10 +85,8 @@ footer { background:white; color:#555; text-align:center; padding:6px; font-size
   <span id="onlineCount">👥 Usuários online: 0</span>
 </div>
 
-<div id="mobileUserLine"></div>
-
 <div id="mainContent">
-  <div id="userList"></div>
+  <div id="userList"></div> <!-- mobile vertical right -->
   <div id="chatContainer">
     <div id="chatWindow"></div>
     <div id="chatInput">
@@ -105,7 +97,7 @@ footer { background:white; color:#555; text-align:center; padding:6px; font-size
   <div id="adSidebar">Publicidade aqui (Adsense)</div>
 </div>
 
-<footer>© 2025 Славянский клуб — Aprenda Russo e Português com diversão!</footer>
+<footer>© 2025 Славянский клуб</footer>
 
 <script>
 // Firebase config
@@ -131,7 +123,6 @@ const userList=document.getElementById("userList");
 const alertaLogin=document.getElementById("alertaLogin");
 const onlineCount=document.getElementById("onlineCount");
 const generalBtn=document.getElementById("generalBtn");
-const mobileUserLine=document.getElementById("mobileUserLine");
 let currentChat="global";
 
 // LOGIN/LOGOUT
@@ -161,28 +152,15 @@ db.ref("online").on("value", snap=>{
   const users=snap.val()||{};
   onlineCount.textContent=`👥 ${Object.keys(users).length}`;
 
-  // DESKTOP
+  // DESKTOP & MOBILE
   userList.innerHTML="";
   for(const [uid,u] of Object.entries(users)){
     const div=document.createElement("div");
     div.className="userItem";
-    div.innerHTML=`<img src="${u.photo||'https://cdn-icons-png.flaticon.com/512/847/847969.png'}"><span>${u.name}</span>`;
+    div.innerHTML=`<img src="${u.photo||'https://cdn-icons-png.flaticon.com/512/847/847969.png'}" title="${u.name}">`;
     div.onclick=()=>requestPrivateChat(uid,u.name);
     userList.appendChild(div);
   }
-
-  // MOBILE
-  mobileUserLine.innerHTML="";
-  for(const [uid,u] of Object.entries(users)){
-    const div=document.createElement("div");
-    div.className="userItemMobile";
-    div.innerHTML=`<img src="${u.photo||'https://cdn-icons-png.flaticon.com/512/847/847969.png'}" title="${u.name}">`;
-    div.onclick=()=>requestPrivateChat(uid,u.name);
-    mobileUserLine.appendChild(div);
-  }
-
-  // INFINITE SCROLL HORIZONTAL
-  startMobileScroll();
 });
 
 // ENVIAR MENSAGEM
@@ -245,20 +223,6 @@ generalBtn.onclick=()=>{
   db.ref("chatGlobal").once("value",s=>{s.forEach(m=>showMessage(m.val(),"chatGlobal"));});
   generalBtn.style.display="none";
 };
-
-// SCROLL INFINITO MOBILE
-let scrollInterval;
-function startMobileScroll(){
-  clearInterval(scrollInterval);
-  const container = mobileUserLine;
-  if(!container) return;
-  scrollInterval = setInterval(()=>{
-    container.scrollLeft += 1;
-    if(container.scrollLeft >= container.scrollWidth - container.clientWidth){
-      container.scrollLeft = 0;
-    }
-  },20);
-}
 </script>
 </body>
 </html>
