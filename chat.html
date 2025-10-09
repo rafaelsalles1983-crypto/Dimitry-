@@ -31,7 +31,7 @@ header h1 { display:flex; align-items:center; gap:8px; color: var(--color-primar
 #topBar span { font-size:0.9em; flex-shrink:0; }
 
 /* MOBILE USERS HORIZONTAL */
-#mobileUserLine { display:none; overflow-x:hidden; white-space:nowrap; background:#fafafa; padding:6px 4px; border-bottom:1px solid #ddd; }
+#mobileUserLine { display:none; overflow-x:auto; white-space:nowrap; background:#fafafa; padding:6px 4px; border-bottom:1px solid #ddd; }
 .userItemMobile { width:50px; height:50px; border-radius:50%; overflow:hidden; display:inline-block; margin-right:6px; border:2px solid transparent; cursor:pointer; transition: transform 0.2s; }
 .userItemMobile img { width:100%; height:100%; border-radius:50%; object-fit:cover; }
 .userItemMobile:hover { border-color:var(--color-primary); transform:scale(1.1); }
@@ -66,24 +66,46 @@ footer { background:white; color:#555; text-align:center; padding:6px; font-size
 
 /* MOBILE */
 @media(max-width:768px){
+  /* Ajusta mainContent para reservar espaço para topBar + userLine + chatInput + footer */
   #mainContent {
-  flex-direction:row;
-  height: calc(100vh - 52px - 40px); /* 52px topo + 40px espaço para footer */
+    flex-direction:column;
+    height: calc(100vh - 52px - 60px - 50px - 6px); 
+    /* 52px topBar + 60px mobileUserLine + 50px chatInput + 6px footer */
   }
-  
+
   #userList, #adSidebar { display:none; }
   #mobileUserLine { display:flex; }
+
+  /* Chat reduzido para caber todos elementos */
   #chatWindow {
-  flex:1;
-  overflow-y:auto;
-  padding:10px;
-  margin-bottom:60px; /* já considera o input */
+    flex:1;
+    overflow-y:auto;
+    margin-bottom:4px;
+    width:100%;
   }
-  
-  #chatInput { position:fixed; bottom:0; left:0; right:0; padding:4px; background:white; z-index:50; width:100%; }
-  footer { position:fixed; bottom:0; left:0; right:0; }
+
+  /* Input fixo acima do footer */
+  #chatInput {
+    position:fixed;
+    bottom:26px; /* espaço para footer visível */
+    left:0;
+    right:0;
+    padding:4px;
+    background:white;
+    z-index:50;
+    width:100%;
+  }
+
+  /* Footer fixo */
+  footer {
+    position:fixed;
+    bottom:0;
+    left:0;
+    right:0;
+  }
+
   html, body { overflow:hidden; }
-  #topBar { position:fixed; top:52px; left:0; right:0; z-index:100; }
+  #topBar { position:fixed; top:0; left:0; right:0; z-index:100; }
 }
 </style>
 </head>
