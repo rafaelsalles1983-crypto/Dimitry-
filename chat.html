@@ -21,7 +21,7 @@
 html, body { height:100%; font-family:Arial,sans-serif; background: var(--color-bg-light); }
 
 /* HEADER */
-header { background:#fff; padding:10px; border-bottom:1px solid #ddd; }
+header { background:#fff; padding:10px; border-bottom:1px solid #ddd; z-index:100; width:100%; }
 header h1 { display:flex; align-items:center; gap:8px; color: var(--color-primary); font-size:1.4em; }
 .emoji-head { width:32px; height:32px; }
 
@@ -31,7 +31,7 @@ header h1 { display:flex; align-items:center; gap:8px; color: var(--color-primar
 #topBar span { font-size:0.9em; flex-shrink:0; }
 
 /* MOBILE USERS HORIZONTAL */
-#mobileUserLine { display:none; overflow-x:auto; white-space:nowrap; background:#fafafa; padding:6px 4px; border-bottom:1px solid #ddd; }
+#mobileUserLine { display:none; overflow-x:hidden; white-space:nowrap; background:#fafafa; padding:6px 4px; border-bottom:1px solid #ddd; }
 .userItemMobile { width:50px; height:50px; border-radius:50%; overflow:hidden; display:inline-block; margin-right:6px; border:2px solid transparent; cursor:pointer; transition: transform 0.2s; }
 .userItemMobile img { width:100%; height:100%; border-radius:50%; object-fit:cover; }
 .userItemMobile:hover { border-color:var(--color-primary); transform:scale(1.1); }
@@ -62,50 +62,59 @@ header h1 { display:flex; align-items:center; gap:8px; color: var(--color-primar
 #adSidebar { width:280px; background:#f1f1f1; border-left:1px dashed #ccc; padding:8px; text-align:center; overflow-y:auto; }
 
 /* FOOTER */
-footer { background:white; color:#555; text-align:center; padding:6px; font-size:0.85em; border-top:1px solid #ddd; }
+footer { background:white; color:#555; text-align:center; padding:6px; font-size:0.85em; border-top:1px solid #ddd; z-index:100; }
 
 /* MOBILE */
 @media(max-width:768px){
-  /* Ajusta mainContent para reservar espaço para topBar + userLine + chatInput + footer */
+  html, body { height:100%; overflow:visible; }
+
+  /* Header fixo no topo */
+  header { position:fixed; top:0; left:0; right:0; z-index:100; }
+
+  /* TopBar fixo abaixo do header */
+  #topBar { 
+    position:fixed; 
+    top:52px; 
+    left:0; 
+    right:0; 
+    z-index:100; 
+    width:100%;
+  }
+
+  /* Mobile user horizontal abaixo do TopBar */
+  #mobileUserLine {
+    display:flex;
+    position:fixed;
+    top: 52px + 40px; /* header + topBar */
+    left:0;
+    right:0;
+    padding:6px 4px;
+    background:#fafafa;
+    border-bottom:1px solid #ddd;
+    z-index:100;
+    overflow-x:auto;
+    white-space:nowrap;
+  }
+
+  /* Main content ocupa espaço entre mobileUserLine e chatInput/footer */
   #mainContent {
     flex-direction:column;
-    height: calc(100vh - 52px - 60px - 50px - 6px); 
-    /* 52px topBar + 60px mobileUserLine + 50px chatInput + 6px footer */
-  }
-
-  #userList, #adSidebar { display:none; }
-  #mobileUserLine { display:flex; }
-
-  /* Chat reduzido para caber todos elementos */
-  #chatWindow {
-    flex:1;
+    margin-top: 52px + 40px + 60px; /* header + topBar + mobileUserLine */
+    margin-bottom: 60px + 40px; /* chatInput + footer */
+    height: auto;
     overflow-y:auto;
-    margin-bottom:4px;
-    width:100%;
   }
 
-  /* Input fixo acima do footer */
-  #chatInput {
-    position:fixed;
-    bottom:26px; /* espaço para footer visível */
-    left:0;
-    right:0;
-    padding:4px;
-    background:white;
-    z-index:50;
-    width:100%;
-  }
+  #chatWindow { flex:1; overflow-y:auto; width:100%; margin-bottom:0; padding-bottom:10px; }
+
+  /* Chat input fixo acima do footer */
+  #chatInput { position:fixed; bottom:40px; left:0; right:0; padding:4px; background:white; z-index:50; width:100%; }
 
   /* Footer fixo */
-  footer {
-    position:fixed;
-    bottom:0;
-    left:0;
-    right:0;
-  }
+  footer { position:fixed; bottom:0; left:0; right:0; z-index:100; width:100%; }
 
-  html, body { overflow:hidden; }
-  #topBar { position:fixed; top:0; left:0; right:0; z-index:100; }
+  /* Oculta userList e adSidebar no mobile */
+  #userList, #adSidebar { display:none; }
 }
 </style>
 </head>
@@ -213,7 +222,6 @@ db.ref("online").on("value", snap=>{
     mobileUserLine.appendChild(div);
   }
 
-  // INFINITE SCROLL HORIZONTAL
   startMobileScroll();
 });
 
