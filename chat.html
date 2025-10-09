@@ -36,7 +36,7 @@ header h1 { display:flex; align-items:center; gap:8px; color: var(--color-primar
 .userItemMobile img { width:100%; height:100%; border-radius:50%; object-fit:cover; }
 .userItemMobile:hover { border-color:var(--color-primary); transform:scale(1.1); }
 
-/* BOLINHA DE NOTIFICAÇÃO */
+/* BOLINHA DE NOTIFICAÇÃO PISCANTE */
 .notify-dot {
   position:absolute;
   top:2px;
@@ -45,7 +45,13 @@ header h1 { display:flex; align-items:center; gap:8px; color: var(--color-primar
   height:10px;
   background:red;
   border-radius:50%;
+  animation: blink 1s infinite;
   display:none;
+}
+@keyframes blink {
+  0% { opacity:1; }
+  50% { opacity:0; }
+  100% { opacity:1; }
 }
 
 /* MAIN */
@@ -161,7 +167,6 @@ footer { background:white; color:#555; text-align:center; padding:6px; font-size
 
 <footer>© 2025 Славянский клуб — Aprenda Russo e Português com diversão!</footer>
 
-<!-- SOM DE NOTIFICAÇÃO -->
 <audio id="msgSound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_2a8c4e8d5a.mp3?filename=message-pop-alert-23584.mp3" preload="auto"></audio>
 
 <script>
@@ -190,8 +195,8 @@ const generalBtn=document.getElementById("generalBtn");
 const mobileUserLine=document.getElementById("mobileUserLine");
 const msgSound=document.getElementById("msgSound");
 let currentChat="global";
+let unreadMap={};
 
-// LOGIN
 loginBtn.onclick=()=>auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
 logoutBtn.onclick=()=>auth.signOut();
 
@@ -213,32 +218,30 @@ auth.onAuthStateChanged(user=>{
   }
 });
 
-// LISTA DE USUÁRIOS
-db.ref("online").on("value", snap=>{
+db.ref("online").on("value",snap=>{
   const users=snap.val()||{};
   onlineCount.textContent=`👥 ${Object.keys(users).length}`;
   userList.innerHTML="";
   mobileUserLine.innerHTML="";
-
   for(const [uid,u] of Object.entries(users)){
     const div=document.createElement("div");
     div.className="userItem";
     div.innerHTML=`<img src="${u.photo}"><span>${u.name}</span><div class='notify-dot'></div>`;
-    div.onclick=()=>requestPrivateChat(uid,u.name);
+    div.onclick=()=>openPrivateChat(uid,u.name);
     userList.appendChild(div);
 
     const mob=document.createElement("div");
     mob.className="userItemMobile";
     mob.innerHTML=`<img src="${u.photo}" title="${u.name}"><div class='notify-dot'></div>`;
-    mob.onclick=()=>requestPrivateChat(uid,u.name);
+    mob.onclick=()=>openPrivateChat(uid,u.name);
     mobileUserLine.appendChild(mob);
   }
   startMobileScroll();
 });
 
-// ENVIAR MENSAGEM
 sendBtn.onclick=sendMessage;
 msgInput.addEventListener("keypress",e=>{if(e.key==="Enter")sendMessage();});
+
 function sendMessage(){
   const text=msgInput.value.trim();
   const user=auth.currentUser;
@@ -248,12 +251,77 @@ function sendMessage(){
   msgInput.value="";
 }
 
-// RECEBER MENSAGENS GERAIS + NOTIFICAÇÕES
+// CHAT GERAL
 db.ref("chatGlobal").on("child_added",snap=>{
   const msg=snap.val();
   showMessage(msg,"chatGlobal");
   if(msg.user!==auth.currentUser?.displayName && currentChat!=="global") playNotification();
 });
+
+// ABRIR CHAT PRIVADO
+function openPrivateChat(uid,name){
+  if(!auth.currentUser)return alert("Faça login para conversar.");
+  if(uid===auth.currentUser.uid)return;
+
+  const chatId=[uid,auth.currentUser.uid].sort().join("_");
+  currentChat=chatId;
+  chatWindow.innerHTML=`<div style='text-align:center;margin:10px;color:#555;'>💬 Conversa privada com ${name}</div>`;
+  generalBtn.style.display="inline-block";
+
+  // Marca mensagens como lidas
+  if(unreadMap[chatId]){
+    unreadMap[chatId]=false;
+    updateNotifyDot(uid,false);
+  }
+
+  // Verifica se há aceitação
+  db.ref("privateStatus/"+chatId).once("value").then(s=>{
+    const st=s.val();
+    if(st && st.rejected){
+      chatWindow.innerHTML="<div style='text-align:center;color:red;'>❌ Esta conversa foi recusada.</div>";
+      return;
+    }
+    if(!st || (!st.accepted && st.waiting)){
+      showAcceptancePrompt(chatId,name);
+    } else {
+      startChatListener(chatId);
+    }
+  });
+}
+
+// MOSTRA PERGUNTA "ACEITAR?"
+function showAcceptancePrompt(chatId,name){
+  chatWindow.innerHTML=`
+    <div style='text-align:center;margin-top:20px;'>
+      ${name} enviou uma mensagem. Deseja aceitar o chat?<br><br>
+      <button onclick="acceptChat('${chatId}')">✅ Aceitar</button>
+      <button onclick="rejectChat('${chatId}')">❌ Recusar</button>
+    </div>`;
+}
+
+// ACEITAR / RECUSAR CHAT
+function acceptChat(chatId){
+  db.ref("privateStatus/"+chatId).set({accepted:true});
+  startChatListener(chatId);
+}
+function rejectChat(chatId){
+  db.ref("privateStatus/"+chatId).set({rejected:true});
+  chatWindow.innerHTML="<div style='text-align:center;color:red;'>❌ Você recusou esta conversa.</div>";
+}
+
+// MONITORA CHAT PRIVADO
+function startChatListener(chatId){
+  db.ref("private/"+chatId).off();
+  db.ref("private/"+chatId).on("child_added",s=>{
+    showMessage(s.val(),chatId);
+    if(s.val().user!==auth.currentUser.displayName && currentChat!==chatId){
+      playNotification();
+      unreadMap[chatId]=true;
+      const uidOther=chatId.replace(auth.currentUser.uid,"").replace("_","");
+      updateNotifyDot(uidOther,true);
+    }
+  });
+}
 
 function showMessage(msg,room){
   if(room!=="chatGlobal" && room!==currentChat)return;
@@ -264,46 +332,23 @@ function showMessage(msg,room){
   chatWindow.scrollTop=chatWindow.scrollHeight;
 }
 
-// NOTIFICAÇÃO SONORA + VISUAL
+// NOTIFICAÇÃO
 function playNotification(){
   msgSound.currentTime=0;
   msgSound.play();
-  document.title="🔔 Nova mensagem!";
-  setTimeout(()=>document.title="чат 🌍",2000);
 }
 
-// PEDIDO DE CHAT PRIVADO
-function requestPrivateChat(uid,name){
-  if(!auth.currentUser) return alert("Faça login para conversar.");
-  if(uid===auth.currentUser.uid) return;
-  db.ref(`privateRequests/${uid}`).push({from:auth.currentUser.uid,fromName:auth.currentUser.displayName});
-  alert(`Pedido de conversa privada enviado para ${name}.`);
+// Atualiza bolinha vermelha
+function updateNotifyDot(uid,show){
+  const items=[...document.querySelectorAll(".userItem"),...document.querySelectorAll(".userItemMobile")];
+  for(const el of items){
+    if(el.innerHTML.includes(uid)) continue;
+    const dot=el.querySelector(".notify-dot");
+    if(dot) dot.style.display=show?"block":"none";
+  }
 }
 
-// RECEBE PEDIDOS
-auth.onAuthStateChanged(user=>{
-  if(!user)return;
-  db.ref(`privateRequests/${user.uid}`).on("child_added",snap=>{
-    const data=snap.val();
-    if(confirm(`${data.fromName} quer conversar com você em privado. Aceitar?`)){
-      startPrivateChat(user.uid,data.from,data.fromName);
-    }
-    snap.ref.remove();
-  });
-});
-
-function startPrivateChat(uid1,uid2,otherName){
-  currentChat=[uid1,uid2].sort().join("_");
-  chatWindow.innerHTML=`<div style='text-align:center;margin:10px;color:#555;'>💬 Conversa privada com ${otherName}</div>`;
-  generalBtn.style.display="inline-block";
-  db.ref("private/"+currentChat).off();
-  db.ref("private/"+currentChat).on("child_added",s=>{
-    showMessage(s.val(),currentChat);
-    if(s.val().user!==auth.currentUser.displayName) playNotification();
-  });
-}
-
-// VOLTAR
+// VOLTAR CHAT GERAL
 generalBtn.onclick=()=>{
   currentChat="global";
   chatWindow.innerHTML="";
@@ -311,7 +356,7 @@ generalBtn.onclick=()=>{
   generalBtn.style.display="none";
 };
 
-// SCROLL INFINITO MOBILE
+// SCROLL AUTOMÁTICO MOBILE
 let scrollInterval;
 function startMobileScroll(){
   clearInterval(scrollInterval);
