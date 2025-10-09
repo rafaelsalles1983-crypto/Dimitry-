@@ -268,20 +268,15 @@ function openPrivateChat(uid,name){
   chatWindow.innerHTML=`<div style='text-align:center;margin:10px;color:#555;'>💬 Conversa privada com ${name}</div>`;
   generalBtn.style.display="inline-block";
 
-  // Marca mensagens como lidas
   if(unreadMap[chatId]){
     unreadMap[chatId]=false;
     updateNotifyDot(uid,false);
   }
 
-  // Verifica se há aceitação
   db.ref("privateStatus/"+chatId).once("value").then(s=>{
     const st=s.val();
-    if(st && st.rejected){
-      chatWindow.innerHTML="<div style='text-align:center;color:red;'>❌ Esta conversa foi recusada.</div>";
-      return;
-    }
-    if(!st || (!st.accepted && st.waiting)){
+    // Agora recusas não são permanentes
+    if(!st || !st.accepted){
       showAcceptancePrompt(chatId,name);
     } else {
       startChatListener(chatId);
@@ -289,7 +284,7 @@ function openPrivateChat(uid,name){
   });
 }
 
-// MOSTRA PERGUNTA "ACEITAR?"
+// MOSTRA "ACEITAR?" AO RECEBER MENSAGEM
 function showAcceptancePrompt(chatId,name){
   chatWindow.innerHTML=`
     <div style='text-align:center;margin-top:20px;'>
@@ -305,7 +300,7 @@ function acceptChat(chatId){
   startChatListener(chatId);
 }
 function rejectChat(chatId){
-  db.ref("privateStatus/"+chatId).set({rejected:true});
+  db.ref("privateStatus/"+chatId).remove(); // Permite novas futuras solicitações
   chatWindow.innerHTML="<div style='text-align:center;color:red;'>❌ Você recusou esta conversa.</div>";
 }
 
@@ -342,7 +337,6 @@ function playNotification(){
 function updateNotifyDot(uid,show){
   const items=[...document.querySelectorAll(".userItem"),...document.querySelectorAll(".userItemMobile")];
   for(const el of items){
-    if(el.innerHTML.includes(uid)) continue;
     const dot=el.querySelector(".notify-dot");
     if(dot) dot.style.display=show?"block":"none";
   }
