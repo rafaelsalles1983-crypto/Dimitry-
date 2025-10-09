@@ -12,71 +12,179 @@
 <style>
 :root {
   --color-bg-light: #f5f5f5;
+  --color-bg-dark: #1e1e1e;
+  --color-text-light: #333;
+  --color-text-dark: #eee;
   --color-primary: #4CAF50;
   --color-primary-hover: #45a049;
 }
 
-/* RESET */
-* { box-sizing:border-box; margin:0; padding:0; }
-html,body { height:100%; font-family:Arial,sans-serif; background:var(--color-bg-light); }
+/* ===== RESET ===== */
+* { box-sizing: border-box; margin:0; padding:0; }
+html, body { height: 100%; font-family: Arial, sans-serif; background: var(--color-bg-light); }
 
-/* HEADER */
-header { background:#fff; padding:6px 12px; border-bottom:1px solid #ddd; }
-header h1 { display:flex; align-items:center; gap:8px; font-size:1.4em; color:var(--color-primary); margin:0; }
-.emoji-head { width:28px; height:28px; }
+/* ===== HEADER ===== */
+header {
+  background:#fff;
+  padding:10px;
+  border-bottom:1px solid #ddd;
+}
+header h1 {
+  display:flex;
+  align-items:center;
+  gap:8px;
+  color: var(--color-primary);
+  font-size:1.4em;
+}
+.emoji-head { width:32px; height:32px; vertical-align:middle; }
 
-/* TOPBAR */
-#topBar { display:flex; align-items:center; gap:8px; padding:6px 10px; background:#fafafa; border-bottom:1px solid #ddd; overflow-x:auto; }
-#topBar button { background:white; color:var(--color-primary); border:1px solid var(--color-primary); padding:5px 10px; border-radius:5px; cursor:pointer; flex-shrink:0; }
+/* ===== TOPBAR ===== */
+#topBar {
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:6px 10px;
+  background:#fafafa;
+  border-bottom:1px solid #ddd;
+  overflow-x:auto;
+  flex-wrap:wrap;
+}
+#topBar button {
+  background:white;
+  color:var(--color-primary);
+  border:1px solid var(--color-primary);
+  padding:6px 10px;
+  border-radius:5px;
+  cursor:pointer;
+  flex-shrink:0;
+}
 #topBar span { font-size:0.9em; flex-shrink:0; }
 
-/* MAIN CONTENT */
-#mainContent { display:flex; flex:1; overflow:hidden; height: calc(100vh - 88px); }
+/* ===== MOBILE USER LINE ===== */
+#mobileUserLine {
+  display:none;
+  overflow-x:auto;
+  white-space:nowrap;
+  background:#fafafa;
+  padding:6px 4px;
+  border-bottom:1px solid #ddd;
+  scroll-behavior: smooth;
+}
+.userItemMobile {
+  width:50px;
+  height:50px;
+  border-radius:50%;
+  overflow:hidden;
+  cursor:pointer;
+  display:inline-block;
+  margin-right:6px;
+  border:2px solid transparent;
+  flex-shrink:0;
+  transition: transform 0.2s;
+}
+.userItemMobile img { width:100%; height:100%; border-radius:50%; object-fit:cover; }
+.userItemMobile:hover { border-color:var(--color-primary); transform:scale(1.1); }
 
-/* USER LIST */
-#userList { width:60px; background:#fff; border-right:1px solid #ddd; overflow-y:auto; padding:6px; display:flex; flex-direction:column; align-items:center; }
-.userItem { width:48px; height:48px; margin-bottom:6px; cursor:pointer; border-radius:50%; overflow:hidden; border:2px solid transparent; }
-.userItem img { width:100%; height:100%; border-radius:50%; object-fit:cover; }
-.userItem:hover { border-color:var(--color-primary); }
+/* ===== MAIN CONTENT ===== */
+#mainContent { display:flex; flex:1; overflow:hidden; height: calc(100vh - 108px); }
 
-/* CHAT */
+/* ===== USER LIST (DESKTOP) ===== */
+#userList {
+  width:200px;
+  background:#fff;
+  border-right:1px solid #ddd;
+  overflow-y:auto;
+  padding:8px;
+}
+.userItem {
+  display:flex;
+  align-items:center;
+  gap:6px;
+  margin-bottom:6px;
+  cursor:pointer;
+  padding:6px;
+  border-radius:5px;
+}
+.userItem:hover { background:#e0f7e9; }
+.userItem img { width:28px; height:28px; border-radius:50%; }
+
+/* ===== CHAT ===== */
 #chatContainer { flex:1; display:flex; flex-direction:column; overflow:hidden; }
-#chatWindow { flex:1; overflow-y:auto; padding:10px; background:white; }
-.msg { margin:5px 0; padding:8px; border-radius:8px; max-width:80%; word-wrap:break-word; }
+#chatWindow {
+  flex:1;
+  overflow-y:auto;
+  padding:10px;
+  background:white;
+}
+.msg {
+  margin:5px 0;
+  padding:8px;
+  border-radius:8px;
+  max-width:80%;
+  word-wrap:break-word;
+}
 .userMsg { background:#e0f7e9; align-self:flex-end; }
 .otherMsg { background:#fff8dc; align-self:flex-start; }
 
-/* CHAT INPUT */
-#chatInput { display:flex; border-top:1px solid #ddd; background:white; padding:4px; }
-#chatInput input { flex:1; padding:10px; font-size:1em; border:1px solid #ccc; border-radius:5px; }
-#chatInput button { background:var(--color-primary); color:white; border:none; padding:10px 14px; margin-left:4px; border-radius:5px; cursor:pointer; }
+/* ===== CHAT INPUT ===== */
+#chatInput {
+  display:flex;
+  border-top:1px solid #ddd;
+  background:white;
+  padding:4px;
+}
+#chatInput input {
+  flex:1;
+  padding:10px;
+  font-size:1em;
+  border:1px solid #ccc;
+  border-radius:5px;
+}
+#chatInput button {
+  background:var(--color-primary);
+  color:white;
+  border:none;
+  padding:10px 14px;
+  margin-left:4px;
+  border-radius:5px;
+  cursor:pointer;
+}
 #chatInput button:hover { background:var(--color-primary-hover); }
 
-/* ADS */
-#adSidebar { width:280px; background:#f1f1f1; border-left:1px dashed #ccc; padding:8px; text-align:center; overflow-y:auto; }
+/* ===== ADS ===== */
+#adSidebar {
+  width:280px;
+  background:#f1f1f1;
+  border-left:1px dashed #ccc;
+  padding:8px;
+  text-align:center;
+  overflow-y:auto;
+}
 
-/* FOOTER */
-footer { background:white; color:#555; text-align:center; padding:6px; font-size:0.85em; border-top:1px solid #ddd; }
+/* ===== FOOTER ===== */
+footer {
+  background:white;
+  color:#555;
+  text-align:center;
+  padding:6px;
+  font-size:0.85em;
+  border-top:1px solid #ddd;
+}
 
-/* MODAL */
-#overlay { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); display:none; justify-content:center; align-items:center; z-index:200; }
-#overlay .modal { background:white; padding:16px; border-radius:8px; width:90%; max-width:320px; text-align:center; }
-#overlay .modal button { margin:8px; padding:8px 12px; border:none; border-radius:5px; cursor:pointer; }
-#overlay .modal .accept { background:var(--color-primary); color:white; }
-#overlay .modal .decline { background:#ccc; }
-
-/* MOBILE */
+/* ===== MOBILE ===== */
 @media(max-width:768px){
-  #mainContent { flex-direction:column; height: calc(100vh - 88px); }
+  #mainContent { flex-direction:column; height: calc(100vh - 140px); }
   #userList, #adSidebar { display:none; }
-  #chatWindow { flex:1; overflow-y:auto; }
-  #chatInput { position:fixed; bottom:40px; left:0; right:0; padding:4px; background:white; z-index:50; }
-  footer { position:fixed; bottom:0; left:0; right:0; }
+  #mobileUserLine { display:flex; }
+  #chatWindow { flex:1; overflow-y:auto; margin-bottom:60px; }
+  #chatInput { position:fixed; bottom:0; left:0; right:0; padding:4px; background:white; z-index:50; display:flex; width:100%; }
+  footer { position:fixed; bottom:-1px; left:0; right:0; }
   html, body { overflow:hidden; }
-  #topBar { position:fixed; top:44px; left:0; right:0; z-index:100; }
+  #topBar { position:fixed; top:52px; left:0; right:0; z-index:100; }
 }
 </style>
 </head>
+
 <body>
 <header>
   <h1>Славянский клуб <img src="emoji_dimitry.png" alt="Dimitry" class="emoji-head"></h1>
@@ -86,13 +194,17 @@ footer { background:white; color:#555; text-align:center; padding:6px; font-size
   <button id="backBtn" onclick="window.location.href='index.html'">⬅ Voltar</button>
   <button id="loginBtn">Login com Google</button>
   <button id="logoutBtn" style="display:none;">Logout</button>
-  <span id="onlineCount">👥 0</span>
-  <span id="alertaLogin">⚠️ Faça login para enviar mensagens.</span>
   <button id="generalBtn" style="display:none;">⬅ Bate-papo geral</button>
+  <span id="alertaLogin">⚠️ Faça login para enviar mensagens.</span>
+  <span id="onlineCount">👥 Usuários online: 0</span>
 </div>
+
+<!-- Linha de usuários online para mobile -->
+<div id="mobileUserLine"></div>
 
 <div id="mainContent">
   <div id="userList"></div>
+
   <div id="chatContainer">
     <div id="chatWindow"></div>
     <div id="chatInput">
@@ -100,21 +212,14 @@ footer { background:white; color:#555; text-align:center; padding:6px; font-size
       <button id="sendBtn" disabled>Enviar</button>
     </div>
   </div>
-  <div id="adSidebar">Publicidade</div>
+
+  <div id="adSidebar">Publicidade aqui (Adsense)</div>
 </div>
 
 <footer>© 2025 Славянский клуб — Aprenda Russo e Português com diversão!</footer>
 
-<!-- MODAL -->
-<div id="overlay">
-  <div class="modal">
-    <p id="modalText">Pedido de chat privado de Fulano</p>
-    <button class="accept">Aceitar</button>
-    <button class="decline">Recusar</button>
-  </div>
-</div>
-
 <script>
+// Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyCYJCgfil5HKrCWtB14zwdicDaEcldHU6A",
   authDomain: "dimitry-rusian.firebaseapp.com",
@@ -125,9 +230,9 @@ const firebaseConfig = {
   appId: "1:449029666805:web:feaf575a7b7e6f234a52bc"
 };
 firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const db = firebase.database();
 
+const auth=firebase.auth();
+const db=firebase.database();
 const loginBtn=document.getElementById("loginBtn");
 const logoutBtn=document.getElementById("logoutBtn");
 const msgInput=document.getElementById("msgInput");
@@ -137,18 +242,14 @@ const userList=document.getElementById("userList");
 const alertaLogin=document.getElementById("alertaLogin");
 const onlineCount=document.getElementById("onlineCount");
 const generalBtn=document.getElementById("generalBtn");
-const overlay=document.getElementById("overlay");
-const modalText=document.getElementById("modalText");
-const acceptBtn=overlay.querySelector(".accept");
-const declineBtn=overlay.querySelector(".decline");
-
+const mobileUserLine=document.getElementById("mobileUserLine");
 let currentChat="global";
-let pendingRequest=null;
 
 // Login/logout
-loginBtn.onclick=()=>auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
-logoutBtn.onclick=()=>auth.signOut();
+loginBtn.onclick = ()=> auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
+logoutBtn.onclick = ()=> auth.signOut();
 
+// Estado do usuário
 auth.onAuthStateChanged(user=>{
   if(user){
     loginBtn.style.display="none";
@@ -158,7 +259,7 @@ auth.onAuthStateChanged(user=>{
     sendBtn.disabled=false;
     db.ref("online/"+user.uid).set({name:user.displayName,photo:user.photoURL});
     db.ref("online/"+user.uid).onDisconnect().remove();
-  }else{
+  } else{
     loginBtn.style.display="inline-block";
     logoutBtn.style.display="none";
     alertaLogin.style.display="inline-block";
@@ -167,24 +268,35 @@ auth.onAuthStateChanged(user=>{
   }
 });
 
-// Mostrar usuários online
+// Atualizar lista de usuários online
 db.ref("online").on("value", snap=>{
-  userList.innerHTML="";
   const users=snap.val()||{};
   onlineCount.textContent=`👥 ${Object.keys(users).length}`;
+
+  // Desktop
+  userList.innerHTML="";
   for(const [uid,u] of Object.entries(users)){
     const div=document.createElement("div");
     div.className="userItem";
-    div.innerHTML=`<img src="${u.photo||'https://cdn-icons-png.flaticon.com/512/847/847969.png'}" title="${u.name}">`;
+    div.innerHTML=`<img src="${u.photo||'https://cdn-icons-png.flaticon.com/512/847/847969.png'}"><span>${u.name}</span>`;
     div.onclick=()=>requestPrivateChat(uid,u.name);
     userList.appendChild(div);
+  }
+
+  // Mobile
+  mobileUserLine.innerHTML="";
+  for(const [uid,u] of Object.entries(users)){
+    const div=document.createElement("div");
+    div.className="userItemMobile";
+    div.innerHTML=`<img src="${u.photo||'https://cdn-icons-png.flaticon.com/512/847/847969.png'}" title="${u.name}">`;
+    div.onclick=()=>requestPrivateChat(uid,u.name);
+    mobileUserLine.appendChild(div);
   }
 });
 
 // Enviar mensagem
-sendBtn.onclick=sendMessage;
-msgInput.addEventListener("keypress",e=>{if(e.key==="Enter")sendMessage();});
-
+sendBtn.onclick = sendMessage;
+msgInput.addEventListener("keypress", e=>{if(e.key==="Enter") sendMessage();});
 function sendMessage(){
   const text=msgInput.value.trim();
   const user=auth.currentUser;
@@ -194,11 +306,10 @@ function sendMessage(){
   msgInput.value="";
 }
 
-// Receber mensagens globais
-db.ref("chatGlobal").on("child_added",snap=>showMessage(snap.val(),"chatGlobal"));
-
+// Receber mensagens
+db.ref("chatGlobal").on("child_added", snap=>showMessage(snap.val(),"chatGlobal"));
 function showMessage(msg,room){
-  if(room!=="chatGlobal"&&room!==currentChat)return;
+  if(room!=="chatGlobal" && room!==currentChat) return;
   const div=document.createElement("div");
   div.className=msg.user===auth.currentUser?.displayName?"msg userMsg":"msg otherMsg";
   div.textContent=`${msg.user}: ${msg.text}`;
@@ -206,40 +317,17 @@ function showMessage(msg,room){
   chatWindow.scrollTop=chatWindow.scrollHeight;
 }
 
-// Solicitar chat privado
+// Chat privado
 function requestPrivateChat(uid,name){
-  if(!auth.currentUser)return alert("Faça login para conversar.");
-  if(uid===auth.currentUser.uid)return;
-  pendingRequest={uid,name};
-  // Enviar pedido para o outro usuário
-  db.ref("privateRequests/"+uid).push({from:auth.currentUser.uid,name:auth.currentUser.displayName});
-  alert(`Pedido enviado para ${name}. Aguarde aceitação.`);
-}
-
-// Escutar pedidos recebidos
-auth.onAuthStateChanged(user=>{
-  if(!user)return;
-  db.ref("privateRequests/"+user.uid).on("child_added",snap=>{
-    const req=snap.val();
-    pendingRequest={from: req.from, name:req.name, key:snap.key};
-    modalText.textContent=`${req.name} quer conversar privadamente com você. Aceitar?`;
-    overlay.style.display="flex";
-  });
-});
-
-// Aceitar/Recusar
-acceptBtn.onclick=()=>{
-  if(!pendingRequest)return;
-  const uid=pendingRequest.from;
+  if(!auth.currentUser) return alert("Faça login para conversar.");
+  if(uid===auth.currentUser.uid) return;
+  if(!confirm(`Deseja enviar um pedido de conversa privada para ${name}?`)) return;
   currentChat=[auth.currentUser.uid,uid].sort().join("_");
-  chatWindow.innerHTML=`<div style='text-align:center;margin:10px;color:#555;'>💬 Conversa privada com ${pendingRequest.name}</div>`;
+  chatWindow.innerHTML=`<div style='text-align:center;margin:10px;color:#555;'>💬 Conversa privada com ${name}</div>`;
   generalBtn.style.display="inline-block";
-  overlay.style.display="none";
-  db.ref("privateRequests/"+auth.currentUser.uid+"/"+pendingRequest.key).remove();
-  db.ref("private/"+currentChat).on("child_added",s=>showMessage(s.val(),currentChat));
-  pendingRequest=null;
-};
-declineBtn.onclick=()=>{ overlay.style.display="none"; if(pendingRequest) db.ref("privateRequests/"+auth.currentUser.uid+"/"+pendingRequest.key).remove(); pendingRequest=null; };
+  db.ref("private/"+currentChat).off();
+  db.ref("private/"+currentChat).on("child_added", s=>showMessage(s.val(),currentChat));
+}
 
 // Voltar ao chat geral
 generalBtn.onclick=()=>{
