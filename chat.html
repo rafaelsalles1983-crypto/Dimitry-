@@ -12,18 +12,15 @@
 <style>
 :root {
   --color-bg-light: #f5f5f5;
-  --color-bg-dark: #1e1e1e;
-  --color-text-light: #333;
-  --color-text-dark: #eee;
   --color-primary: #4CAF50;
   --color-primary-hover: #45a049;
 }
 
-/* ===== RESET ===== */
+/* RESET */
 * { box-sizing: border-box; margin:0; padding:0; }
-html, body { height: 100%; font-family: Arial, sans-serif; background: var(--color-bg-light); }
+html, body { height:100%; font-family:Arial,sans-serif; background: var(--color-bg-light); }
 
-/* ===== HEADER ===== */
+/* HEADER */
 header {
   background:#fff;
   padding:10px;
@@ -36,9 +33,9 @@ header h1 {
   color: var(--color-primary);
   font-size:1.4em;
 }
-.emoji-head { width:32px; height:32px; vertical-align:middle; }
+.emoji-head { width:32px; height:32px; }
 
-/* ===== TOPBAR ===== */
+/* TOPBAR */
 #topBar {
   display:flex;
   align-items:center;
@@ -46,8 +43,8 @@ header h1 {
   padding:6px 10px;
   background:#fafafa;
   border-bottom:1px solid #ddd;
-  overflow-x:auto;
   flex-wrap:wrap;
+  overflow-x:auto;
 }
 #topBar button {
   background:white;
@@ -60,131 +57,66 @@ header h1 {
 }
 #topBar span { font-size:0.9em; flex-shrink:0; }
 
-/* ===== MOBILE USER LINE ===== */
+/* MOBILE USERS HORIZONTAL */
 #mobileUserLine {
   display:none;
-  overflow-x:auto;
+  overflow-x:hidden; /* ocultar scrollbar */
   white-space:nowrap;
   background:#fafafa;
   padding:6px 4px;
   border-bottom:1px solid #ddd;
-  scroll-behavior: smooth;
 }
 .userItemMobile {
-  width:50px;
-  height:50px;
-  border-radius:50%;
-  overflow:hidden;
-  cursor:pointer;
-  display:inline-block;
-  margin-right:6px;
-  border:2px solid transparent;
-  flex-shrink:0;
-  transition: transform 0.2s;
+  width:50px; height:50px; border-radius:50%; overflow:hidden;
+  display:inline-block; margin-right:6px; border:2px solid transparent;
+  cursor:pointer; transition: transform 0.2s;
 }
 .userItemMobile img { width:100%; height:100%; border-radius:50%; object-fit:cover; }
 .userItemMobile:hover { border-color:var(--color-primary); transform:scale(1.1); }
 
-/* ===== MAIN CONTENT ===== */
+/* MAIN */
 #mainContent { display:flex; flex:1; overflow:hidden; height: calc(100vh - 108px); }
 
-/* ===== USER LIST (DESKTOP) ===== */
+/* USER LIST (DESKTOP) */
 #userList {
-  width:200px;
-  background:#fff;
-  border-right:1px solid #ddd;
-  overflow-y:auto;
-  padding:8px;
+  width:200px; background:#fff; border-right:1px solid #ddd; overflow-y:auto; padding:8px;
 }
-.userItem {
-  display:flex;
-  align-items:center;
-  gap:6px;
-  margin-bottom:6px;
-  cursor:pointer;
-  padding:6px;
-  border-radius:5px;
-}
+.userItem { display:flex; align-items:center; gap:6px; margin-bottom:6px; cursor:pointer; padding:6px; border-radius:5px; }
 .userItem:hover { background:#e0f7e9; }
 .userItem img { width:28px; height:28px; border-radius:50%; }
 
-/* ===== CHAT ===== */
+/* CHAT */
 #chatContainer { flex:1; display:flex; flex-direction:column; overflow:hidden; }
-#chatWindow {
-  flex:1;
-  overflow-y:auto;
-  padding:10px;
-  background:white;
-}
-.msg {
-  margin:5px 0;
-  padding:8px;
-  border-radius:8px;
-  max-width:80%;
-  word-wrap:break-word;
-}
-.userMsg { background:#e0f7e9; align-self:flex-end; }
-.otherMsg { background:#fff8dc; align-self:flex-start; }
+#chatWindow { flex:1; overflow-y:auto; padding:10px; background:white; }
+.msg { margin:5px 0; padding:8px; border-radius:8px; max-width:80%; word-wrap:break-word; }
+.userMsg { background:#e0f7e9; align-self:flex-end; text-align:right; }
+.otherMsg { background:#fff8dc; align-self:flex-start; text-align:left; }
 
-/* ===== CHAT INPUT ===== */
-#chatInput {
-  display:flex;
-  border-top:1px solid #ddd;
-  background:white;
-  padding:4px;
-}
-#chatInput input {
-  flex:1;
-  padding:10px;
-  font-size:1em;
-  border:1px solid #ccc;
-  border-radius:5px;
-}
-#chatInput button {
-  background:var(--color-primary);
-  color:white;
-  border:none;
-  padding:10px 14px;
-  margin-left:4px;
-  border-radius:5px;
-  cursor:pointer;
-}
+/* CHAT INPUT */
+#chatInput { display:flex; border-top:1px solid #ddd; background:white; padding:4px; }
+#chatInput input { flex:1; padding:10px; font-size:1em; border:1px solid #ccc; border-radius:5px; }
+#chatInput button { background:var(--color-primary); color:white; border:none; padding:10px 14px; margin-left:4px; border-radius:5px; cursor:pointer; }
 #chatInput button:hover { background:var(--color-primary-hover); }
 
-/* ===== ADS ===== */
-#adSidebar {
-  width:280px;
-  background:#f1f1f1;
-  border-left:1px dashed #ccc;
-  padding:8px;
-  text-align:center;
-  overflow-y:auto;
-}
+/* ADS */
+#adSidebar { width:280px; background:#f1f1f1; border-left:1px dashed #ccc; padding:8px; text-align:center; overflow-y:auto; }
 
-/* ===== FOOTER ===== */
-footer {
-  background:white;
-  color:#555;
-  text-align:center;
-  padding:6px;
-  font-size:0.85em;
-  border-top:1px solid #ddd;
-}
+/* FOOTER */
+footer { background:white; color:#555; text-align:center; padding:6px; font-size:0.85em; border-top:1px solid #ddd; }
 
-/* ===== MOBILE ===== */
+/* MOBILE */
 @media(max-width:768px){
-  #mainContent { flex-direction:column; height: calc(100vh - 140px); }
+  #mainContent { flex-direction:column; height: calc(100vh - 160px); }
   #userList, #adSidebar { display:none; }
   #mobileUserLine { display:flex; }
   #chatWindow { flex:1; overflow-y:auto; margin-bottom:60px; }
-  #chatInput { position:fixed; bottom:0; left:0; right:0; padding:4px; background:white; z-index:50; display:flex; width:100%; }
-  footer { position:fixed; bottom:-1px; left:0; right:0; }
+  #chatInput { position:fixed; bottom:0; left:0; right:0; padding:4px; background:white; z-index:50; width:100%; }
+  footer { position:fixed; bottom:0; left:0; right:0; }
   html, body { overflow:hidden; }
   #topBar { position:fixed; top:52px; left:0; right:0; z-index:100; }
 }
 </style>
 </head>
-
 <body>
 <header>
   <h1>Славянский клуб <img src="emoji_dimitry.png" alt="Dimitry" class="emoji-head"></h1>
@@ -199,12 +131,10 @@ footer {
   <span id="onlineCount">👥 Usuários online: 0</span>
 </div>
 
-<!-- Linha de usuários online para mobile -->
 <div id="mobileUserLine"></div>
 
 <div id="mainContent">
   <div id="userList"></div>
-
   <div id="chatContainer">
     <div id="chatWindow"></div>
     <div id="chatInput">
@@ -212,14 +142,12 @@ footer {
       <button id="sendBtn" disabled>Enviar</button>
     </div>
   </div>
-
   <div id="adSidebar">Publicidade aqui (Adsense)</div>
 </div>
 
 <footer>© 2025 Славянский клуб — Aprenda Russo e Português com diversão!</footer>
 
 <script>
-// Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyCYJCgfil5HKrCWtB14zwdicDaEcldHU6A",
   authDomain: "dimitry-rusian.firebaseapp.com",
@@ -245,11 +173,10 @@ const generalBtn=document.getElementById("generalBtn");
 const mobileUserLine=document.getElementById("mobileUserLine");
 let currentChat="global";
 
-// Login/logout
+// LOGIN/LOGOUT
 loginBtn.onclick = ()=> auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
 logoutBtn.onclick = ()=> auth.signOut();
 
-// Estado do usuário
 auth.onAuthStateChanged(user=>{
   if(user){
     loginBtn.style.display="none";
@@ -268,12 +195,12 @@ auth.onAuthStateChanged(user=>{
   }
 });
 
-// Atualizar lista de usuários online
+// LISTA DE USUÁRIOS
 db.ref("online").on("value", snap=>{
   const users=snap.val()||{};
   onlineCount.textContent=`👥 ${Object.keys(users).length}`;
 
-  // Desktop
+  // DESKTOP
   userList.innerHTML="";
   for(const [uid,u] of Object.entries(users)){
     const div=document.createElement("div");
@@ -283,7 +210,7 @@ db.ref("online").on("value", snap=>{
     userList.appendChild(div);
   }
 
-  // Mobile
+  // MOBILE
   mobileUserLine.innerHTML="";
   for(const [uid,u] of Object.entries(users)){
     const div=document.createElement("div");
@@ -292,9 +219,12 @@ db.ref("online").on("value", snap=>{
     div.onclick=()=>requestPrivateChat(uid,u.name);
     mobileUserLine.appendChild(div);
   }
+
+  // INFINITE SCROLL HORIZONTAL
+  startMobileScroll();
 });
 
-// Enviar mensagem
+// ENVIAR MENSAGEM
 sendBtn.onclick = sendMessage;
 msgInput.addEventListener("keypress", e=>{if(e.key==="Enter") sendMessage();});
 function sendMessage(){
@@ -306,7 +236,7 @@ function sendMessage(){
   msgInput.value="";
 }
 
-// Receber mensagens
+// RECEBER MENSAGENS
 db.ref("chatGlobal").on("child_added", snap=>showMessage(snap.val(),"chatGlobal"));
 function showMessage(msg,room){
   if(room!=="chatGlobal" && room!==currentChat) return;
@@ -317,25 +247,57 @@ function showMessage(msg,room){
   chatWindow.scrollTop=chatWindow.scrollHeight;
 }
 
-// Chat privado
+// CHAT PRIVADO COM ACEITAÇÃO
 function requestPrivateChat(uid,name){
   if(!auth.currentUser) return alert("Faça login para conversar.");
   if(uid===auth.currentUser.uid) return;
-  if(!confirm(`Deseja enviar um pedido de conversa privada para ${name}?`)) return;
-  currentChat=[auth.currentUser.uid,uid].sort().join("_");
-  chatWindow.innerHTML=`<div style='text-align:center;margin:10px;color:#555;'>💬 Conversa privada com ${name}</div>`;
-  generalBtn.style.display="inline-block";
-  db.ref("private/"+currentChat).off();
-  db.ref("private/"+currentChat).on("child_added", s=>showMessage(s.val(),currentChat));
+
+  const reqPath = `privateRequests/${uid}`;
+  db.ref(reqPath).push({
+    from: auth.currentUser.uid,
+    fromName: auth.currentUser.displayName
+  });
+  alert(`Pedido de conversa privada enviado para ${name}.`);
 }
 
-// Voltar ao chat geral
+// RECEBER PEDIDO DE CONVERSA PRIVADA
+auth.onAuthStateChanged(user=>{
+  if(!user) return;
+  const reqPath = `privateRequests/${user.uid}`;
+  db.ref(reqPath).on("child_added", snap=>{
+    const data = snap.val();
+    if(confirm(`${data.fromName} quer conversar com você em privado. Aceitar?`)){
+      currentChat=[user.uid,data.from].sort().join("_");
+      chatWindow.innerHTML=`<div style='text-align:center;margin:10px;color:#555;'>💬 Conversa privada com ${data.fromName}</div>`;
+      generalBtn.style.display="inline-block";
+      db.ref("private/"+currentChat).off();
+      db.ref("private/"+currentChat).on("child_added", s=>showMessage(s.val(),currentChat));
+    }
+    snap.ref.remove();
+  });
+});
+
+// VOLTAR CHAT GERAL
 generalBtn.onclick=()=>{
   currentChat="global";
   chatWindow.innerHTML="";
   db.ref("chatGlobal").once("value",s=>{s.forEach(m=>showMessage(m.val(),"chatGlobal"));});
   generalBtn.style.display="none";
 };
+
+// FUNÇÃO SCROLL INFINITO MOBILE
+let scrollInterval;
+function startMobileScroll(){
+  clearInterval(scrollInterval);
+  const container = mobileUserLine;
+  if(!container) return;
+  scrollInterval = setInterval(()=>{
+    container.scrollLeft += 1;
+    if(container.scrollLeft >= container.scrollWidth - container.clientWidth){
+      container.scrollLeft = 0;
+    }
+  },20); // ajuste velocidade
+}
 </script>
 </body>
 </html>
