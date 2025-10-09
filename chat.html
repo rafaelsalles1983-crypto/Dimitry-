@@ -24,14 +24,10 @@
 }
 
 * { box-sizing: border-box; margin:0; padding:0; }
-
 html, body {
   height: 100%;
-  margin:0;
-  padding:0;
   font-family: Arial, sans-serif;
 }
-
 body {
   display: flex;
   flex-direction: column;
@@ -51,13 +47,7 @@ header h1 {
   padding: 12px;
   background: #fff;
 }
-
-/* Emoji estilo */
-.emoji-head {
-  width: 32px;
-  height: 32px;
-  vertical-align: middle;
-}
+.emoji-head { width: 32px; height: 32px; vertical-align: middle; }
 
 #modeToggle {
   position: fixed;
@@ -88,35 +78,51 @@ header h1 {
   border-radius: 5px;
   cursor: pointer;
 }
-#topBar button:hover { background: var(--color-primary-hover); }
+#topBar button:hover { background: var(--color-primary-hover); color:white; }
 
 #topBar span { font-size: 1em; color: var(--color-text-light); }
-body.dark #topBar span { color: var(--color-text-dark); }
 
 #mainContent {
   display: flex;
   flex: 1;
-  margin:0;
   overflow: hidden;
-  min-height: 0;
 }
 
+/* ==== NOVO: Lista de usuários ==== */
+#userSidebar {
+  width: 220px;
+  background: #fff;
+  border-right: 1px dashed #ccc;
+  overflow-y: auto;
+  padding: 8px;
+}
+.userCard {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 6px 0;
+  padding: 6px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.userCard:hover { background: #e8f5e9; }
+.userCard img { width:32px; height:32px; border-radius:50%; }
+.userCard span { font-size: 0.9em; font-weight: bold; }
+
+/* ===== CHAT ===== */
 #chatContainer {
   flex: 1;
   display: flex;
   flex-direction: column;
-  min-height: 0;
 }
 
 #chatWindow {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  flex: 1;
-  min-height: 0;
   border: 1px solid var(--color-primary);
-  border-radius: 0;
   background: white;
-  overflow: hidden;
 }
 
 #chatMessages {
@@ -137,9 +143,7 @@ body.dark #topBar span { color: var(--color-text-dark); }
   display: flex;
   align-items: flex-start;
   gap: 10px;
-  transition: background 0.3s;
 }
-
 .msg img { width:32px; height:32px; border-radius:50%; }
 .userMsg { align-self: flex-end; background: var(--color-msg-user-light); }
 .otherMsg { align-self: flex-start; background: var(--color-msg-other-light); }
@@ -147,10 +151,8 @@ body.dark #topBar span { color: var(--color-text-dark); }
 #chatInput {
   display:flex;
   border-top:1px solid #ddd;
-  flex-shrink: 0;
   background: white;
 }
-
 #chatInput input {
   flex:1;
   border:none;
@@ -158,7 +160,6 @@ body.dark #topBar span { color: var(--color-text-dark); }
   outline:none;
   font-size: 1.1em;
 }
-
 #chatInput button {
   background: white;
   color:var(--color-primary);
@@ -167,12 +168,7 @@ body.dark #topBar span { color: var(--color-text-dark); }
   cursor:pointer;
   font-size: 1.1em;
 }
-#chatInput button:hover { background: var(--color-primary-hover); }
-
-body.dark { background: var(--color-bg-dark); color: var(--color-text-dark); }
-body.dark #chatWindow { background:#2a2a2a; border-color: var(--color-primary); }
-body.dark .userMsg { background: var(--color-msg-user-dark); }
-body.dark .otherMsg { background: var(--color-msg-other-dark); }
+#chatInput button:hover { background: var(--color-primary-hover); color:white; }
 
 #adSidebar {
   width: 300px;
@@ -180,7 +176,6 @@ body.dark .otherMsg { background: var(--color-msg-other-dark); }
   border-left: 1px dashed #ccc;
   padding: 8px 0;
   text-align: center;
-  overflow: auto;
 }
 
 /* ===== FOOTER ===== */
@@ -192,13 +187,19 @@ footer {
   font-size: 0.85em;
   box-shadow: 0 -2px 6px rgba(0,0,0,0.1);
 }
+
+/* DARK */
+body.dark { background: var(--color-bg-dark); color: var(--color-text-dark); }
+body.dark #chatWindow { background:#2a2a2a; }
+body.dark .userMsg { background: var(--color-msg-user-dark); }
+body.dark .otherMsg { background: var(--color-msg-other-dark); }
+body.dark #userSidebar { background: #2b2b2b; border-color:#444; }
+
 /* MOBILE */
 @media(max-width:768px){
   #mainContent { flex-direction: column; }
-  #chatContainer { width:100%; height:100%; }
-  #chatWindow { border-radius:0; height:100%; }
   #adSidebar { display:none; }
-  body, html { padding:0; margin:0; height:100%; }
+  #userSidebar { display:none; }
 }
 </style>
 </head>
@@ -208,7 +209,6 @@ footer {
 <header>
   <h1>Славянский клуб <img src="emoji_dimitry.png" alt="Dimitry" class="emoji-head"></h1>
 </header>
-
 <button id="modeToggle">🌙</button>
 
 <div id="topBar">
@@ -220,6 +220,8 @@ footer {
 </div>
 
 <div id="mainContent">
+  <div id="userSidebar"></div>
+
   <div id="chatContainer">
     <div id="chatWindow">
       <div id="chatMessages"></div>
@@ -229,6 +231,7 @@ footer {
       </div>
     </div>
   </div>
+
   <div id="adSidebar">Publicidade aqui (Adsense)</div>
 </div>
 
@@ -237,7 +240,7 @@ footer {
 <audio id="notifySound" src="https://cdn.pixabay.com/download/audio/2023/02/28/audio_144c8b3b18.mp3?filename=notification-3-126509.mp3"></audio>
 
 <script>
-// Firebase config
+/* ==== FIREBASE CONFIG ==== */
 const firebaseConfig = {
   apiKey: "AIzaSyCYJCgfil5HKrCWtB14zwdicDaEcldHU6A",
   authDomain: "dimitry-rusian.firebaseapp.com",
@@ -249,26 +252,27 @@ const firebaseConfig = {
   measurementId: "G-6DLM398X84"
 };
 firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const db = firebase.database();
+const auth=firebase.auth();
+const db=firebase.database();
 
-const loginBtn = document.getElementById("loginBtn");
-const logoutBtn = document.getElementById("logoutBtn");
-const msgInput = document.getElementById("msgInput");
-const sendBtn = document.getElementById("sendBtn");
-const chatMessages = document.getElementById("chatMessages");
-const alertaLogin = document.getElementById("alertaLogin");
-const onlineCount = document.getElementById("onlineCount");
-const notifySound = document.getElementById("notifySound");
-const modeToggle = document.getElementById("modeToggle");
+const userSidebar=document.getElementById("userSidebar");
+const chatMessages=document.getElementById("chatMessages");
+const msgInput=document.getElementById("msgInput");
+const sendBtn=document.getElementById("sendBtn");
+const onlineCount=document.getElementById("onlineCount");
+const alertaLogin=document.getElementById("alertaLogin");
+const loginBtn=document.getElementById("loginBtn");
+const logoutBtn=document.getElementById("logoutBtn");
+const notifySound=document.getElementById("notifySound");
+const modeToggle=document.getElementById("modeToggle");
 
-// Dark/Light
+/* ==== MODO ESCURO ==== */
 modeToggle.addEventListener("click",()=>document.body.classList.toggle("dark"));
 
-// Login
+/* ==== LOGIN ==== */
 loginBtn.addEventListener("click",()=>{
   const provider=new firebase.auth.GoogleAuthProvider();
-  auth.signInWithPopup(provider).catch(err=>alert(err.message));
+  auth.signInWithPopup(provider);
 });
 logoutBtn.addEventListener("click",()=>auth.signOut());
 
@@ -279,10 +283,10 @@ auth.onAuthStateChanged(user=>{
     alertaLogin.style.display="none";
     msgInput.disabled=false;
     sendBtn.disabled=false;
-    const userRef=db.ref("online/"+user.uid);
-    userRef.set({name:user.displayName, photo:user.photoURL});
-    userRef.onDisconnect().remove();
-  } else{
+    const ref=db.ref("online/"+user.uid);
+    ref.set({name:user.displayName, photo:user.photoURL});
+    ref.onDisconnect().remove();
+  }else{
     loginBtn.style.display="inline-block";
     logoutBtn.style.display="none";
     alertaLogin.style.display="block";
@@ -291,45 +295,67 @@ auth.onAuthStateChanged(user=>{
   }
 });
 
-// Online users
-db.ref("online").on("value", snapshot=>{
-  onlineCount.textContent=`👥 Usuários online: ${snapshot.numChildren()}`;
+/* ==== EXIBIR USUÁRIOS ONLINE ==== */
+db.ref("online").on("value",snap=>{
+  const users=snap.val()||{};
+  onlineCount.textContent=`👥 Usuários online: ${Object.keys(users).length}`;
+  userSidebar.innerHTML="";
+  Object.entries(users).forEach(([uid,info])=>{
+    const div=document.createElement("div");
+    div.className="userCard";
+    div.innerHTML=`<img src="${info.photo||'https://cdn-icons-png.flaticon.com/512/847/847969.png'}"><span>${info.name}</span>`;
+    div.onclick=()=>requestPrivateChat(uid,info.name);
+    userSidebar.appendChild(div);
+  });
 });
 
-// Send
-function sendMessage(){
+/* ==== ENVIO DE MENSAGEM ==== */
+function sendMessage(chatPath="chatGlobal"){
   const msg=msgInput.value.trim();
   const user=auth.currentUser;
   if(!msg||!user)return;
-  db.ref('chatGlobal').push({
+  db.ref(chatPath).push({
     user:user.displayName,
+    uid:user.uid,
     photo:user.photoURL||"",
     text:msg,
     timestamp:Date.now()
   }).then(()=>msgInput.value="");
 }
-sendBtn.addEventListener("click",sendMessage);
-msgInput.addEventListener("keypress",e=>{if(e.key==="Enter")sendMessage();});
+sendBtn.addEventListener("click",()=>sendMessage(currentChat));
+msgInput.addEventListener("keypress",e=>{if(e.key==="Enter")sendMessage(currentChat);});
 
-// Receive
-db.ref('chatGlobal').orderByChild('timestamp').on('child_added', snapshot=>{
-  const msg=snapshot.val();
-  const div=document.createElement("div");
-  div.classList.add("msg");
-  const currentUser=auth.currentUser?.displayName;
-  if(msg.user===currentUser) div.classList.add("userMsg");
-  else div.classList.add("otherMsg");
-  const img=document.createElement("img");
-  img.src=msg.photo||"https://cdn-icons-png.flaticon.com/512/847/847969.png";
-  const content=document.createElement("div");
-  const time=new Date(msg.timestamp).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
-  content.innerHTML=`<strong>${msg.user}:</strong> ${msg.text} <br><span class="time">${time}</span>`;
-  div.appendChild(img);
-  div.appendChild(content);
-  chatMessages.appendChild(div);
-  chatMessages.scrollTop=chatMessages.scrollHeight;
-  if(msg.user!==currentUser) notifySound.play().catch(()=>{});
-});
+/* ==== RECEBER MENSAGENS ==== */
+let currentChat="chatGlobal";
+function listenChat(path){
+  db.ref(path).off();
+  chatMessages.innerHTML="";
+  db.ref(path).orderByChild("timestamp").on("child_added",snap=>{
+    const msg=snap.val();
+    const div=document.createElement("div");
+    div.classList.add("msg");
+    if(msg.uid===auth.currentUser?.uid)div.classList.add("userMsg");else div.classList.add("otherMsg");
+    div.innerHTML=`<img src="${msg.photo||''}"><div><strong>${msg.user}:</strong> ${msg.text}</div>`;
+    chatMessages.appendChild(div);
+    chatMessages.scrollTop=chatMessages.scrollHeight;
+    if(msg.uid!==auth.currentUser?.uid)notifySound.play().catch(()=>{});
+  });
+}
+listenChat("chatGlobal");
+
+/* ==== CHAT PRIVADO ==== */
+function requestPrivateChat(targetUid,targetName){
+  const currentUser=auth.currentUser;
+  if(!currentUser)return alert("Você precisa fazer login.");
+  if(targetUid===currentUser.uid)return;
+
+  if(confirm(`Deseja conversar em privado com ${targetName}?`)){
+    const roomId=[currentUser.uid,targetUid].sort().join("_");
+    currentChat="private/"+roomId;
+    alert(`Você entrou no chat privado com ${targetName}`);
+    listenChat(currentChat);
+  }
+}
 </script>
 
 </body>
