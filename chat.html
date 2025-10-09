@@ -21,7 +21,7 @@
 html, body { height:100%; font-family:Arial,sans-serif; background: var(--color-bg-light); }
 
 /* HEADER */
-header { background:#fff; padding:10px; border-bottom:1px solid #ddd; z-index:100; width:100%; }
+header { background:#fff; padding:10px; border-bottom:1px solid #ddd; z-index:100; display:flex; align-items:center; gap:8px; }
 header h1 { display:flex; align-items:center; gap:8px; color: var(--color-primary); font-size:1.4em; }
 .emoji-head { width:32px; height:32px; }
 
@@ -62,30 +62,35 @@ header h1 { display:flex; align-items:center; gap:8px; color: var(--color-primar
 #adSidebar { width:280px; background:#f1f1f1; border-left:1px dashed #ccc; padding:8px; text-align:center; overflow-y:auto; }
 
 /* FOOTER */
-footer { background:white; color:#555; text-align:center; padding:6px; font-size:0.85em; border-top:1px solid #ddd; z-index:100; }
+footer { background:white; color:#555; text-align:center; padding:6px; font-size:0.85em; border-top:1px solid #ddd; }
 
 /* MOBILE */
 @media(max-width:768px){
   html, body { height:100%; overflow:visible; }
 
-  /* Header fixo no topo */
-  header { position:fixed; top:0; left:0; right:0; z-index:100; }
-
-  /* TopBar fixo abaixo do header */
-  #topBar { 
+  header { 
     position:fixed; 
-    top:52px; 
+    top:0; 
     left:0; 
     right:0; 
     z-index:100; 
-    width:100%;
+    height:50px;
   }
 
-  /* Mobile user horizontal abaixo do TopBar */
+  #topBar { 
+    position:fixed; 
+    top:50px; 
+    left:0; 
+    right:0; 
+    z-index:100; 
+    width:100%; 
+    height:40px;
+  }
+
   #mobileUserLine {
     display:flex;
     position:fixed;
-    top: 52px + 40px; /* header + topBar */
+    top:90px; 
     left:0;
     right:0;
     padding:6px 4px;
@@ -96,24 +101,43 @@ footer { background:white; color:#555; text-align:center; padding:6px; font-size
     white-space:nowrap;
   }
 
-  /* Main content ocupa espaço entre mobileUserLine e chatInput/footer */
   #mainContent {
     flex-direction:column;
-    margin-top: 52px + 40px + 60px; /* header + topBar + mobileUserLine */
-    margin-bottom: 60px + 40px; /* chatInput + footer */
+    margin-top: 130px; 
+    margin-bottom: 100px; 
     height: auto;
     overflow-y:auto;
   }
 
-  #chatWindow { flex:1; overflow-y:auto; width:100%; margin-bottom:0; padding-bottom:10px; }
+  #chatWindow { 
+    flex:1; 
+    overflow-y:auto; 
+    width:100%; 
+    margin-bottom:0; 
+    padding-bottom:10px; 
+  }
 
-  /* Chat input fixo acima do footer */
-  #chatInput { position:fixed; bottom:40px; left:0; right:0; padding:4px; background:white; z-index:50; width:100%; }
+  #chatInput { 
+    position:fixed; 
+    bottom:40px; 
+    left:0; 
+    right:0; 
+    padding:4px; 
+    background:white; 
+    z-index:50; 
+    width:100%; 
+  }
 
-  /* Footer fixo */
-  footer { position:fixed; bottom:0; left:0; right:0; z-index:100; width:100%; }
+  footer { 
+    position:fixed; 
+    bottom:0; 
+    left:0; 
+    right:0; 
+    z-index:100; 
+    width:100%; 
+    height:40px;
+  }
 
-  /* Oculta userList e adSidebar no mobile */
   #userList, #adSidebar { display:none; }
 }
 </style>
@@ -222,6 +246,7 @@ db.ref("online").on("value", snap=>{
     mobileUserLine.appendChild(div);
   }
 
+  // INFINITE SCROLL HORIZONTAL
   startMobileScroll();
 });
 
