@@ -15,56 +15,102 @@
   --color-primary: #4CAF50;
   --color-primary-hover: #45a049;
 }
-* { box-sizing:border-box; margin:0; padding:0;}
-html, body { height:100%; font-family:Arial,sans-serif; background: var(--color-bg-light);}
-header { background:#fff; padding:10px; border-bottom:1px solid #ddd; display:flex; align-items:center; gap:8px; z-index:100;}
-header h1 { color: var(--color-primary); font-size:1.4em; display:flex; align-items:center; gap:8px;}
-.emoji-head { width:32px;height:32px;}
-#topBar { display:flex; align-items:center; gap:8px; padding:6px 10px; background:#fafafa; border-bottom:1px solid #ddd; flex-wrap:wrap; overflow-x:auto; z-index:100;}
-#topBar button { background:white; color:var(--color-primary); border:1px solid var(--color-primary); padding:6px 10px; border-radius:5px; cursor:pointer; flex-shrink:0;}
-#topBar span { font-size:0.9em; flex-shrink:0;}
-#mobileUserLine { display:none; overflow-x:hidden; white-space:nowrap; background:#fafafa; padding:6px 4px; border-bottom:1px solid #ddd;}
+
+/* RESET */
+* { box-sizing: border-box; margin:0; padding:0; }
+html, body { height:100%; font-family:Arial,sans-serif; background: var(--color-bg-light); }
+
+/* HEADER */
+header { background:#fff; padding:10px; border-bottom:1px solid #ddd; z-index:100; display:flex; align-items:center; gap:8px; }
+header h1 { display:flex; align-items:center; gap:8px; color: var(--color-primary); font-size:1.4em; }
+.emoji-head { width:32px; height:32px; }
+
+/* TOPBAR */
+#topBar { display:flex; align-items:center; gap:8px; padding:6px 10px; background:#fafafa; border-bottom:1px solid #ddd; flex-wrap:wrap; overflow-x:auto; z-index:100; }
+#topBar button { background:white; color:var(--color-primary); border:1px solid var(--color-primary); padding:6px 10px; border-radius:5px; cursor:pointer; flex-shrink:0; }
+#topBar span { font-size:0.9em; flex-shrink:0; }
+
+/* MOBILE USERS HORIZONTAL */
+#mobileUserLine { display:none; overflow-x:hidden; white-space:nowrap; background:#fafafa; padding:6px 4px; border-bottom:1px solid #ddd; }
 .userItemMobile { width:50px; height:50px; border-radius:50%; overflow:hidden; display:inline-block; margin-right:6px; border:2px solid transparent; cursor:pointer; transition: transform 0.2s; position:relative; }
 .userItemMobile img { width:100%; height:100%; border-radius:50%; object-fit:cover; }
 .userItemMobile:hover { border-color:var(--color-primary); transform:scale(1.1); }
 
-.notify-dot { position:absolute; top:2px; right:2px; width:10px; height:10px; background:red; border-radius:50%; animation: blink 1s infinite; display:none; }
-@keyframes blink { 0%{opacity:1;} 50%{opacity:0;} 100%{opacity:1;} }
+/* BOLINHA DE NOTIFICAÇÃO PISCANTE */
+.notify-dot {
+  position:absolute;
+  top:2px;
+  right:2px;
+  width:10px;
+  height:10px;
+  background:red;
+  border-radius:50%;
+  animation: blink 1s infinite;
+  display:none;
+}
+@keyframes blink {
+  0% { opacity:1; }
+  50% { opacity:0; }
+  100% { opacity:1; }
+}
 
-#mainContent { display:flex; flex:1; overflow:hidden; height: calc(100vh - 108px);}
+/* MAIN */
+#mainContent { display:flex; flex:1; overflow:hidden; height: calc(100vh - 108px); }
+
+/* USER LIST (DESKTOP) */
 #userList { width:200px; background:#fff; border-right:1px solid #ddd; overflow-y:auto; padding:8px; }
-.userItem { display:flex; align-items:center; gap:6px; margin-bottom:6px; cursor:pointer; padding:6px; border-radius:5px; position:relative;}
-.userItem img { width:28px;height:28px;border-radius:50%; }
+.userItem { display:flex; align-items:center; gap:6px; margin-bottom:6px; cursor:pointer; padding:6px; border-radius:5px; position:relative; }
 .userItem:hover { background:#e0f7e9; }
+.userItem img { width:28px; height:28px; border-radius:50%; }
 
+/* CHAT */
 #chatContainer { flex:1; display:flex; flex-direction:column; overflow:hidden; }
 #chatWindow { flex:1; overflow-y:auto; padding:10px; background:white; }
 .msg { margin:5px 0; padding:8px; border-radius:8px; max-width:80%; word-wrap:break-word; }
 .userMsg { background:#e0f7e9; align-self:flex-end; text-align:right; }
 .otherMsg { background:#fff8dc; align-self:flex-start; text-align:left; }
 
+/* CHAT INPUT */
 #chatInput { display:flex; border-top:1px solid #ddd; background:white; padding:4px; }
 #chatInput input { flex:1; padding:10px; font-size:1em; border:1px solid #ccc; border-radius:5px; }
 #chatInput button { background:var(--color-primary); color:white; border:none; padding:10px 14px; margin-left:4px; border-radius:5px; cursor:pointer; }
 #chatInput button:hover { background:var(--color-primary-hover); }
+#deleteChatBtn { background:red; color:white; }
 
+/* ADS */
 #adSidebar { width:280px; background:#f1f1f1; border-left:1px dashed #ccc; padding:8px; text-align:center; overflow-y:auto; }
+
+/* FOOTER */
 footer { background:white; color:#555; text-align:center; padding:6px; font-size:0.85em; border-top:1px solid #ddd; }
 
+/* MOBILE */
 @media(max-width:768px){
-  header{position:fixed;top:0;left:0;right:0;z-index:100;height:50px;}
-  #topBar{position:fixed; top:50px; left:0; right:0; z-index:100; width:100%; height:40px;}
-  #mobileUserLine{display:flex; position:fixed; top:90px; left:0; right:0; z-index:100; overflow-x:auto;}
-  #mainContent{flex-direction:column; margin-top:130px; margin-bottom:100px; height:auto; overflow-y:auto;}
-  #chatInput{position:fixed; bottom:40px; left:0; right:0; padding:4px; background:white; z-index:50; width:100%;}
-  footer{position:fixed; bottom:0; left:0; right:0; width:100%; height:40px;}
-  #userList,#adSidebar{display:none;}
+  html, body { height:100%; overflow:visible; }
+  header { position:fixed; top:0; left:0; right:0; z-index:100; height:50px; }
+  #topBar { position:fixed; top:50px; left:0; right:0; z-index:100; width:100%; height:40px; }
+  #mobileUserLine {
+    display:flex;
+    position:fixed;
+    top:90px;
+    left:0;
+    right:0;
+    padding:6px 4px;
+    background:#fafafa;
+    border-bottom:1px solid #ddd;
+    z-index:100;
+    overflow-x:auto;
+    white-space:nowrap;
+  }
+  #mainContent { flex-direction:column; margin-top: 130px; margin-bottom: 100px; height: auto; overflow-y:auto; }
+  #chatInput { position:fixed; bottom:40px; left:0; right:0; padding:4px; background:white; z-index:50; width:100%; }
+  footer { position:fixed; bottom:0; left:0; right:0; z-index:100; width:100%; height:40px; }
+  #userList, #adSidebar { display:none; }
 }
 </style>
 </head>
 <body>
 <header>
-<h1>Славянский клуб <img src="emoji_dimitry.png" alt="Dimitry" class="emoji-head"></h1>
+  <h1>Славянский клуб <img src="emoji_dimitry.png" alt="Dimitry" class="emoji-head"></h1>
 </header>
 
 <div id="topBar">
@@ -85,12 +131,14 @@ footer { background:white; color:#555; text-align:center; padding:6px; font-size
     <div id="chatInput">
       <input type="text" id="msgInput" placeholder="Digite sua mensagem..." disabled>
       <button id="sendBtn" disabled>Enviar</button>
+      <button id="deleteChatBtn">Apagar Chat</button>
     </div>
   </div>
   <div id="adSidebar">Publicidade aqui (Adsense)</div>
 </div>
 
 <footer>© 2025 Славянский клуб — Aprenda Russo e Português com diversão!</footer>
+
 <audio id="msgSound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_2a8c4e8d5a.mp3?filename=message-pop-alert-23584.mp3" preload="auto"></audio>
 
 <script>
@@ -113,19 +161,20 @@ const msgInput=document.getElementById("msgInput");
 const sendBtn=document.getElementById("sendBtn");
 const chatWindow=document.getElementById("chatWindow");
 const userList=document.getElementById("userList");
-const mobileUserLine=document.getElementById("mobileUserLine");
 const alertaLogin=document.getElementById("alertaLogin");
 const onlineCount=document.getElementById("onlineCount");
 const generalBtn=document.getElementById("generalBtn");
+const mobileUserLine=document.getElementById("mobileUserLine");
+const deleteChatBtn=document.getElementById("deleteChatBtn");
 const msgSound=document.getElementById("msgSound");
 
 let currentChat="global";
-let unreadMap={}; // Guarda chats com mensagens não lidas
+let unreadMap={};
 
 loginBtn.onclick=()=>auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
 logoutBtn.onclick=()=>auth.signOut();
 
-// LOGIN / LOGOUT
+// LOGIN
 auth.onAuthStateChanged(user=>{
   if(user){
     loginBtn.style.display="none";
@@ -133,6 +182,7 @@ auth.onAuthStateChanged(user=>{
     alertaLogin.style.display="none";
     msgInput.disabled=false;
     sendBtn.disabled=false;
+    deleteChatBtn.disabled=false;
     db.ref("online/"+user.uid).set({name:user.displayName,photo:user.photoURL});
     db.ref("online/"+user.uid).onDisconnect().remove();
   } else {
@@ -141,6 +191,7 @@ auth.onAuthStateChanged(user=>{
     alertaLogin.style.display="inline-block";
     msgInput.disabled=true;
     sendBtn.disabled=true;
+    deleteChatBtn.disabled=true;
   }
 });
 
@@ -154,31 +205,74 @@ db.ref("online").on("value",snap=>{
     const div=document.createElement("div");
     div.className="userItem";
     div.innerHTML=`<img src="${u.photo}"><span>${u.name}</span><div class='notify-dot'></div>`;
-    div.onclick=()=>clickUser(uid,u.name);
+    div.onclick=()=>openPrivateChat(uid,u.name);
     userList.appendChild(div);
 
     const mob=document.createElement("div");
     mob.className="userItemMobile";
     mob.innerHTML=`<img src="${u.photo}" title="${u.name}"><div class='notify-dot'></div>`;
-    mob.onclick=()=>clickUser(uid,u.name);
+    mob.onclick=()=>openPrivateChat(uid,u.name);
     mobileUserLine.appendChild(mob);
   }
   startMobileScroll();
 });
 
-function clickUser(uid,name){
+// ENVIAR MENSAGEM
+sendBtn.onclick=sendMessage;
+msgInput.addEventListener("keypress",e=>{if(e.key==="Enter")sendMessage();});
+
+function sendMessage(){
+  const text=msgInput.value.trim();
+  const user=auth.currentUser;
+  if(!text||!user) return;
+  const path=currentChat==="global"?"chatGlobal":"private/"+currentChat;
+  db.ref(path).push({user:user.displayName,photo:user.photoURL,text,timestamp:Date.now()});
+  msgInput.value="";
+}
+
+// APAGAR CHAT
+deleteChatBtn.onclick=()=>{
+  if(currentChat==="global"){
+    if(confirm("Deseja apagar todo o chat global?")){
+      db.ref("chatGlobal").remove();
+      chatWindow.innerHTML="";
+    }
+  } else {
+    if(confirm("Deseja apagar este chat privado?")){
+      db.ref("private/"+currentChat).remove();
+      db.ref("privateStatus/"+currentChat).remove();
+      chatWindow.innerHTML="<div style='text-align:center;color:red;'>Chat apagado.</div>";
+      unreadMap[currentChat]=false;
+    }
+  }
+};
+
+// CHAT GLOBAL
+db.ref("chatGlobal").on("child_added",snap=>{
+  const msg=snap.val();
+  showMessage(msg,"chatGlobal");
+  if(msg.user!==auth.currentUser?.displayName && currentChat!=="global"){
+    playNotification();
+    alert("Nova mensagem no chat global!");
+  }
+});
+
+// ABRIR CHAT PRIVADO
+function openPrivateChat(uid,name){
   if(!auth.currentUser) return alert("Faça login para conversar.");
   if(uid===auth.currentUser.uid) return;
-  const chatId=[auth.currentUser.uid,uid].sort().join("_");
+  const chatId=[uid,auth.currentUser.uid].sort().join("_");
   currentChat=chatId;
-  chatWindow.innerHTML=`<div style='text-align:center;margin:10px;color:#555;'>💬 Conversa com ${name}</div>`;
+  chatWindow.innerHTML=`<div style='text-align:center;margin:10px;color:#555;'>💬 Conversa privada com ${name}</div>`;
   generalBtn.style.display="inline-block";
 
-  // Limpa alerta
-  unreadMap[chatId]=false;
-  showNotifyDot(uid,false);
+  // Marca mensagens como lidas
+  if(unreadMap[chatId]){
+    unreadMap[chatId]=false;
+    updateNotifyDot(uid,false);
+  }
 
-  // Verifica status do chat
+  // Verifica status de aceitação
   db.ref("privateStatus/"+chatId).once("value").then(s=>{
     const st=s.val();
     if(st && st.rejected){
@@ -193,15 +287,17 @@ function clickUser(uid,name){
   });
 }
 
+// MOSTRA PERGUNTA ACEITAR/RECUSAR
 function showAcceptancePrompt(chatId,name){
   chatWindow.innerHTML=`
     <div style='text-align:center;margin-top:20px;'>
-      ${name} enviou uma mensagem. Deseja aceitar?<br><br>
+      ${name} enviou uma mensagem. Deseja aceitar o chat?<br><br>
       <button onclick="acceptChat('${chatId}')">✅ Aceitar</button>
       <button onclick="rejectChat('${chatId}')">❌ Recusar</button>
     </div>`;
 }
 
+// ACEITAR / RECUSAR CHAT
 function acceptChat(chatId){
   db.ref("privateStatus/"+chatId).set({accepted:true});
   startChatListener(chatId);
@@ -211,24 +307,6 @@ function rejectChat(chatId){
   chatWindow.innerHTML="<div style='text-align:center;color:red;'>❌ Você recusou esta conversa.</div>";
 }
 
-// ENVIO DE MENSAGEM
-sendBtn.onclick=sendMessage;
-msgInput.addEventListener("keypress",e=>{if(e.key==="Enter") sendMessage();});
-function sendMessage(){
-  const text=msgInput.value.trim();
-  const user=auth.currentUser;
-  if(!text||!user)return;
-  const path=currentChat==="global"?"chatGlobal":"private/"+currentChat;
-  db.ref(path).push({user:user.displayName,photo:user.photoURL,text,timestamp:Date.now()});
-
-  // Se privado e destinatário ainda não aceitou, define waiting
-  if(currentChat!=="global"){
-    db.ref("privateStatus/"+currentChat).set({waiting:true}, {merge:true});
-  }
-
-  msgInput.value="";
-}
-
 // MONITORA CHAT PRIVADO
 function startChatListener(chatId){
   db.ref("private/"+chatId).off();
@@ -236,19 +314,15 @@ function startChatListener(chatId){
     const msg=s.val();
     showMessage(msg,chatId);
     if(msg.user!==auth.currentUser.displayName && currentChat!==chatId){
-      if(!unreadMap[chatId]){
-        unreadMap[chatId]=true;
-        const uidOther=chatId.replace(auth.currentUser.uid,"").replace("_","");
-        showNotifyDot(uidOther,true);
-        alert(`💬 Nova mensagem de ${msg.user}`);
-        msgSound.currentTime=0;
-        msgSound.play();
-      }
+      playNotification();
+      alert("Nova mensagem de "+msg.user);
+      unreadMap[chatId]=true;
+      const uidOther=chatId.replace(auth.currentUser.uid,"").replace("_","");
+      updateNotifyDot(uidOther,true);
     }
   });
 }
 
-// MOSTRA MENSAGEM
 function showMessage(msg,room){
   if(room!=="chatGlobal" && room!==currentChat) return;
   const div=document.createElement("div");
@@ -258,10 +332,17 @@ function showMessage(msg,room){
   chatWindow.scrollTop=chatWindow.scrollHeight;
 }
 
-// BOLINHA VERMELHA
-function showNotifyDot(uid,show){
+// NOTIFICAÇÃO
+function playNotification(){
+  msgSound.currentTime=0;
+  msgSound.play();
+}
+
+// Atualiza bolinha vermelha
+function updateNotifyDot(uid,show){
   const items=[...document.querySelectorAll(".userItem"),...document.querySelectorAll(".userItemMobile")];
   for(const el of items){
+    if(el.innerHTML.includes(uid)) continue;
     const dot=el.querySelector(".notify-dot");
     if(dot) dot.style.display=show?"block":"none";
   }
@@ -275,7 +356,7 @@ generalBtn.onclick=()=>{
   generalBtn.style.display="none";
 };
 
-// SCROLL MOBILE
+// SCROLL AUTOMÁTICO MOBILE
 let scrollInterval;
 function startMobileScroll(){
   clearInterval(scrollInterval);
@@ -286,12 +367,6 @@ function startMobileScroll(){
     if(container.scrollLeft>=container.scrollWidth-container.clientWidth) container.scrollLeft=0;
   },20);
 }
-
-// CHAT GLOBAL
-db.ref("chatGlobal").on("child_added",snap=>{
-  const msg=snap.val();
-  showMessage(msg,"chatGlobal");
-});
 </script>
 </body>
 </html>
