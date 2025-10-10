@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Chat Dimitry</title>
+<title>Славянский клуб 💬</title>
 
 <!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -12,55 +12,107 @@
 
 <style>
 :root {
-  --color-primary: #4CAF50;
-  --color-bg: #f5f5f5;
+  --primary: #4CAF50;
+  --bg: #f5f5f5;
 }
+
 body {
   margin: 0;
   font-family: Arial, sans-serif;
-  background: var(--color-bg);
+  background: var(--bg);
 }
+
+/* ===== Header ===== */
 header {
   background: white;
-  padding: 10px;
+  color: var(--primary);
   display: flex;
   align-items: center;
   justify-content: space-between;
+  padding: 8px 12px;
   border-bottom: 1px solid #ddd;
+  position: fixed;
+  width: 100%;
+  top: 0;
+  z-index: 100;
 }
-header h1 { color: var(--color-primary); font-size: 1.2em; margin: 0; }
-
+header h1 {
+  margin: 0;
+  font-size: 1.2em;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
 #menuDots {
   cursor: pointer;
   font-size: 1.5em;
-  padding: 5px;
+  padding: 6px;
 }
+
+/* ===== Menu oculto ===== */
 #menuBox {
   display: none;
-  position: absolute;
+  position: fixed;
   right: 10px;
   top: 50px;
   background: white;
   border: 1px solid #ccc;
   border-radius: 8px;
-  z-index: 100;
+  z-index: 200;
 }
 #menuBox button {
-  background: none;
   border: none;
+  background: none;
+  padding: 10px;
   width: 100%;
-  padding: 8px 12px;
   text-align: left;
   cursor: pointer;
 }
-#menuBox button:hover { background: #f0f0f0; }
+#menuBox button:hover {
+  background: #f0f0f0;
+}
 
+/* ===== Barra superior ===== */
+#topBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #fafafa;
+  border-bottom: 1px solid #ddd;
+  margin-top: 50px;
+  padding: 6px 10px;
+}
+#globalBtn {
+  background: white;
+  border: 1px solid var(--primary);
+  color: var(--primary);
+  border-radius: 8px;
+  padding: 6px 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  position: relative;
+}
+#globalBtn .notify-dot {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 10px;
+  height: 10px;
+  background: red;
+  border-radius: 50%;
+  animation: blink 1s infinite;
+  display: none;
+}
+
+/* ===== Users list ===== */
 #userList {
+  width: 220px;
+  background: white;
   border-right: 1px solid #ddd;
-  width: 200px;
-  height: calc(100vh - 50px);
+  height: calc(100vh - 100px);
   overflow-y: auto;
-  background: #fff;
   float: left;
 }
 .userItem {
@@ -72,15 +124,15 @@ header h1 { color: var(--color-primary); font-size: 1.2em; margin: 0; }
 }
 .userItem:hover { background: #e8f5e9; }
 .userItem img {
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   margin-right: 8px;
 }
 .notify-dot {
   position: absolute;
   right: 8px;
-  top: 10px;
+  top: 14px;
   width: 10px;
   height: 10px;
   background: red;
@@ -90,25 +142,24 @@ header h1 { color: var(--color-primary); font-size: 1.2em; margin: 0; }
 }
 @keyframes blink { 50% { opacity: 0; } }
 
+/* ===== Chat ===== */
 #chatContainer {
-  margin-left: 200px;
-  height: calc(100vh - 50px);
+  margin-left: 220px;
   display: flex;
   flex-direction: column;
+  height: calc(100vh - 100px);
 }
 #chatHeader {
   background: #fafafa;
   border-bottom: 1px solid #ddd;
   padding: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  font-weight: bold;
 }
 #chatWindow {
   flex: 1;
-  padding: 10px;
   overflow-y: auto;
   background: white;
+  padding: 10px;
 }
 .msg {
   margin: 5px 0;
@@ -128,35 +179,68 @@ header h1 { color: var(--color-primary); font-size: 1.2em; margin: 0; }
 }
 #chatInput input {
   flex: 1;
-  padding: 8px;
   border: 1px solid #ccc;
   border-radius: 6px;
+  padding: 8px;
 }
 #chatInput button {
-  margin-left: 6px;
-  background: var(--color-primary);
+  background: var(--primary);
   color: white;
   border: none;
   border-radius: 6px;
   padding: 8px 12px;
+  margin-left: 6px;
   cursor: pointer;
 }
+
+/* ===== Mobile users bar ===== */
+#mobileUsers {
+  display: none;
+  overflow-x: auto;
+  white-space: nowrap;
+  background: #fafafa;
+  border-bottom: 1px solid #ddd;
+}
+.userIcon {
+  display: inline-block;
+  position: relative;
+  margin: 5px;
+  cursor: pointer;
+}
+.userIcon img {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+}
+.userIcon .notify-dot {
+  position: absolute;
+  top: 2px;
+  right: 4px;
+  width: 10px;
+  height: 10px;
+  background: red;
+  border-radius: 50%;
+  animation: blink 1s infinite;
+  display: none;
+}
+
+/* ===== Toast ===== */
 #toast {
   position: fixed;
   bottom: 60px;
   right: 10px;
-  background: #4CAF50;
+  background: var(--primary);
   color: white;
   padding: 10px 15px;
   border-radius: 5px;
   display: none;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-  z-index: 200;
 }
+
+/* ===== Responsive ===== */
 @media (max-width: 768px) {
   #userList { display: none; }
-  #chatContainer { margin-left: 0; }
-  #menuBox { top: 60px; right: 5px; }
+  #mobileUsers { display: flex; }
+  #chatContainer { margin-left: 0; height: calc(100vh - 180px); }
 }
 </style>
 </head>
@@ -165,15 +249,19 @@ header h1 { color: var(--color-primary); font-size: 1.2em; margin: 0; }
 <header>
   <h1>Славянский клуб 💬</h1>
   <div id="menuDots">⋮</div>
-  <div id="menuBox">
-    <button id="clearChatBtn">🗑️ Apagar chat</button>
-  </div>
+  <div id="menuBox"><button id="clearChatBtn">🗑️ Apagar chat</button></div>
 </header>
 
+<div id="topBar">
+  <button id="globalBtn">🌍 Chat Global <div class="notify-dot"></div></button>
+  <span id="onlineCount">👥 0 online</span>
+</div>
+
+<div id="mobileUsers"></div>
 <div id="userList"></div>
 
 <div id="chatContainer">
-  <div id="chatHeader"><span id="chatWith">Chat global 🌍</span></div>
+  <div id="chatHeader">Chat Global 🌍</div>
   <div id="chatWindow"></div>
   <div id="chatInput">
     <input type="text" id="msgInput" placeholder="Digite sua mensagem..." disabled>
@@ -182,7 +270,6 @@ header h1 { color: var(--color-primary); font-size: 1.2em; margin: 0; }
 </div>
 
 <div id="toast"></div>
-
 <audio id="msgSound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_2a8c4e8d5a.mp3" preload="auto"></audio>
 
 <script>
@@ -199,115 +286,138 @@ firebase.initializeApp(firebaseConfig);
 
 const auth = firebase.auth();
 const db = firebase.database();
-const userList = document.getElementById("userList");
-const chatWindow = document.getElementById("chatWindow");
-const msgInput = document.getElementById("msgInput");
-const sendBtn = document.getElementById("sendBtn");
-const chatWith = document.getElementById("chatWith");
-const toast = document.getElementById("toast");
-const msgSound = document.getElementById("msgSound");
-const menuDots = document.getElementById("menuDots");
-const menuBox = document.getElementById("menuBox");
-const clearChatBtn = document.getElementById("clearChatBtn");
 
-let currentUser = null;
-let currentChat = "global";
-let localDeleted = {}; // chats apagados localmente
+const msgInput=document.getElementById("msgInput");
+const sendBtn=document.getElementById("sendBtn");
+const chatWindow=document.getElementById("chatWindow");
+const chatHeader=document.getElementById("chatHeader");
+const globalBtn=document.getElementById("globalBtn");
+const globalDot=globalBtn.querySelector(".notify-dot");
+const userList=document.getElementById("userList");
+const mobileUsers=document.getElementById("mobileUsers");
+const toast=document.getElementById("toast");
+const msgSound=document.getElementById("msgSound");
+const menuDots=document.getElementById("menuDots");
+const menuBox=document.getElementById("menuBox");
+const clearChatBtn=document.getElementById("clearChatBtn");
+const onlineCount=document.getElementById("onlineCount");
 
-menuDots.onclick = () => {
-  menuBox.style.display = menuBox.style.display === "block" ? "none" : "block";
+let currentUser=null;
+let currentChat="global";
+let deletedChats=JSON.parse(localStorage.getItem("deletedChats")||"{}");
+
+// Menu ⋮
+menuDots.onclick=()=>{menuBox.style.display=menuBox.style.display==="block"?"none":"block";};
+clearChatBtn.onclick=()=>{
+  deletedChats[currentChat]=true;
+  localStorage.setItem("deletedChats",JSON.stringify(deletedChats));
+  chatWindow.innerHTML="<p style='text-align:center;color:#777;'>💬 Chat apagado localmente.</p>";
+  menuBox.style.display="none";
 };
 
-clearChatBtn.onclick = () => {
-  localDeleted[currentChat] = true;
-  chatWindow.innerHTML = "<p style='text-align:center;color:#777;'>💬 Chat apagado localmente.</p>";
-  menuBox.style.display = "none";
-  localStorage.setItem("deletedChats", JSON.stringify(localDeleted));
-};
+// Login automático Google (temporário)
+auth.signInAnonymously();
 
-auth.onAuthStateChanged(user => {
+// Estado online
+auth.onAuthStateChanged(user=>{
   if(user){
-    currentUser = user;
-    msgInput.disabled = false;
-    sendBtn.disabled = false;
-    db.ref("online/"+user.uid).set({name:user.displayName,photo:user.photoURL});
+    currentUser=user;
+    msgInput.disabled=false;
+    sendBtn.disabled=false;
+    db.ref("online/"+user.uid).set({name:"Usuário "+user.uid.slice(-4),photo:"https://cdn-icons-png.flaticon.com/512/847/847969.png"});
     db.ref("online/"+user.uid).onDisconnect().remove();
   }
 });
 
+// Lista de usuários
 db.ref("online").on("value",snap=>{
-  userList.innerHTML="";
-  const users = snap.val() || {};
+  userList.innerHTML=""; mobileUsers.innerHTML="";
+  const users=snap.val()||{};
+  const total=Object.keys(users).length;
+  onlineCount.textContent=`👥 ${total} online`;
   for(const [uid,u] of Object.entries(users)){
     if(uid===currentUser?.uid) continue;
-    const div=document.createElement("div");
-    div.className="userItem";
-    div.innerHTML=`<img src="${u.photo||''}"><span>${u.name}</span><div class='notify-dot'></div>`;
-    div.onclick=()=>openPrivateChat(uid,u.name);
-    div.dataset.uid=uid;
-    userList.appendChild(div);
+    const userDiv=document.createElement("div");
+    userDiv.className="userItem";
+    userDiv.innerHTML=`<img src="${u.photo}"><span>${u.name}</span><div class='notify-dot'></div>`;
+    userDiv.dataset.uid=uid;
+    userDiv.onclick=()=>openPrivate(uid,u.name);
+    userList.appendChild(userDiv);
+
+    const mob=document.createElement("div");
+    mob.className="userIcon";
+    mob.innerHTML=`<img src="${u.photo}" title="${u.name}"><div class='notify-dot'></div>`;
+    mob.dataset.uid=uid;
+    mob.onclick=()=>openPrivate(uid,u.name);
+    mobileUsers.appendChild(mob);
   }
 });
 
-sendBtn.onclick=sendMessage;
-msgInput.onkeypress=e=>{if(e.key==="Enter")sendMessage();};
-
-function sendMessage(){
-  const text=msgInput.value.trim();
-  if(!text||!currentUser)return;
-  const path=currentChat==="global"?"chatGlobal":"private/"+currentChat;
-  db.ref(path).push({
-    uid:currentUser.uid,
-    user:currentUser.displayName,
-    text,
-    timestamp:Date.now()
-  });
-  msgInput.value="";
-}
-
+// Chat global
 db.ref("chatGlobal").on("child_added",snap=>{
   const msg=snap.val();
-  if(localDeleted["global"]) return;
-  showMessage(msg,"global");
+  if(deletedChats["global"]) return;
+  showMsg(msg,"global");
   if(msg.uid!==currentUser?.uid && currentChat!=="global"){
-    showToast("🌍 Nova mensagem no chat global");
+    globalDot.style.display="block";
+    toastMsg("🌍 Nova mensagem no global");
     msgSound.play();
   }
 });
 
-function openPrivateChat(uid,name){
-  if(!currentUser) return alert("Faça login para conversar");
+globalBtn.onclick=()=>{
+  globalDot.style.display="none";
+  currentChat="global";
+  chatHeader.textContent="Chat Global 🌍";
+  loadMessages("chatGlobal","global");
+};
+
+sendBtn.onclick=sendMsg;
+msgInput.onkeypress=e=>{if(e.key==="Enter")sendMsg();};
+
+function sendMsg(){
+  const text=msgInput.value.trim();
+  if(!text||!currentUser)return;
+  const path=currentChat==="global"?"chatGlobal":"private/"+currentChat;
+  db.ref(path).push({uid:currentUser.uid,text,user:"Você",timestamp:Date.now()});
+  msgInput.value="";
+}
+
+function openPrivate(uid,name){
   const chatId=[uid,currentUser.uid].sort().join("_");
   currentChat=chatId;
-  chatWith.textContent="💬 "+name;
+  chatHeader.textContent="💬 "+name;
   chatWindow.innerHTML="";
-  if(localDeleted[chatId]) {
+  loadMessages("private/"+chatId,chatId);
+  listenPrivate(chatId,uid);
+  hideDot(uid);
+}
+
+function loadMessages(path,id){
+  chatWindow.innerHTML="";
+  if(deletedChats[id]){
     chatWindow.innerHTML="<p style='text-align:center;color:#777;'>💬 Chat apagado localmente.</p>";
     return;
   }
-  db.ref("private/"+chatId).once("value",s=>s.forEach(m=>showMessage(m.val(),chatId)));
-  listenPrivate(chatId,uid);
+  db.ref(path).once("value",snap=>snap.forEach(s=>showMsg(s.val(),id)));
 }
 
 function listenPrivate(chatId,otherUid){
   db.ref("private/"+chatId).off();
   db.ref("private/"+chatId).on("child_added",snap=>{
     const msg=snap.val();
-    if(localDeleted[chatId]) return;
-    showMessage(msg,chatId);
+    if(deletedChats[chatId]) return;
+    showMsg(msg,chatId);
     if(msg.uid!==currentUser.uid && currentChat!==chatId){
-      showToast("💬 Nova mensagem de "+msg.user);
+      toastMsg("💬 Nova mensagem recebida!");
+      showDot(otherUid);
       msgSound.play();
-      showNotifyDot(otherUid,true);
-    }
-    if(msg.uid!==currentUser.uid && currentChat===chatId){
-      showNotifyDot(otherUid,false);
     }
   });
 }
 
-function showMessage(msg,room){
-  if(room!==currentChat)return;
+function showMsg(msg,id){
+  if(id!==currentChat)return;
   const div=document.createElement("div");
   div.className="msg "+(msg.uid===currentUser?.uid?"userMsg":"otherMsg");
   div.textContent=`${msg.user}: ${msg.text}`;
@@ -315,23 +425,18 @@ function showMessage(msg,room){
   chatWindow.scrollTop=chatWindow.scrollHeight;
 }
 
-function showToast(text){
-  toast.textContent=text;
+function toastMsg(txt){
+  toast.textContent=txt;
   toast.style.display="block";
   setTimeout(()=>toast.style.display="none",3000);
 }
 
-function showNotifyDot(uid,show){
-  const userDiv=[...document.querySelectorAll(".userItem")].find(el=>el.dataset.uid===uid);
-  if(userDiv){
-    const dot=userDiv.querySelector(".notify-dot");
-    if(dot) dot.style.display=show?"block":"none";
-  }
+function showDot(uid){
+  document.querySelectorAll(`[data-uid='${uid}'] .notify-dot`).forEach(d=>d.style.display="block");
 }
-
-// restaura chats apagados localmente
-const stored = localStorage.getItem("deletedChats");
-if(stored) localDeleted = JSON.parse(stored);
+function hideDot(uid){
+  document.querySelectorAll(`[data-uid='${uid}'] .notify-dot`).forEach(d=>d.style.display="none");
+}
 </script>
 </body>
 </html>
