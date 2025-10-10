@@ -24,7 +24,7 @@ header h1 { display:flex; align-items:center; gap:8px; color: var(--color-primar
 #topBar { display:flex; align-items:center; gap:8px; padding:6px 10px; background:#fafafa; border-bottom:1px solid #ddd; flex-wrap:wrap; overflow-x:auto; z-index:100; }
 #topBar button { background:white; color:var(--color-primary); border:1px solid var(--color-primary); padding:6px 10px; border-radius:5px; cursor:pointer; flex-shrink:0; }
 #topBar span { font-size:0.9em; flex-shrink:0; }
-#topBar #deleteChatBtn { margin-left:auto; }
+#topBar #deleteChatBtn { margin-left:auto; display:none; }
 
 #mobileUserLine { display:none; overflow-x:hidden; white-space:nowrap; background:#fafafa; padding:6px 4px; border-bottom:1px solid #ddd; }
 .userItemMobile { width:50px; height:50px; border-radius:50%; overflow:hidden; display:inline-block; margin-right:6px; border:2px solid transparent; cursor:pointer; transition: transform 0.2s; position:relative; }
@@ -65,6 +65,10 @@ header h1 { display:flex; align-items:center; gap:8px; color: var(--color-primar
 #adSidebar { width:280px; background:#f1f1f1; border-left:1px dashed #ccc; padding:8px; text-align:center; overflow-y:auto; }
 footer { background:white; color:#555; text-align:center; padding:6px; font-size:0.85em; border-top:1px solid #ddd; }
 
+#toast {
+  position:fixed; bottom:60px; right:10px; background:#4CAF50; color:white; padding:10px 15px; border-radius:5px; box-shadow:0 2px 6px rgba(0,0,0,0.3); display:none; z-index:200;
+}
+
 @media(max-width:768px){
   html,body { height:100%; overflow:visible; }
   header { position:fixed; top:0; left:0; right:0; z-index:100; height:50px; }
@@ -74,6 +78,7 @@ footer { background:white; color:#555; text-align:center; padding:6px; font-size
   #chatInput { position:fixed; bottom:40px; left:0; right:0; padding:4px; background:white; z-index:50; width:100%; }
   footer { position:fixed; bottom:0; left:0; right:0; z-index:100; width:100%; height:40px; }
   #userList, #adSidebar { display:none; }
+  #topBar #deleteChatBtn { display:inline-block; }
 }
 </style>
 </head>
@@ -87,13 +92,12 @@ footer { background:white; color:#555; text-align:center; padding:6px; font-size
   <button id="loginBtn">Login com Google</button>
   <button id="logoutBtn" style="display:none;">Logout</button>
   <button id="generalBtn" style="display:none;">⬅ Bate-papo geral</button>
-  <button id="deleteChatBtn" style="display:none;">🗑️ Apagar Chat</button>
+  <button id="deleteChatBtn">🗑️ Apagar Chat</button>
   <span id="alertaLogin">⚠️ Faça login para enviar mensagens.</span>
   <span id="onlineCount">👥 Usuários online: 0</span>
 </div>
 
 <div id="mobileUserLine"></div>
-
 <div id="mainContent">
   <div id="userList"></div>
   <div id="chatContainer">
@@ -107,6 +111,7 @@ footer { background:white; color:#555; text-align:center; padding:6px; font-size
 </div>
 
 <footer>© 2025 Славянский клуб — Aprenda Russo e Português com diversão!</footer>
+<div id="toast"></div>
 
 <audio id="msgSound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_2a8c4e8d5a.mp3?filename=message-pop-alert-23584.mp3" preload="auto"></audio>
 
@@ -136,14 +141,16 @@ const generalBtn=document.getElementById("generalBtn");
 const deleteChatBtn=document.getElementById("deleteChatBtn");
 const mobileUserLine=document.getElementById("mobileUserLine");
 const msgSound=document.getElementById("msgSound");
+const toast=document.getElementById("toast");
 
 let currentChat="global";
 let unreadMap={};
+let deletedChats={};
 
+// LOGIN
 loginBtn.onclick=()=>auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
 logoutBtn.onclick=()=>auth.signOut();
 
-// LOGIN
 auth.onAuthStateChanged(user=>{
   if(user){
     loginBtn.style.display="none";
@@ -153,6 +160,8 @@ auth.onAuthStateChanged(user=>{
     sendBtn.disabled=false;
     db.ref("online/"+user.uid).set({name:user.displayName,photo:user.photoURL});
     db.ref("online/"+user.uid).onDisconnect().remove();
+    // Recupera chats apagados
+    db.ref("deletedChats/"+user.uid).once("value").then(snap=>{deletedChats=snap.val()||{};});
   }else{
     loginBtn.style.display="inline-block";
     logoutBtn.style.display="none";
@@ -199,8 +208,9 @@ function sendMessage(){
 // CHAT GLOBAL
 db.ref("chatGlobal").on("child_added",snap=>{
   const msg=snap.val();
+  if(deletedChats["global"]) return;
   showMessage(msg,"chatGlobal");
-  if(msg.user!==auth.currentUser?.displayName && currentChat!=="global") playNotification();
+  if(msg.user!==auth.currentUser?.displayName && currentChat!=="global") showToast("Nova mensagem no chat global!");
 });
 
 // ABRIR CHAT PRIVADO
@@ -210,11 +220,10 @@ function openPrivateChat(uid,name){
 
   const chatId=[uid,auth.currentUser.uid].sort().join("_");
   currentChat=chatId;
+  deleteChatBtn.style.display="inline-block";
   chatWindow.innerHTML=`<div style='text-align:center;margin:10px;color:#555;'>💬 Conversa privada com ${name}</div>`;
   generalBtn.style.display="inline-block";
-  deleteChatBtn.style.display="inline-block";
 
-  // Marca mensagens como lidas
   if(unreadMap[chatId]){
     unreadMap[chatId]=false;
     updateNotifyDot(uid,false);
@@ -254,10 +263,10 @@ function startChatListener(chatId){
   db.ref("private/"+chatId).on("child_added",s=>{
     showMessage(s.val(),chatId);
     if(s.val().user!==auth.currentUser.displayName && currentChat!==chatId){
-      playNotification();
       unreadMap[chatId]=true;
       const uidOther=chatId.replace(auth.currentUser.uid,"").replace("_","");
       updateNotifyDot(uidOther,true);
+      showToast("Nova mensagem de "+s.val().user);
     }
   });
 }
@@ -272,10 +281,11 @@ function showMessage(msg,room){
   chatWindow.scrollTop=chatWindow.scrollHeight;
 }
 
-// ALERTA
-function playNotification(){
-  msgSound.currentTime=0; msgSound.play();
-  alert("Você recebeu uma nova mensagem!");
+// TOAST
+function showToast(msg){
+  toast.textContent=msg;
+  toast.style.display="block";
+  setTimeout(()=>{toast.style.display="none";},3000);
 }
 
 // BOLINHA NOTIFICAÇÃO
@@ -292,12 +302,15 @@ function updateNotifyDot(uid,show){
 deleteChatBtn.onclick=()=>{
   if(currentChat==="global"){
     if(confirm("Deseja limpar o chat global apenas para você?")){
+      deletedChats["global"]=true;
+      db.ref("deletedChats/"+auth.currentUser.uid+"/global").set(true);
       chatWindow.innerHTML="";
     }
   } else {
     if(confirm("Deseja apagar este chat privado apenas para você?")){
+      deletedChats[currentChat]=true;
+      db.ref("deletedChats/"+auth.currentUser.uid+"/"+currentChat).set(true);
       chatWindow.innerHTML="";
-      db.ref("private/"+currentChat+"/"+auth.currentUser.uid).remove();
     }
   }
 };
@@ -306,7 +319,9 @@ deleteChatBtn.onclick=()=>{
 generalBtn.onclick=()=>{
   currentChat="global";
   chatWindow.innerHTML="";
-  db.ref("chatGlobal").once("value",s=>s.forEach(m=>showMessage(m.val(),"chatGlobal")));
+  db.ref("chatGlobal").once("value",s=>s.forEach(m=>{
+    if(!deletedChats["global"]) showMessage(m.val(),"chatGlobal");
+  }));
   generalBtn.style.display="none";
   deleteChatBtn.style.display="none";
 };
