@@ -97,8 +97,8 @@ footer { background:white; color:#555; text-align:center; padding:6px; font-size
     overflow-x:auto;
     white-space:nowrap;
   }
-  #mainContent { flex-direction:column; margin-top:130px; margin-bottom:100px; height:auto; overflow-y:auto; }
-  #chatWindow { flex:1; overflow-y:auto; width:100%; padding-bottom:10px; }
+  #mainContent { flex-direction:column; margin-top:130px; margin-bottom:120px; height:auto; overflow-y:auto; }
+  #chatWindow { flex:1; overflow-y:auto; width:100%; padding-bottom:70px; }
   #chatInput { position:fixed; bottom:40px; left:0; right:0; padding:4px; background:white; z-index:50; width:100%; }
   footer { position:fixed; bottom:0; left:0; right:0; z-index:100; width:100%; height:40px; }
   #userList, #adSidebar { display:none; }
@@ -164,6 +164,7 @@ let currentChat="global";
 let privateChatListener=null;
 let alertIcons={};
 let acceptedChats={};
+let hiddenChats={}; // armazenar chats apagados localmente
 
 loginBtn.onclick=()=>auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
 logoutBtn.onclick=()=>auth.signOut();
@@ -196,13 +197,11 @@ db.ref("online").on("value",snap=>{
 
   for(const [uid,u] of Object.entries(users)){
     if(!u.name) continue;
-    // Desktop
     const div=document.createElement("div");
     div.className="userItem";
     div.innerHTML=`<img src="${u.photo||'https://cdn-icons-png.flaticon.com/512/847/847969.png'}"><span>${u.name}</span>`;
     div.onclick=()=>requestPrivateChat(uid,u.name);
     userList.appendChild(div);
-    // Mobile
     const mob=document.createElement("div");
     mob.className="userItemMobile";
     mob.innerHTML=`<img src="${u.photo||'https://cdn-icons-png.flaticon.com/512/847/847969.png'}" title="${u.name}">`;
@@ -227,25 +226,12 @@ function sendMessage(){
 
 // EXIBIR MENSAGENS
 function showMessage(msg,room){
-  if(room!=="chatGlobal"&&room!==currentChat)return;
+  if(hiddenChats[room]) return; // chat apagado localmente
+  if(room!=="chatGlobal"&&room!==currentChat) return;
+
   const div=document.createElement("div");
   div.className=msg.uid===auth.currentUser?.uid?"msg userMsg":"msg otherMsg";
   div.textContent=`${msg.user}: ${msg.text}`;
-
-  // Menu de três pontinhos para apagar chat local
-  if(room!=="chatGlobal"){
-    const menu=document.createElement("div");
-    menu.className="menu-btn";
-    menu.innerHTML=`<div></div><div></div><div></div>`;
-    menu.onclick=e=>{
-      e.stopPropagation();
-      if(confirm("Apagar chat local?")){
-        div.remove();
-      }
-    };
-    div.appendChild(menu);
-  }
-
   chatWindow.appendChild(div);
   chatWindow.scrollTop=chatWindow.scrollHeight;
 }
@@ -301,7 +287,9 @@ auth.onAuthStateChanged(user=>{
 // INICIAR CHAT PRIVADO
 function startPrivateChat(chatId,partnerName){
   currentChat=chatId;
-  chatWindow.innerHTML=`<div style='text-align:center;margin:10px;color:#555;'>💬 Conversa privada com ${partnerName}</div>`;
+  hiddenChats[chatId]=false;
+  chatWindow.innerHTML=`<div style='text-align:center;margin:10px;color:#555;'>💬 Conversa privada com ${partnerName} 
+  <span style="cursor:pointer;color:red;" onclick="hideChat('${chatId}')">[Apagar chat]</span></div>`;
   generalBtn.style.display="inline-block";
 
   if(privateChatListener) privateChatListener.off();
@@ -312,6 +300,14 @@ function startPrivateChat(chatId,partnerName){
   for(const icons of Object.values(alertIcons)){
     icons.desktop.querySelector(".alert-dot")?.remove();
     icons.mobile.querySelector(".alert-dot")?.remove();
+  }
+}
+
+// APAGAR CHAT LOCAL
+function hideChat(chatId){
+  if(confirm("Apagar este chat localmente?")){
+    hiddenChats[chatId]=true;
+    chatWindow.innerHTML=`<div style='text-align:center;margin:10px;color:#555;'>💬 Chat apagado. Você pode retomar a conversa clicando no usuário novamente.</div>`;
   }
 }
 
