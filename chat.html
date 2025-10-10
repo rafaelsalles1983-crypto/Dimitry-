@@ -14,6 +14,7 @@
   --color-bg-light: #f5f5f5;
   --color-primary: #4CAF50;
   --color-primary-hover: #45a049;
+  --color-chat-partner: #007BFF; /* azul para o nome do parceiro */
 }
 
 /* RESET */
@@ -29,6 +30,16 @@ header h1 { display:flex; align-items:center; gap:8px; color: var(--color-primar
 #topBar { display:flex; align-items:center; gap:8px; padding:6px 10px; background:#fafafa; border-bottom:1px solid #ddd; flex-wrap:wrap; overflow-x:auto; z-index:100; }
 #topBar button { background:white; color:var(--color-primary); border:1px solid var(--color-primary); padding:6px 10px; border-radius:5px; cursor:pointer; flex-shrink:0; }
 #topBar span { font-size:0.9em; flex-shrink:0; }
+
+/* NOME DO PARCEIRO */
+#chatPartnerName {
+  position:absolute;
+  top:8px;
+  right:10px;
+  font-size:0.95em;
+  color: var(--color-chat-partner);
+  font-weight:bold;
+}
 
 /* MOBILE USERS HORIZONTAL */
 #mobileUserLine { display:none; overflow-x:hidden; white-space:nowrap; background:#fafafa; padding:6px 4px; border-bottom:1px solid #ddd; }
@@ -54,7 +65,7 @@ header h1 { display:flex; align-items:center; gap:8px; color: var(--color-primar
 .menu-btn div { width:4px; height:4px; background:#555; border-radius:50%; margin:2px 0; }
 
 /* MAIN */
-#mainContent { display:flex; flex:1; overflow:hidden; height: calc(100vh - 108px); }
+#mainContent { display:flex; flex:1; overflow:hidden; height: calc(100vh - 108px); position:relative; }
 
 /* USER LIST (DESKTOP) */
 #userList { width:200px; background:#fff; border-right:1px solid #ddd; overflow-y:auto; padding:8px; }
@@ -64,7 +75,7 @@ header h1 { display:flex; align-items:center; gap:8px; color: var(--color-primar
 
 /* CHAT */
 #chatContainer { flex:1; display:flex; flex-direction:column; overflow:hidden; position:relative; }
-#chatWindow { flex:1; overflow-y:auto; padding:10px; background:white; }
+#chatWindow { flex:1; overflow-y:auto; padding:10px; background:white; margin-top:20px; }
 .msg { margin:5px 0; padding:8px; border-radius:8px; max-width:80%; word-wrap:break-word; position:relative; }
 .userMsg { background:#e0f7e9; align-self:flex-end; text-align:right; }
 .otherMsg { background:#fff8dc; align-self:flex-start; text-align:left; }
@@ -106,6 +117,7 @@ footer { background:white; color:#555; text-align:center; padding:6px; font-size
 </style>
 </head>
 <body>
+
 <header>
   <h1>Славянский клуб <img src="emoji_dimitry.png" alt="Dimitry" class="emoji-head"></h1>
 </header>
@@ -124,6 +136,7 @@ footer { background:white; color:#555; text-align:center; padding:6px; font-size
 <div id="mainContent">
   <div id="userList"></div>
   <div id="chatContainer">
+    <div id="chatPartnerName"></div>
     <div id="chatWindow"></div>
     <div id="chatInput">
       <input type="text" id="msgInput" placeholder="Digite sua mensagem..." disabled>
@@ -136,6 +149,7 @@ footer { background:white; color:#555; text-align:center; padding:6px; font-size
 <footer>© 2025 Славянский клуб — Aprenda Russo e Português com diversão!</footer>
 
 <script>
+// === CONFIGURAÇÃO FIREBASE ===
 const firebaseConfig = {
   apiKey: "AIzaSyCYJCgfil5HKrCWtB14zwdicDaEcldHU6A",
   authDomain: "dimitry-rusian.firebaseapp.com",
@@ -149,107 +163,130 @@ firebase.initializeApp(firebaseConfig);
 
 const auth=firebase.auth();
 const db=firebase.database();
-const loginBtn=document.getElementById("loginBtn");
-const logoutBtn=document.getElementById("logoutBtn");
 const msgInput=document.getElementById("msgInput");
 const sendBtn=document.getElementById("sendBtn");
 const chatWindow=document.getElementById("chatWindow");
 const userList=document.getElementById("userList");
-const alertaLogin=document.getElementById("alertaLogin");
-const onlineCount=document.getElementById("onlineCount");
-const generalBtn=document.getElementById("generalBtn");
 const mobileUserLine=document.getElementById("mobileUserLine");
+const generalBtn=document.getElementById("generalBtn");
+const chatPartnerName=document.getElementById("chatPartnerName");
 
 let currentChat="global";
 let privateChatListener=null;
 let alertIcons={};
 let acceptedChats={};
-let hiddenChats={}; // armazenar chats apagados localmente
+let hiddenChats={};
+let userData={};
 
-loginBtn.onclick=()=>auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
-logoutBtn.onclick=()=>auth.signOut();
-
+// === LOGIN ===
 auth.onAuthStateChanged(user=>{
   if(user){
-    loginBtn.style.display="none";
-    logoutBtn.style.display="inline-block";
-    alertaLogin.style.display="none";
     msgInput.disabled=false;
     sendBtn.disabled=false;
+    userData={uid:user.uid,name:user.displayName,photo:user.photoURL};
     db.ref("online/"+user.uid).set({name:user.displayName,photo:user.photoURL});
     db.ref("online/"+user.uid).onDisconnect().remove();
   } else {
-    loginBtn.style.display="inline-block";
-    logoutBtn.style.display="none";
-    alertaLogin.style.display="inline-block";
     msgInput.disabled=true;
     sendBtn.disabled=true;
+    userData={};
   }
 });
 
-// LISTA DE USUÁRIOS
+// === LISTA DE USUÁRIOS COM GLOBAL E SELF FIXOS ===
 db.ref("online").on("value",snap=>{
   const users=snap.val()||{};
-  onlineCount.textContent=`👥 Usuários online: ${Object.keys(users).length}`;
   userList.innerHTML="";
   mobileUserLine.innerHTML="";
   alertIcons={};
 
+  // Global primeiro
+  const divGlobal=document.createElement("div");
+  divGlobal.className="userItem";
+  divGlobal.innerHTML=`<img src="https://cdn-icons-png.flaticon.com/512/1250/1250615.png"><span>💬 Global</span>`;
+  divGlobal.onclick=()=>startGlobalChat();
+  userList.appendChild(divGlobal);
+  const mobGlobal=document.createElement("div");
+  mobGlobal.className="userItemMobile";
+  mobGlobal.innerHTML=`<img src="https://cdn-icons-png.flaticon.com/512/1250/1250615.png" title="Global">`;
+  mobGlobal.onclick=()=>startGlobalChat();
+  mobileUserLine.appendChild(mobGlobal);
+
+  // Self
+  if(userData.uid){
+    const selfDiv=document.createElement("div");
+    selfDiv.className="userItem";
+    selfDiv.innerHTML=`<img src="${userData.photo||'https://cdn-icons-png.flaticon.com/512/847/847969.png'}"><span>${userData.name}</span>`;
+    userList.appendChild(selfDiv);
+    const selfMob=document.createElement("div");
+    selfMob.className="userItemMobile";
+    selfMob.innerHTML=`<img src="${userData.photo||'https://cdn-icons-png.flaticon.com/512/847/847969.png'}" title="${userData.name}">`;
+    mobileUserLine.appendChild(selfMob);
+  }
+
+  // Outros usuários
   for(const [uid,u] of Object.entries(users)){
-    if(!u.name) continue;
+    if(uid===userData.uid) continue;
     const div=document.createElement("div");
     div.className="userItem";
     div.innerHTML=`<img src="${u.photo||'https://cdn-icons-png.flaticon.com/512/847/847969.png'}"><span>${u.name}</span>`;
     div.onclick=()=>requestPrivateChat(uid,u.name);
     userList.appendChild(div);
+
     const mob=document.createElement("div");
     mob.className="userItemMobile";
     mob.innerHTML=`<img src="${u.photo||'https://cdn-icons-png.flaticon.com/512/847/847969.png'}" title="${u.name}">`;
     mob.onclick=()=>requestPrivateChat(uid,u.name);
     mobileUserLine.appendChild(mob);
+
     alertIcons[uid]={desktop:div,mobile:mob};
   }
   startMobileScroll();
 });
 
-// ENVIAR MENSAGEM
+// === ENVIAR MENSAGEM ===
 sendBtn.onclick=sendMessage;
 msgInput.addEventListener("keypress",e=>{if(e.key==="Enter")sendMessage();});
 function sendMessage(){
+  if(!userData.uid) return;
   const text=msgInput.value.trim();
-  const user=auth.currentUser;
-  if(!text||!user)return;
+  if(!text) return;
   const path=currentChat==="global"?"chatGlobal":"private/"+currentChat;
-  db.ref(path).push({user:user.displayName,uid:user.uid,text,timestamp:Date.now()});
+  db.ref(path).push({user:userData.name,uid:userData.uid,text,timestamp:Date.now()});
   msgInput.value="";
 }
 
-// EXIBIR MENSAGENS
+// === SHOW MESSAGE ===
 function showMessage(msg,room){
-  if(hiddenChats[room]) return; // chat apagado localmente
-  if(room!=="chatGlobal"&&room!==currentChat) return;
+  if(hiddenChats[room]) return;
+  if(room!=="chatGlobal" && room!==currentChat) return;
 
   const div=document.createElement("div");
-  div.className=msg.uid===auth.currentUser?.uid?"msg userMsg":"msg otherMsg";
+  div.className=msg.uid===userData.uid?"msg userMsg":"msg otherMsg";
   div.textContent=`${msg.user}: ${msg.text}`;
   chatWindow.appendChild(div);
   chatWindow.scrollTop=chatWindow.scrollHeight;
 }
 
-// CHAT GLOBAL
+// === CHAT GLOBAL ===
 db.ref("chatGlobal").on("child_added",snap=>showMessage(snap.val(),"chatGlobal"));
+function startGlobalChat(){
+  currentChat="global";
+  chatPartnerName.textContent="";
+  chatWindow.innerHTML="";
+  db.ref("chatGlobal").once("value",s=>s.forEach(m=>showMessage(m.val(),"chatGlobal")));
+  generalBtn.style.display="none";
+}
 
-// SOLICITAÇÃO DE CHAT PRIVADO (UMA VEZ)
+// === PRIVADO: solicitação enviada apenas uma vez ===
 function requestPrivateChat(uid,name){
-  const user=auth.currentUser;
-  if(!user) return alert("Faça login para conversar.");
-  if(uid===user.uid) return;
-  if(acceptedChats[uid]) return alert("Você já pode conversar com este usuário.");
+  if(!userData.uid) return alert("Faça login.");
+  if(uid===userData.uid || acceptedChats[uid]) return;
 
-  const reqPath=`privateRequests/${uid}/${user.uid}`;
+  const reqPath=`privateRequests/${uid}/${userData.uid}`;
   db.ref(reqPath).once("value").then(s=>{
     if(!s.exists()){
-      db.ref(reqPath).set({fromName:user.displayName});
+      db.ref(reqPath).set({fromName:userData.name});
       alert(`Solicitação enviada para ${name}.`);
     } else {
       alert("Solicitação já enviada, aguardando resposta.");
@@ -257,26 +294,16 @@ function requestPrivateChat(uid,name){
   });
 }
 
-// RECEBER SOLICITAÇÃO
+// === RECEBER SOLICITAÇÃO ===
 auth.onAuthStateChanged(user=>{
   if(!user) return;
-  const reqRoot=`privateRequests/${user.uid}`;
-  db.ref(reqRoot).on("child_added",snap=>{
+  db.ref(`privateRequests/${user.uid}`).on("child_added",snap=>{
     const fromUID=snap.key;
     const fromName=snap.val().fromName;
-
-    const icon=alertIcons[fromUID];
-    if(icon){
-      const dot=document.createElement("div");
-      dot.className="alert-dot";
-      icon.desktop.appendChild(dot);
-      icon.mobile.appendChild(dot.cloneNode());
-    }
-
     if(!acceptedChats[fromUID]){
       if(confirm(`${fromName} quer conversar com você. Aceitar?`)){
-        const chatId=[user.uid,fromUID].sort().join("_");
         acceptedChats[fromUID]=true;
+        const chatId=[user.uid,fromUID].sort().join("_");
         startPrivateChat(chatId,fromName);
       }
     }
@@ -284,12 +311,21 @@ auth.onAuthStateChanged(user=>{
   });
 });
 
-// INICIAR CHAT PRIVADO
+// === INICIAR PRIVADO ===
 function startPrivateChat(chatId,partnerName){
   currentChat=chatId;
   hiddenChats[chatId]=false;
-  chatWindow.innerHTML=`<div style='text-align:center;margin:10px;color:#555;'>💬 Conversa privada com ${partnerName} 
+  chatPartnerName.textContent=partnerName.split(" ")[0]; // mostrar primeiro nome
+
+  // animação suave
+  chatWindow.innerHTML="";
+  const container=document.createElement("div");
+  container.style.opacity=0;
+  container.innerHTML=`<div style='text-align:center;margin:10px;color:#555;'>💬 Conversa privada com ${partnerName} 
   <span style="cursor:pointer;color:red;" onclick="hideChat('${chatId}')">[Apagar chat]</span></div>`;
+  chatWindow.appendChild(container);
+  setTimeout(()=>{container.style.transition="opacity 0.5s"; container.style.opacity=1;},10);
+
   generalBtn.style.display="inline-block";
 
   if(privateChatListener) privateChatListener.off();
@@ -303,23 +339,21 @@ function startPrivateChat(chatId,partnerName){
   }
 }
 
-// APAGAR CHAT LOCAL
+// === APAGAR CHAT COM ANIMAÇÃO ===
 function hideChat(chatId){
   if(confirm("Apagar este chat localmente?")){
     hiddenChats[chatId]=true;
-    chatWindow.innerHTML=`<div style='text-align:center;margin:10px;color:#555;'>💬 Chat apagado. Você pode retomar a conversa clicando no usuário novamente.</div>`;
+    chatWindow.innerHTML="";
+    chatPartnerName.textContent="";
+    const container=document.createElement("div");
+    container.style.opacity=0;
+    container.innerHTML=`<div style='text-align:center;margin:10px;color:#555;'>💬 Chat apagado. Você pode retomar clicando no usuário.</div>`;
+    chatWindow.appendChild(container);
+    setTimeout(()=>{container.style.transition="opacity 0.5s"; container.style.opacity=1;},10);
   }
 }
 
-// VOLTAR AO CHAT GLOBAL
-generalBtn.onclick=()=>{
-  currentChat="global";
-  chatWindow.innerHTML="";
-  db.ref("chatGlobal").once("value",s=>s.forEach(m=>showMessage(m.val(),"chatGlobal")));
-  generalBtn.style.display="none";
-};
-
-// SCROLL HORIZONTAL MOBILE
+// === SCROLL HORIZONTAL MOBILE ===
 let scrollInterval;
 function startMobileScroll(){
   clearInterval(scrollInterval);
@@ -327,9 +361,7 @@ function startMobileScroll(){
   if(!container) return;
   scrollInterval=setInterval(()=>{
     container.scrollLeft+=1;
-    if(container.scrollLeft>=container.scrollWidth-container.clientWidth){
-      container.scrollLeft=0;
-    }
+    if(container.scrollLeft>=container.scrollWidth-container.clientWidth) container.scrollLeft=0;
   },20);
 }
 </script>
