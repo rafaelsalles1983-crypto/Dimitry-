@@ -2,277 +2,120 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Славянский клуб 💬</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>чат 🌍</title>
 
-<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
 <style>
 :root {
-  --primary: #4CAF50;
-  --bg: #f5f5f5;
+  --color-bg-light: #f5f5f5;
+  --color-primary: #4CAF50;
+  --color-primary-hover: #45a049;
 }
+* { box-sizing: border-box; margin:0; padding:0; }
+html, body { height:100%; font-family:Arial,sans-serif; background: var(--color-bg-light); }
 
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: var(--bg);
-}
+header { background:#fff; padding:10px; border-bottom:1px solid #ddd; z-index:100; display:flex; align-items:center; justify-content:space-between; gap:8px; }
+header h1 { display:flex; align-items:center; gap:8px; color: var(--color-primary); font-size:1.4em; }
+.emoji-head { width:32px; height:32px; }
 
-/* ===== Header ===== */
-header {
-  background: white;
-  color: var(--primary);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 8px 12px;
-  border-bottom: 1px solid #ddd;
-  position: fixed;
-  width: 100%;
-  top: 0;
-  z-index: 100;
-}
-header h1 {
-  margin: 0;
-  font-size: 1.2em;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-#menuDots {
-  cursor: pointer;
-  font-size: 1.5em;
-  padding: 6px;
-}
+#menuBtn { cursor:pointer; font-size:1.4em; padding:4px 8px; user-select:none; }
+#menuOptions { display:none; position:absolute; top:50px; right:10px; background:white; border:1px solid #ddd; border-radius:5px; z-index:200; }
+#menuOptions button { border:none; background:none; padding:10px 20px; width:100%; text-align:left; cursor:pointer; }
+#menuOptions button:hover { background:#f1f1f1; }
 
-/* ===== Menu oculto ===== */
-#menuBox {
-  display: none;
-  position: fixed;
-  right: 10px;
-  top: 50px;
-  background: white;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  z-index: 200;
-}
-#menuBox button {
-  border: none;
-  background: none;
-  padding: 10px;
-  width: 100%;
-  text-align: left;
-  cursor: pointer;
-}
-#menuBox button:hover {
-  background: #f0f0f0;
-}
+#topBar { display:flex; align-items:center; gap:8px; padding:6px 10px; background:#fafafa; border-bottom:1px solid #ddd; flex-wrap:wrap; overflow-x:auto; z-index:100; }
+#topBar button { background:white; color:var(--color-primary); border:1px solid var(--color-primary); padding:6px 10px; border-radius:5px; cursor:pointer; flex-shrink:0; }
+#topBar span { font-size:0.9em; flex-shrink:0; }
 
-/* ===== Barra superior ===== */
-#topBar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: #fafafa;
-  border-bottom: 1px solid #ddd;
-  margin-top: 50px;
-  padding: 6px 10px;
-}
-#globalBtn {
-  background: white;
-  border: 1px solid var(--primary);
-  color: var(--primary);
-  border-radius: 8px;
-  padding: 6px 10px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  position: relative;
-}
-#globalBtn .notify-dot {
-  position: absolute;
-  top: 4px;
-  right: 4px;
-  width: 10px;
-  height: 10px;
-  background: red;
-  border-radius: 50%;
-  animation: blink 1s infinite;
-  display: none;
-}
+#mobileUserLine { display:none; overflow-x:hidden; white-space:nowrap; background:#fafafa; padding:6px 4px; border-bottom:1px solid #ddd; }
+.userItemMobile { width:50px; height:50px; border-radius:50%; overflow:hidden; display:inline-block; margin-right:6px; border:2px solid transparent; cursor:pointer; transition: transform 0.2s; position:relative; }
+.userItemMobile img { width:100%; height:100%; border-radius:50%; object-fit:cover; }
+.userItemMobile:hover { border-color:var(--color-primary); transform:scale(1.1); }
 
-/* ===== Users list ===== */
-#userList {
-  width: 220px;
-  background: white;
-  border-right: 1px solid #ddd;
-  height: calc(100vh - 100px);
-  overflow-y: auto;
-  float: left;
-}
-.userItem {
-  display: flex;
-  align-items: center;
-  padding: 8px;
-  cursor: pointer;
-  position: relative;
-}
-.userItem:hover { background: #e8f5e9; }
-.userItem img {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  margin-right: 8px;
-}
 .notify-dot {
-  position: absolute;
-  right: 8px;
-  top: 14px;
-  width: 10px;
-  height: 10px;
-  background: red;
-  border-radius: 50%;
-  animation: blink 1s infinite;
-  display: none;
+  position:absolute;
+  top:2px;
+  right:4px;
+  width:10px;
+  height:10px;
+  background:red;
+  border-radius:50%;
+  animation:blink 1s infinite;
+  display:none;
 }
-@keyframes blink { 50% { opacity: 0; } }
+@keyframes blink { 50% {opacity:0;} }
 
-/* ===== Chat ===== */
-#chatContainer {
-  margin-left: 220px;
-  display: flex;
-  flex-direction: column;
-  height: calc(100vh - 100px);
-}
-#chatHeader {
-  background: #fafafa;
-  border-bottom: 1px solid #ddd;
-  padding: 10px;
-  font-weight: bold;
-}
-#chatWindow {
-  flex: 1;
-  overflow-y: auto;
-  background: white;
-  padding: 10px;
-}
-.msg {
-  margin: 5px 0;
-  padding: 8px;
-  border-radius: 8px;
-  max-width: 80%;
-  word-wrap: break-word;
-}
-.userMsg { background: #e0f7e9; align-self: flex-end; text-align: right; }
-.otherMsg { background: #fff8dc; align-self: flex-start; text-align: left; }
+#mainContent { display:flex; flex:1; overflow:hidden; height: calc(100vh - 108px); }
 
-#chatInput {
-  display: flex;
-  padding: 8px;
-  border-top: 1px solid #ddd;
-  background: white;
-}
-#chatInput input {
-  flex: 1;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  padding: 8px;
-}
-#chatInput button {
-  background: var(--primary);
-  color: white;
-  border: none;
-  border-radius: 6px;
-  padding: 8px 12px;
-  margin-left: 6px;
-  cursor: pointer;
-}
+#userList { width:200px; background:#fff; border-right:1px solid #ddd; overflow-y:auto; padding:8px; }
+.userItem { display:flex; align-items:center; gap:6px; margin-bottom:6px; cursor:pointer; padding:6px; border-radius:5px; position:relative; }
+.userItem:hover { background:#e0f7e9; }
+.userItem img { width:28px; height:28px; border-radius:50%; }
 
-/* ===== Mobile users bar ===== */
-#mobileUsers {
-  display: none;
-  overflow-x: auto;
-  white-space: nowrap;
-  background: #fafafa;
-  border-bottom: 1px solid #ddd;
-}
-.userIcon {
-  display: inline-block;
-  position: relative;
-  margin: 5px;
-  cursor: pointer;
-}
-.userIcon img {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-}
-.userIcon .notify-dot {
-  position: absolute;
-  top: 2px;
-  right: 4px;
-  width: 10px;
-  height: 10px;
-  background: red;
-  border-radius: 50%;
-  animation: blink 1s infinite;
-  display: none;
-}
+#chatContainer { flex:1; display:flex; flex-direction:column; overflow:hidden; position:relative; }
+#chatWindow { flex:1; overflow-y:auto; padding:10px; background:white; }
+.msg { margin:5px 0; padding:8px; border-radius:8px; max-width:80%; word-wrap:break-word; }
+.userMsg { background:#e0f7e9; align-self:flex-end; text-align:right; }
+.otherMsg { background:#fff8dc; align-self:flex-start; text-align:left; }
 
-/* ===== Toast ===== */
-#toast {
-  position: fixed;
-  bottom: 60px;
-  right: 10px;
-  background: var(--primary);
-  color: white;
-  padding: 10px 15px;
-  border-radius: 5px;
-  display: none;
-}
+#chatInput { display:flex; border-top:1px solid #ddd; background:white; padding:4px; }
+#chatInput input { flex:1; padding:10px; font-size:1em; border:1px solid #ccc; border-radius:5px; }
+#chatInput button { background:var(--color-primary); color:white; border:none; padding:10px 14px; margin-left:4px; border-radius:5px; cursor:pointer; }
+#chatInput button:hover { background:var(--color-primary-hover); }
 
-/* ===== Responsive ===== */
-@media (max-width: 768px) {
-  #userList { display: none; }
-  #mobileUsers { display: flex; }
-  #chatContainer { margin-left: 0; height: calc(100vh - 180px); }
+#adSidebar { width:280px; background:#f1f1f1; border-left:1px dashed #ccc; padding:8px; text-align:center; overflow-y:auto; }
+footer { background:white; color:#555; text-align:center; padding:6px; font-size:0.85em; border-top:1px solid #ddd; }
+
+@media(max-width:768px){
+  header { position:fixed; top:0; left:0; right:0; z-index:100; height:50px; }
+  #topBar { position:fixed; top:50px; left:0; right:0; z-index:100; width:100%; height:40px; }
+  #mobileUserLine { display:flex; position:fixed; top:90px; left:0; right:0; padding:6px 4px; background:#fafafa; border-bottom:1px solid #ddd; z-index:100; overflow-x:auto; white-space:nowrap; }
+  #mainContent { flex-direction:column; margin-top:130px; margin-bottom:100px; height:auto; overflow-y:auto; }
+  #chatWindow { flex:1; overflow-y:auto; width:100%; margin-bottom:0; padding-bottom:10px; }
+  #chatInput { position:fixed; bottom:40px; left:0; right:0; padding:4px; background:white; z-index:50; width:100%; }
+  footer { position:fixed; bottom:0; left:0; right:0; z-index:100; width:100%; height:40px; }
+  #userList, #adSidebar { display:none; }
 }
 </style>
 </head>
 <body>
-
 <header>
-  <h1>Славянский клуб 💬</h1>
-  <div id="menuDots">⋮</div>
-  <div id="menuBox"><button id="clearChatBtn">🗑️ Apagar chat</button></div>
+  <h1>Славянский клуб <img src="emoji_dimitry.png" alt="Dimitry" class="emoji-head"></h1>
+  <div id="menuBtn">⋮</div>
+  <div id="menuOptions"><button id="clearChatBtn">🗑️ Apagar chat</button></div>
 </header>
 
 <div id="topBar">
-  <button id="globalBtn">🌍 Chat Global <div class="notify-dot"></div></button>
-  <span id="onlineCount">👥 0 online</span>
+  <button id="backBtn" onclick="window.location.href='index.html'">⬅ Voltar</button>
+  <button id="loginBtn">Login com Google</button>
+  <button id="logoutBtn" style="display:none;">Logout</button>
+  <button id="generalBtn" style="display:none;">⬅ Bate-papo geral</button>
+  <span id="alertaLogin">⚠️ Faça login para enviar mensagens.</span>
+  <span id="onlineCount">👥 Usuários online: 0</span>
 </div>
 
-<div id="mobileUsers"></div>
-<div id="userList"></div>
+<div id="mobileUserLine"></div>
 
-<div id="chatContainer">
-  <div id="chatHeader">Chat Global 🌍</div>
-  <div id="chatWindow"></div>
-  <div id="chatInput">
-    <input type="text" id="msgInput" placeholder="Digite sua mensagem..." disabled>
-    <button id="sendBtn" disabled>Enviar</button>
+<div id="mainContent">
+  <div id="userList"></div>
+  <div id="chatContainer">
+    <div id="chatWindow"></div>
+    <div id="chatInput">
+      <input type="text" id="msgInput" placeholder="Digite sua mensagem..." disabled>
+      <button id="sendBtn" disabled>Enviar</button>
+    </div>
   </div>
+  <div id="adSidebar">Publicidade aqui (Adsense)</div>
 </div>
 
-<div id="toast"></div>
-<audio id="msgSound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_2a8c4e8d5a.mp3" preload="auto"></audio>
+<footer>© 2025 Славянский клуб — Aprenda Russo e Português com diversão!</footer>
 
 <script>
+// ===== Firebase Config =====
 const firebaseConfig = {
   apiKey: "AIzaSyCYJCgfil5HKrCWtB14zwdicDaEcldHU6A",
   authDomain: "dimitry-rusian.firebaseapp.com",
@@ -284,159 +127,149 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 
-const auth = firebase.auth();
-const db = firebase.database();
+const auth=firebase.auth();
+const db=firebase.database();
 
+const loginBtn=document.getElementById("loginBtn");
+const logoutBtn=document.getElementById("logoutBtn");
 const msgInput=document.getElementById("msgInput");
 const sendBtn=document.getElementById("sendBtn");
 const chatWindow=document.getElementById("chatWindow");
-const chatHeader=document.getElementById("chatHeader");
-const globalBtn=document.getElementById("globalBtn");
-const globalDot=globalBtn.querySelector(".notify-dot");
 const userList=document.getElementById("userList");
-const mobileUsers=document.getElementById("mobileUsers");
-const toast=document.getElementById("toast");
-const msgSound=document.getElementById("msgSound");
-const menuDots=document.getElementById("menuDots");
-const menuBox=document.getElementById("menuBox");
-const clearChatBtn=document.getElementById("clearChatBtn");
+const alertaLogin=document.getElementById("alertaLogin");
 const onlineCount=document.getElementById("onlineCount");
-
-let currentUser=null;
+const generalBtn=document.getElementById("generalBtn");
+const mobileUserLine=document.getElementById("mobileUserLine");
+const menuBtn=document.getElementById("menuBtn");
+const menuOptions=document.getElementById("menuOptions");
+const clearChatBtn=document.getElementById("clearChatBtn");
 let currentChat="global";
 let deletedChats=JSON.parse(localStorage.getItem("deletedChats")||"{}");
 
 // Menu ⋮
-menuDots.onclick=()=>{menuBox.style.display=menuBox.style.display==="block"?"none":"block";};
+menuBtn.onclick=()=>menuOptions.style.display=menuOptions.style.display==="block"?"none":"block";
 clearChatBtn.onclick=()=>{
   deletedChats[currentChat]=true;
   localStorage.setItem("deletedChats",JSON.stringify(deletedChats));
   chatWindow.innerHTML="<p style='text-align:center;color:#777;'>💬 Chat apagado localmente.</p>";
-  menuBox.style.display="none";
+  menuOptions.style.display="none";
 };
 
-// Login automático Google (temporário)
-auth.signInAnonymously();
+// LOGIN / LOGOUT
+loginBtn.onclick = ()=> auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
+logoutBtn.onclick = ()=> auth.signOut();
 
-// Estado online
 auth.onAuthStateChanged(user=>{
   if(user){
-    currentUser=user;
+    loginBtn.style.display="none";
+    logoutBtn.style.display="inline-block";
+    alertaLogin.style.display="none";
     msgInput.disabled=false;
     sendBtn.disabled=false;
-    db.ref("online/"+user.uid).set({name:"Usuário "+user.uid.slice(-4),photo:"https://cdn-icons-png.flaticon.com/512/847/847969.png"});
+    db.ref("online/"+user.uid).set({name:user.displayName,photo:user.photoURL});
     db.ref("online/"+user.uid).onDisconnect().remove();
+  } else{
+    loginBtn.style.display="inline-block";
+    logoutBtn.style.display="none";
+    alertaLogin.style.display="inline-block";
+    msgInput.disabled=true;
+    sendBtn.disabled=true;
   }
 });
 
-// Lista de usuários
-db.ref("online").on("value",snap=>{
-  userList.innerHTML=""; mobileUsers.innerHTML="";
+// LISTA DE USUÁRIOS
+db.ref("online").on("value", snap=>{
   const users=snap.val()||{};
-  const total=Object.keys(users).length;
-  onlineCount.textContent=`👥 ${total} online`;
+  onlineCount.textContent=`👥 ${Object.keys(users).length}`;
+  userList.innerHTML="";
+  mobileUserLine.innerHTML="";
   for(const [uid,u] of Object.entries(users)){
-    if(uid===currentUser?.uid) continue;
     const userDiv=document.createElement("div");
     userDiv.className="userItem";
-    userDiv.innerHTML=`<img src="${u.photo}"><span>${u.name}</span><div class='notify-dot'></div>`;
-    userDiv.dataset.uid=uid;
+    userDiv.innerHTML=`<img src="${u.photo||'https://cdn-icons-png.flaticon.com/512/847/847969.png'}"><span>${u.name}</span><div class='notify-dot'></div>`;
     userDiv.onclick=()=>openPrivate(uid,u.name);
     userList.appendChild(userDiv);
 
     const mob=document.createElement("div");
-    mob.className="userIcon";
-    mob.innerHTML=`<img src="${u.photo}" title="${u.name}"><div class='notify-dot'></div>`;
-    mob.dataset.uid=uid;
+    mob.className="userItemMobile";
+    mob.innerHTML=`<img src="${u.photo||'https://cdn-icons-png.flaticon.com/512/847/847969.png'}" title="${u.name}"><div class='notify-dot'></div>`;
     mob.onclick=()=>openPrivate(uid,u.name);
-    mobileUsers.appendChild(mob);
+    mobileUserLine.appendChild(mob);
   }
 });
 
-// Chat global
-db.ref("chatGlobal").on("child_added",snap=>{
-  const msg=snap.val();
-  if(deletedChats["global"]) return;
-  showMsg(msg,"global");
-  if(msg.uid!==currentUser?.uid && currentChat!=="global"){
-    globalDot.style.display="block";
-    toastMsg("🌍 Nova mensagem no global");
-    msgSound.play();
-  }
-});
+// ENVIAR MENSAGEM
+sendBtn.onclick = sendMessage;
+msgInput.addEventListener("keypress", e=>{if(e.key==="Enter") sendMessage();});
 
-globalBtn.onclick=()=>{
-  globalDot.style.display="none";
-  currentChat="global";
-  chatHeader.textContent="Chat Global 🌍";
-  loadMessages("chatGlobal","global");
-};
-
-sendBtn.onclick=sendMsg;
-msgInput.onkeypress=e=>{if(e.key==="Enter")sendMsg();};
-
-function sendMsg(){
+function sendMessage(){
   const text=msgInput.value.trim();
-  if(!text||!currentUser)return;
+  const user=auth.currentUser;
+  if(!text||!user)return;
   const path=currentChat==="global"?"chatGlobal":"private/"+currentChat;
-  db.ref(path).push({uid:currentUser.uid,text,user:"Você",timestamp:Date.now()});
+  db.ref(path).push({user:user.displayName,uid:user.uid,text,timestamp:Date.now()});
   msgInput.value="";
 }
 
-function openPrivate(uid,name){
-  const chatId=[uid,currentUser.uid].sort().join("_");
-  currentChat=chatId;
-  chatHeader.textContent="💬 "+name;
-  chatWindow.innerHTML="";
-  loadMessages("private/"+chatId,chatId);
-  listenPrivate(chatId,uid);
-  hideDot(uid);
-}
+// RECEBER MENSAGENS GLOBAIS
+db.ref("chatGlobal").on("child_added", snap=>{
+  const msg=snap.val();
+  if(deletedChats["global"]) return;
+  showMessage(msg,"chatGlobal");
+});
 
-function loadMessages(path,id){
-  chatWindow.innerHTML="";
-  if(deletedChats[id]){
-    chatWindow.innerHTML="<p style='text-align:center;color:#777;'>💬 Chat apagado localmente.</p>";
-    return;
-  }
-  db.ref(path).once("value",snap=>snap.forEach(s=>showMsg(s.val(),id)));
-}
-
-function listenPrivate(chatId,otherUid){
-  db.ref("private/"+chatId).off();
-  db.ref("private/"+chatId).on("child_added",snap=>{
-    const msg=snap.val();
-    if(deletedChats[chatId]) return;
-    showMsg(msg,chatId);
-    if(msg.uid!==currentUser.uid && currentChat!==chatId){
-      toastMsg("💬 Nova mensagem recebida!");
-      showDot(otherUid);
-      msgSound.play();
-    }
-  });
-}
-
-function showMsg(msg,id){
-  if(id!==currentChat)return;
+function showMessage(msg,room){
+  if(room!=="chatGlobal" && room!==currentChat) return;
   const div=document.createElement("div");
-  div.className="msg "+(msg.uid===currentUser?.uid?"userMsg":"otherMsg");
+  div.className=msg.uid===auth.currentUser?.uid?"msg userMsg":"msg otherMsg";
   div.textContent=`${msg.user}: ${msg.text}`;
   chatWindow.appendChild(div);
   chatWindow.scrollTop=chatWindow.scrollHeight;
 }
 
-function toastMsg(txt){
-  toast.textContent=txt;
-  toast.style.display="block";
-  setTimeout(()=>toast.style.display="none",3000);
+// CHAT PRIVADO
+function openPrivate(uid,name){
+  if(!auth.currentUser) return alert("Faça login para conversar.");
+  if(uid===auth.currentUser.uid) return;
+  currentChat=[uid,auth.currentUser.uid].sort().join("_");
+  chatWindow.innerHTML=`<div style='text-align:center;margin:10px;color:#555;'>💬 Conversa privada com ${name}</div>`;
+  generalBtn.style.display="inline-block";
+  db.ref("private/"+currentChat).off();
+  db.ref("private/"+currentChat).on("child_added", snap=>{
+    const msg=snap.val();
+    if(deletedChats[currentChat]) return;
+    showMessage(msg,currentChat);
+    if(msg.uid!==auth.currentUser.uid){
+      notifyUser(uid);
+    }
+  });
 }
 
-function showDot(uid){
-  document.querySelectorAll(`[data-uid='${uid}'] .notify-dot`).forEach(d=>d.style.display="block");
+function notifyUser(uid){
+  document.querySelectorAll(`[data-uid='${uid}'] .notify-dot`).forEach(dot=>dot.style.display="block");
 }
-function hideDot(uid){
-  document.querySelectorAll(`[data-uid='${uid}'] .notify-dot`).forEach(d=>d.style.display="none");
+
+generalBtn.onclick=()=>{
+  currentChat="global";
+  chatWindow.innerHTML="";
+  db.ref("chatGlobal").once("value",s=>{s.forEach(m=>showMessage(m.val(),"chatGlobal"));});
+  generalBtn.style.display="none";
+};
+
+// Auto scroll horizontal mobile
+let scrollInterval;
+function startMobileScroll(){
+  clearInterval(scrollInterval);
+  const container=mobileUserLine;
+  if(!container)return;
+  scrollInterval=setInterval(()=>{
+    container.scrollLeft+=1;
+    if(container.scrollLeft>=container.scrollWidth-container.clientWidth){
+      container.scrollLeft=0;
+    }
+  },20);
 }
+startMobileScroll();
 </script>
 </body>
 </html>
