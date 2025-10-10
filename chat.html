@@ -16,63 +16,49 @@
   --color-primary-hover: #45a049;
   --color-name: #1976d2;
 }
-
-/* RESET */
 * { box-sizing: border-box; margin:0; padding:0; }
 html, body { height:100%; font-family:Arial,sans-serif; background: var(--color-bg-light); }
 
-/* HEADER */
 header { background:#fff; padding:10px; border-bottom:1px solid #ddd; z-index:100; display:flex; align-items:center; gap:8px; }
 header h1 { display:flex; align-items:center; gap:8px; color: var(--color-primary); font-size:1.4em; }
 .emoji-head { width:32px; height:32px; }
 
-/* TOPBAR */
 #topBar { display:flex; align-items:center; gap:8px; padding:6px 10px; background:#fafafa; border-bottom:1px solid #ddd; flex-wrap:wrap; overflow-x:auto; z-index:100; }
 #topBar button { background:white; color:var(--color-primary); border:1px solid var(--color-primary); padding:6px 10px; border-radius:5px; cursor:pointer; flex-shrink:0; }
 #topBar span { font-size:0.9em; flex-shrink:0; }
 
-/* MOBILE USERS HORIZONTAL */
 #mobileUserLine { display:none; overflow-x:hidden; white-space:nowrap; background:#fafafa; padding:6px 4px; border-bottom:1px solid #ddd; }
 .userItemMobile { width:50px; height:50px; border-radius:50%; overflow:hidden; display:inline-block; margin-right:6px; border:2px solid transparent; cursor:pointer; transition: transform 0.2s; position:relative; }
 .userItemMobile img { width:100%; height:100%; border-radius:50%; object-fit:cover; }
 .userItemMobile:hover { border-color:var(--color-primary); transform:scale(1.1); }
 
-/* ALERTA PISCANDO */
 .alert-dot { position:absolute; top:0; right:0; width:12px; height:12px; background:red; border-radius:50%; animation: blink 1s infinite; }
 @keyframes blink { 50% { opacity:0; } }
 
-/* NOME DO USUÁRIO */
 #currentPartner { position:absolute; top:0; right:10px; font-weight:bold; color:var(--color-name); }
 
-/* MAIN */
 #mainContent { display:flex; flex:1; overflow:hidden; height: calc(100vh - 108px); }
 
-/* USER LIST (DESKTOP) */
 #userList { width:200px; background:#fff; border-right:1px solid #ddd; overflow-y:auto; padding:8px; }
 .userItem { display:flex; align-items:center; gap:6px; margin-bottom:6px; cursor:pointer; padding:6px; border-radius:5px; position:relative; }
 .userItem:hover { background:#e0f7e9; }
 .userItem img { width:28px; height:28px; border-radius:50%; }
 
-/* CHAT */
 #chatContainer { flex:1; display:flex; flex-direction:column; overflow:hidden; position:relative; }
 #chatWindow { flex:1; overflow-y:auto; padding:10px; background:white; }
 .msg { margin:5px 0; padding:8px; border-radius:8px; max-width:80%; word-wrap:break-word; position:relative; }
 .userMsg { background:#e0f7e9; align-self:flex-end; text-align:right; }
 .otherMsg { background:#fff8dc; align-self:flex-start; text-align:left; }
 
-/* CHAT INPUT */
 #chatInput { display:flex; border-top:1px solid #ddd; background:white; padding:4px; }
 #chatInput input { flex:1; padding:10px; font-size:1em; border:1px solid #ccc; border-radius:5px; }
 #chatInput button { background:var(--color-primary); color:white; border:none; padding:10px 14px; margin-left:4px; border-radius:5px; cursor:pointer; }
 #chatInput button:hover { background:var(--color-primary-hover); }
 
-/* ADS */
 #adSidebar { width:280px; background:#f1f1f1; border-left:1px dashed #ccc; padding:8px; text-align:center; overflow-y:auto; }
 
-/* FOOTER */
 footer { background:white; color:#555; text-align:center; padding:6px; font-size:0.85em; border-top:1px solid #ddd; }
 
-/* MOBILE */
 @media(max-width:768px){
   html, body { height:100%; overflow:visible; }
   header { position:fixed; top:0; left:0; right:0; z-index:100; height:50px; }
@@ -147,9 +133,10 @@ const currentPartnerEl=document.getElementById("currentPartner");
 let currentChat="global";
 let privateChatListener=null;
 let alertIcons={};
-let acceptedChats={};
 let hiddenChats={};
 let userData={};
+let currentPartnerUID=null;
+let blockedUsers={};
 
 // LOGIN/LOGOUT
 loginBtn.onclick=()=>auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
@@ -166,6 +153,7 @@ auth.onAuthStateChanged(user=>{
     userData={uid:user.uid,name:user.displayName,photo:user.photoURL};
     db.ref("online/"+user.uid).set({name:user.displayName,photo:user.photoURL});
     db.ref("online/"+user.uid).onDisconnect().remove();
+    loadBlockedUsers();
     updateUserList();
   } else {
     loginBtn.style.display="inline-block";
@@ -174,10 +162,37 @@ auth.onAuthStateChanged(user=>{
     msgInput.disabled=true;
     sendBtn.disabled=true;
     userData={};
+    currentPartnerUID=null;
     updateUserList();
     startGlobalChat();
   }
 });
+
+// Carregar bloqueados
+function loadBlockedUsers(){
+  if(!userData.uid) return;
+  db.ref(`blocked/${userData.uid}`).once("value").then(snap=>{
+    blockedUsers = snap.val()||{};
+  });
+}
+
+// BLOQUEAR/DEBLOQUEAR
+function toggleBlock(uid){
+  if(!userData.uid) return;
+  const ref=db.ref(`blocked/${userData.uid}/${uid}`);
+  if(blockedUsers[uid]){
+    ref.remove();
+    blockedUsers[uid]=false;
+    alert("Usuário desbloqueado.");
+  } else {
+    ref.set(true);
+    blockedUsers[uid]=true;
+    alert("Usuário bloqueado.");
+    if(currentPartnerUID===uid){
+      startGlobalChat();
+    }
+  }
+}
 
 // FUNÇÃO PARA ATUALIZAR USUÁRIOS
 function updateUserList(){
@@ -187,7 +202,6 @@ function updateUserList(){
     mobileUserLine.innerHTML="";
     alertIcons={};
 
-    // Chat global primeiro
     const divGlobal=document.createElement("div");
     divGlobal.className="userItem";
     divGlobal.innerHTML=`<img src="https://cdn-icons-png.flaticon.com/512/3126/3126540.png"><span>Global</span>`;
@@ -199,7 +213,6 @@ function updateUserList(){
     mobGlobal.onclick=()=>startGlobalChat();
     mobileUserLine.appendChild(mobGlobal);
 
-    // Próprio usuário
     if(userData.uid){
       const divSelf=document.createElement("div");
       divSelf.className="userItem";
@@ -213,35 +226,59 @@ function updateUserList(){
       mobileUserLine.appendChild(mobSelf);
     }
 
-    // Demais usuários
     for(const [uid,u] of Object.entries(users)){
       if(!u.name || uid===userData.uid) continue;
       const div=document.createElement("div");
       div.className="userItem";
       div.innerHTML=`<img src="${u.photo||'https://cdn-icons-png.flaticon.com/512/847/847969.png'}"><span>${u.name}</span>`;
-      div.onclick=()=>requestPrivateChat(uid,u.name);
+      div.onclick=()=>startPrivateChat(uid,u.name);
+      const blockBtn=document.createElement("button");
+      blockBtn.style.marginLeft="auto";
+      blockBtn.textContent=blockedUsers[uid]?"Desbloquear":"Bloquear";
+      blockBtn.onclick=(e)=>{
+        e.stopPropagation();
+        toggleBlock(uid);
+        blockBtn.textContent=blockedUsers[uid]?"Desbloquear":"Bloquear";
+      };
+      div.appendChild(blockBtn);
       userList.appendChild(div);
 
       const mob=document.createElement("div");
       mob.className="userItemMobile";
       mob.innerHTML=`<img src="${u.photo||'https://cdn-icons-png.flaticon.com/512/847/847969.png'}" title="${u.name}">`;
-      mob.onclick=()=>requestPrivateChat(uid,u.name);
+      mob.onclick=()=>startPrivateChat(uid,u.name);
       mobileUserLine.appendChild(mob);
 
       alertIcons[uid]={desktop:div,mobile:mob};
     }
+
+    onlineCount.textContent=`👥 Usuários online: ${Object.keys(users).length}`;
     startMobileScroll();
   });
 }
 
-// FUNÇÃO GLOBAL CHAT
+// CHAT GLOBAL
 function startGlobalChat(){
   currentChat="global";
+  currentPartnerUID=null;
   currentPartnerEl.textContent="🌍 Global";
   chatWindow.innerHTML="";
   generalBtn.style.display="none";
-  hiddenChats["global"]=false;
   db.ref("chatGlobal").once("value",s=>s.forEach(m=>showMessage(m.val(),"chatGlobal")));
+}
+
+// INICIAR CHAT PRIVADO
+function startPrivateChat(uid,name){
+  if(blockedUsers[uid]) { alert("Este usuário está bloqueado."); return; }
+  currentPartnerUID=uid;
+  currentChat=[userData.uid,uid].sort().join("_");
+  currentPartnerEl.textContent=name;
+  chatWindow.innerHTML=`<div style='text-align:center;margin:10px;color:#555;'>💬 Conversa privada com ${name} <span style="cursor:pointer;color:red;" onclick="hideChat('${currentChat}')">[Apagar chat]</span></div>`;
+  generalBtn.style.display="inline-block";
+
+  if(privateChatListener) privateChatListener.off();
+  privateChatListener=db.ref("private/"+currentChat);
+  privateChatListener.on("child_added",s=>showMessage(s.val(),currentChat));
 }
 
 // FUNÇÕES DE MENSAGEM
@@ -251,13 +288,16 @@ msgInput.addEventListener("keypress",e=>{if(e.key==="Enter")sendMessage();});
 function sendMessage(){
   const text=msgInput.value.trim();
   if(!text || !userData.uid) return;
+  if(currentPartnerUID && blockedUsers[currentPartnerUID]){
+    alert("Você está bloqueado por este usuário ou bloqueou este usuário.");
+    return;
+  }
   const path=currentChat==="global"?"chatGlobal":"private/"+currentChat;
   db.ref(path).push({user:userData.name,uid:userData.uid,text,timestamp:Date.now()});
   msgInput.value="";
 }
 
 function showMessage(msg,room){
-  if(hiddenChats[room]) return;
   if(room!=="chatGlobal" && room!==currentChat) return;
   const div=document.createElement("div");
   div.className=msg.uid===userData.uid?"msg userMsg":"msg otherMsg";
@@ -266,75 +306,12 @@ function showMessage(msg,room){
   chatWindow.scrollTop=chatWindow.scrollHeight;
 }
 
-// CHAT GLOBAL
+// LISTENERS
 db.ref("chatGlobal").on("child_added",snap=>showMessage(snap.val(),"chatGlobal"));
-
-// SOLICITAÇÃO PRIVADA
-function requestPrivateChat(uid,name){
-  if(!userData.uid) return alert("Faça login!");
-  if(uid===userData.uid) return;
-  if(acceptedChats[uid]) return alert("Você já pode conversar com este usuário.");
-
-  const reqPath=`privateRequests/${uid}/${userData.uid}`;
-  db.ref(reqPath).once("value").then(s=>{
-    if(!s.exists()){
-      db.ref(reqPath).set({fromName:userData.name});
-      alert(`Solicitação enviada para ${name}.`);
-    } else {
-      alert("Solicitação já enviada, aguardando resposta.");
-    }
-  });
-}
-
-// RECEBER SOLICITAÇÃO
-auth.onAuthStateChanged(user=>{
-  if(!user) return;
-  const reqRoot=`privateRequests/${user.uid}`;
-  db.ref(reqRoot).on("child_added",snap=>{
-    const fromUID=snap.key;
-    const fromName=snap.val().fromName;
-    const icon=alertIcons[fromUID];
-    if(icon){
-      const dot=document.createElement("div");
-      dot.className="alert-dot";
-      icon.desktop.appendChild(dot);
-      icon.mobile.appendChild(dot.cloneNode());
-    }
-
-    if(!acceptedChats[fromUID]){
-      if(confirm(`${fromName} quer conversar com você. Aceitar?`)){
-        const chatId=[userData.uid,fromUID].sort().join("_");
-        acceptedChats[fromUID]=true;
-        startPrivateChat(chatId,fromName);
-      }
-    }
-    snap.ref.remove();
-  });
-});
-
-// INICIAR CHAT PRIVADO
-function startPrivateChat(chatId,partnerName){
-  currentChat=chatId;
-  hiddenChats[chatId]=false;
-  currentPartnerEl.textContent=partnerName;
-  chatWindow.innerHTML=`<div style='text-align:center;margin:10px;color:#555;'>💬 Conversa privada com ${partnerName} <span style="cursor:pointer;color:red;" onclick="hideChat('${chatId}')">[Apagar chat]</span></div>`;
-  generalBtn.style.display="inline-block";
-
-  if(privateChatListener) privateChatListener.off();
-  privateChatListener=db.ref("private/"+chatId);
-  privateChatListener.on("child_added",s=>showMessage(s.val(),chatId));
-
-  // remover alertas
-  for(const icons of Object.values(alertIcons)){
-    icons.desktop.querySelector(".alert-dot")?.remove();
-    icons.mobile.querySelector(".alert-dot")?.remove();
-  }
-}
 
 // APAGAR CHAT LOCAL
 function hideChat(chatId){
   if(confirm("Apagar este chat localmente?")){
-    hiddenChats[chatId]=true;
     chatWindow.innerHTML=`<div style='text-align:center;margin:10px;color:#555;'>💬 Chat apagado. Você pode retomar a conversa clicando no usuário novamente.</div>`;
   }
 }
