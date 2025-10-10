@@ -24,7 +24,6 @@ header h1 { display:flex; align-items:center; gap:8px; color: var(--color-primar
 #topBar { display:flex; align-items:center; gap:8px; padding:6px 10px; background:#fafafa; border-bottom:1px solid #ddd; flex-wrap:wrap; overflow-x:auto; z-index:100; }
 #topBar button { background:white; color:var(--color-primary); border:1px solid var(--color-primary); padding:6px 10px; border-radius:5px; cursor:pointer; flex-shrink:0; }
 #topBar span { font-size:0.9em; flex-shrink:0; }
-#topBar #deleteChatBtn { margin-left:auto; display:none; }
 
 #mobileUserLine { display:none; overflow-x:hidden; white-space:nowrap; background:#fafafa; padding:6px 4px; border-bottom:1px solid #ddd; }
 .userItemMobile { width:50px; height:50px; border-radius:50%; overflow:hidden; display:inline-block; margin-right:6px; border:2px solid transparent; cursor:pointer; transition: transform 0.2s; position:relative; }
@@ -78,7 +77,6 @@ footer { background:white; color:#555; text-align:center; padding:6px; font-size
   #chatInput { position:fixed; bottom:40px; left:0; right:0; padding:4px; background:white; z-index:50; width:100%; }
   footer { position:fixed; bottom:0; left:0; right:0; z-index:100; width:100%; height:40px; }
   #userList, #adSidebar { display:none; }
-  #topBar #deleteChatBtn { display:inline-block; }
 }
 </style>
 </head>
@@ -92,7 +90,6 @@ footer { background:white; color:#555; text-align:center; padding:6px; font-size
   <button id="loginBtn">Login com Google</button>
   <button id="logoutBtn" style="display:none;">Logout</button>
   <button id="generalBtn" style="display:none;">⬅ Bate-papo geral</button>
-  <button id="deleteChatBtn">🗑️ Apagar Chat</button>
   <span id="alertaLogin">⚠️ Faça login para enviar mensagens.</span>
   <span id="onlineCount">👥 Usuários online: 0</span>
 </div>
@@ -138,14 +135,12 @@ const userList=document.getElementById("userList");
 const alertaLogin=document.getElementById("alertaLogin");
 const onlineCount=document.getElementById("onlineCount");
 const generalBtn=document.getElementById("generalBtn");
-const deleteChatBtn=document.getElementById("deleteChatBtn");
 const mobileUserLine=document.getElementById("mobileUserLine");
 const msgSound=document.getElementById("msgSound");
 const toast=document.getElementById("toast");
 
 let currentChat="global";
 let unreadMap={};
-let deletedChats={};
 
 // LOGIN
 loginBtn.onclick=()=>auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
@@ -160,8 +155,6 @@ auth.onAuthStateChanged(user=>{
     sendBtn.disabled=false;
     db.ref("online/"+user.uid).set({name:user.displayName,photo:user.photoURL});
     db.ref("online/"+user.uid).onDisconnect().remove();
-    // Recupera chats apagados
-    db.ref("deletedChats/"+user.uid).once("value").then(snap=>{deletedChats=snap.val()||{};});
   }else{
     loginBtn.style.display="inline-block";
     logoutBtn.style.display="none";
@@ -208,7 +201,6 @@ function sendMessage(){
 // CHAT GLOBAL
 db.ref("chatGlobal").on("child_added",snap=>{
   const msg=snap.val();
-  if(deletedChats["global"]) return;
   showMessage(msg,"chatGlobal");
   if(msg.user!==auth.currentUser?.displayName && currentChat!=="global") showToast("Nova mensagem no chat global!");
 });
@@ -220,7 +212,6 @@ function openPrivateChat(uid,name){
 
   const chatId=[uid,auth.currentUser.uid].sort().join("_");
   currentChat=chatId;
-  deleteChatBtn.style.display="inline-block";
   chatWindow.innerHTML=`<div style='text-align:center;margin:10px;color:#555;'>💬 Conversa privada com ${name}</div>`;
   generalBtn.style.display="inline-block";
 
@@ -292,38 +283,17 @@ function showToast(msg){
 function updateNotifyDot(uid,show){
   const items=[...document.querySelectorAll(".userItem"),...document.querySelectorAll(".userItemMobile")];
   for(const el of items){
-    if(el.innerHTML.includes(uid)) continue;
     const dot=el.querySelector(".notify-dot");
     if(dot) dot.style.display=show?"block":"none";
   }
 }
 
-// APAGAR CHAT
-deleteChatBtn.onclick=()=>{
-  if(currentChat==="global"){
-    if(confirm("Deseja limpar o chat global apenas para você?")){
-      deletedChats["global"]=true;
-      db.ref("deletedChats/"+auth.currentUser.uid+"/global").set(true);
-      chatWindow.innerHTML="";
-    }
-  } else {
-    if(confirm("Deseja apagar este chat privado apenas para você?")){
-      deletedChats[currentChat]=true;
-      db.ref("deletedChats/"+auth.currentUser.uid+"/"+currentChat).set(true);
-      chatWindow.innerHTML="";
-    }
-  }
-};
-
 // VOLTAR CHAT GERAL
 generalBtn.onclick=()=>{
   currentChat="global";
   chatWindow.innerHTML="";
-  db.ref("chatGlobal").once("value",s=>s.forEach(m=>{
-    if(!deletedChats["global"]) showMessage(m.val(),"chatGlobal");
-  }));
+  db.ref("chatGlobal").once("value",s=>s.forEach(m=>showMessage(m.val(),"chatGlobal")));
   generalBtn.style.display="none";
-  deleteChatBtn.style.display="none";
 };
 
 // SCROLL MOBILE
