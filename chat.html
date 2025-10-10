@@ -50,7 +50,7 @@ header h1 { display:flex; align-items:center; gap:8px; color: var(--color-primar
 .userItem:hover { background:#e0f7e9; }
 .userItem img { width:28px; height:28px; border-radius:50%; }
 
-#chatContainer { flex:1; display:flex; flex-direction:column; overflow:hidden; }
+#chatContainer { flex:1; display:flex; flex-direction:column; overflow:hidden; position:relative; }
 #chatWindow { flex:1; overflow-y:auto; padding:10px; background:white; }
 .msg { margin:5px 0; padding:8px; border-radius:8px; max-width:80%; word-wrap:break-word; }
 .userMsg { background:#e0f7e9; align-self:flex-end; text-align:right; }
@@ -67,6 +67,9 @@ footer { background:white; color:#555; text-align:center; padding:6px; font-size
 #toast {
   position:fixed; bottom:60px; right:10px; background:#4CAF50; color:white; padding:10px 15px; border-radius:5px; box-shadow:0 2px 6px rgba(0,0,0,0.3); display:none; z-index:200;
 }
+
+#chatMenu { position:absolute; top:4px; right:4px; z-index:150; display:none; }
+#chatMenu button { background:white; border:1px solid #ccc; padding:4px 6px; border-radius:4px; cursor:pointer; }
 
 @media(max-width:768px){
   html,body { height:100%; overflow:visible; }
@@ -99,6 +102,9 @@ footer { background:white; color:#555; text-align:center; padding:6px; font-size
   <div id="userList"></div>
   <div id="chatContainer">
     <div id="chatWindow"></div>
+    <div id="chatMenu">
+      <button id="deleteChatBtn">🗑 Apagar chat</button>
+    </div>
     <div id="chatInput">
       <input type="text" id="msgInput" placeholder="Digite sua mensagem..." disabled>
       <button id="sendBtn" disabled>Enviar</button>
@@ -138,9 +144,13 @@ const generalBtn=document.getElementById("generalBtn");
 const mobileUserLine=document.getElementById("mobileUserLine");
 const msgSound=document.getElementById("msgSound");
 const toast=document.getElementById("toast");
+const chatMenu=document.getElementById("chatMenu");
+const deleteChatBtn=document.getElementById("deleteChatBtn");
 
 let currentChat="global";
+let currentChatUID=null;
 let unreadMap={};
+let currentChatName="";
 
 // LOGIN
 loginBtn.onclick=()=>auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
@@ -192,79 +202,63 @@ msgInput.addEventListener("keypress",e=>{if(e.key==="Enter")sendMessage();});
 function sendMessage(){
   const text=msgInput.value.trim();
   const user=auth.currentUser;
-  if(!text||!user)return;
-  const path=currentChat==="global"?"chatGlobal":"private/"+currentChat;
+  if(!text||!user||currentChat==="global") return;
+  const path="private/"+currentChat;
   db.ref(path).push({user:user.displayName,photo:user.photoURL,text,timestamp:Date.now()});
   msgInput.value="";
 }
-
-// CHAT GLOBAL
-db.ref("chatGlobal").on("child_added",snap=>{
-  const msg=snap.val();
-  showMessage(msg,"chatGlobal");
-  if(msg.user!==auth.currentUser?.displayName && currentChat!=="global") showToast("Nova mensagem no chat global!");
-});
 
 // ABRIR CHAT PRIVADO
 function openPrivateChat(uid,name){
   if(!auth.currentUser) return alert("Faça login para conversar.");
   if(uid===auth.currentUser.uid) return;
 
-  const chatId=[uid,auth.currentUser.uid].sort().join("_");
-  currentChat=chatId;
+  currentChatUID=uid;
+  currentChat=[uid,auth.currentUser.uid].sort().join("_");
+  currentChatName=name;
   chatWindow.innerHTML=`<div style='text-align:center;margin:10px;color:#555;'>💬 Conversa privada com ${name}</div>`;
   generalBtn.style.display="inline-block";
 
-  if(unreadMap[chatId]){
-    unreadMap[chatId]=false;
-    updateNotifyDot(uid,false);
-  }
+  chatMenu.style.display="block";
 
-  db.ref("privateStatus/"+chatId).once("value").then(s=>{
-    const st=s.val();
-    if(!st || (!st.accepted && !st.rejected)){
-      showAcceptancePrompt(chatId,name);
-    } else if(st.accepted){
-      startChatListener(chatId);
+  // Verifica se chat foi deletado
+  db.ref("deletedChats/"+auth.currentUser.uid+"/"+currentChat).once("value").then(s=>{
+    if(s.exists()){
+      chatWindow.innerHTML="<div style='text-align:center;color:#555;'>🗑 Você apagou este chat.</div>";
     } else {
-      chatWindow.innerHTML="<div style='text-align:center;color:red;'>❌ Conversa recusada.</div>";
+      startChatListener(currentChat);
     }
   });
 }
 
-// ACEITAR / RECUSAR
-function showAcceptancePrompt(chatId,name){
-  chatWindow.innerHTML=`<div style='text-align:center;margin-top:20px;'>${name} enviou uma mensagem.<br><br>
-    <button onclick="acceptChat('${chatId}')">✅ Aceitar</button>
-    <button onclick="rejectChat('${chatId}')">❌ Recusar</button>
-  </div>`;
-}
-function acceptChat(chatId){
-  db.ref("privateStatus/"+chatId).set({accepted:true});
-  startChatListener(chatId);
-}
-function rejectChat(chatId){
-  db.ref("privateStatus/"+chatId).set({rejected:true});
-  chatWindow.innerHTML="<div style='text-align:center;color:red;'>❌ Você recusou esta conversa.</div>";
-}
+// APAGAR CHAT
+deleteChatBtn.onclick=()=>{
+  if(currentChat==="global") return;
+  if(!confirm("Deseja apagar este chat apenas para você?")) return;
+  db.ref("deletedChats/"+auth.currentUser.uid+"/"+currentChat).set(true);
+  chatWindow.innerHTML="<div style='text-align:center;color:#555;'>🗑 Você apagou este chat.</div>";
+};
 
-// CHAT PRIVADO
+// MONITORAR CHAT
 function startChatListener(chatId){
   db.ref("private/"+chatId).off();
   db.ref("private/"+chatId).on("child_added",s=>{
-    showMessage(s.val(),chatId);
-    if(s.val().user!==auth.currentUser.displayName && currentChat!==chatId){
-      unreadMap[chatId]=true;
-      const uidOther=chatId.replace(auth.currentUser.uid,"").replace("_","");
-      updateNotifyDot(uidOther,true);
-      showToast("Nova mensagem de "+s.val().user);
-    }
+    // Checa se chat foi deletado pelo usuário
+    db.ref("deletedChats/"+auth.currentUser.uid+"/"+chatId).once("value").then(del=>{
+      if(del.exists()) return;
+      showMessage(s.val(),chatId);
+      if(s.val().user!==auth.currentUser.displayName){
+        unreadMap[chatId]=true;
+        updateNotifyDot(currentChatUID,true);
+        showToast("Nova mensagem de "+s.val().user);
+      }
+    });
   });
 }
 
 // MOSTRAR MENSAGEM
 function showMessage(msg,room){
-  if(room!=="chatGlobal" && room!==currentChat)return;
+  if(room!==currentChat) return;
   const div=document.createElement("div");
   div.className=msg.user===auth.currentUser?.displayName?"msg userMsg":"msg otherMsg";
   div.textContent=`${msg.user}: ${msg.text}`;
@@ -294,6 +288,7 @@ generalBtn.onclick=()=>{
   chatWindow.innerHTML="";
   db.ref("chatGlobal").once("value",s=>s.forEach(m=>showMessage(m.val(),"chatGlobal")));
   generalBtn.style.display="none";
+  chatMenu.style.display="none";
 };
 
 // SCROLL MOBILE
