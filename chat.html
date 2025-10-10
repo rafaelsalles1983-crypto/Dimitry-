@@ -49,6 +49,10 @@ header h1 { display:flex; align-items:center; gap:8px; color: var(--color-primar
 }
 @keyframes blink { 50% { opacity:0; } }
 
+/* MENU DE 3 PONTOS */
+.menu-btn { position:absolute; top:4px; right:4px; width:18px; height:18px; cursor:pointer; }
+.menu-btn div { width:4px; height:4px; background:#555; border-radius:50%; margin:2px 0; }
+
 /* MAIN */
 #mainContent { display:flex; flex:1; overflow:hidden; height: calc(100vh - 108px); }
 
@@ -59,9 +63,9 @@ header h1 { display:flex; align-items:center; gap:8px; color: var(--color-primar
 .userItem img { width:28px; height:28px; border-radius:50%; }
 
 /* CHAT */
-#chatContainer { flex:1; display:flex; flex-direction:column; overflow:hidden; }
+#chatContainer { flex:1; display:flex; flex-direction:column; overflow:hidden; position:relative; }
 #chatWindow { flex:1; overflow-y:auto; padding:10px; background:white; }
-.msg { margin:5px 0; padding:8px; border-radius:8px; max-width:80%; word-wrap:break-word; }
+.msg { margin:5px 0; padding:8px; border-radius:8px; max-width:80%; word-wrap:break-word; position:relative; }
 .userMsg { background:#e0f7e9; align-self:flex-end; text-align:right; }
 .otherMsg { background:#fff8dc; align-self:flex-start; text-align:left; }
 
@@ -93,21 +97,10 @@ footer { background:white; color:#555; text-align:center; padding:6px; font-size
     overflow-x:auto;
     white-space:nowrap;
   }
-  #mainContent {
-    flex-direction:column;
-    margin-top:130px;
-    margin-bottom:100px;
-    height:auto;
-    overflow-y:auto;
-  }
+  #mainContent { flex-direction:column; margin-top:130px; margin-bottom:100px; height:auto; overflow-y:auto; }
   #chatWindow { flex:1; overflow-y:auto; width:100%; padding-bottom:10px; }
-  #chatInput {
-    position:fixed; bottom:40px; left:0; right:0; padding:4px;
-    background:white; z-index:50; width:100%;
-  }
-  footer {
-    position:fixed; bottom:0; left:0; right:0; z-index:100; width:100%; height:40px;
-  }
+  #chatInput { position:fixed; bottom:40px; left:0; right:0; padding:4px; background:white; z-index:50; width:100%; }
+  footer { position:fixed; bottom:0; left:0; right:0; z-index:100; width:100%; height:40px; }
   #userList, #adSidebar { display:none; }
 }
 </style>
@@ -170,6 +163,7 @@ const mobileUserLine=document.getElementById("mobileUserLine");
 let currentChat="global";
 let privateChatListener=null;
 let alertIcons={};
+let acceptedChats={};
 
 loginBtn.onclick=()=>auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
 logoutBtn.onclick=()=>auth.signOut();
@@ -192,20 +186,23 @@ auth.onAuthStateChanged(user=>{
   }
 });
 
+// LISTA DE USUÁRIOS
 db.ref("online").on("value",snap=>{
   const users=snap.val()||{};
   onlineCount.textContent=`👥 Usuários online: ${Object.keys(users).length}`;
   userList.innerHTML="";
   mobileUserLine.innerHTML="";
+  alertIcons={};
 
   for(const [uid,u] of Object.entries(users)){
     if(!u.name) continue;
+    // Desktop
     const div=document.createElement("div");
     div.className="userItem";
     div.innerHTML=`<img src="${u.photo||'https://cdn-icons-png.flaticon.com/512/847/847969.png'}"><span>${u.name}</span>`;
     div.onclick=()=>requestPrivateChat(uid,u.name);
     userList.appendChild(div);
-
+    // Mobile
     const mob=document.createElement("div");
     mob.className="userItemMobile";
     mob.innerHTML=`<img src="${u.photo||'https://cdn-icons-png.flaticon.com/512/847/847969.png'}" title="${u.name}">`;
@@ -216,6 +213,7 @@ db.ref("online").on("value",snap=>{
   startMobileScroll();
 });
 
+// ENVIAR MENSAGEM
 sendBtn.onclick=sendMessage;
 msgInput.addEventListener("keypress",e=>{if(e.key==="Enter")sendMessage();});
 function sendMessage(){
@@ -227,34 +225,60 @@ function sendMessage(){
   msgInput.value="";
 }
 
+// EXIBIR MENSAGENS
 function showMessage(msg,room){
   if(room!=="chatGlobal"&&room!==currentChat)return;
   const div=document.createElement("div");
   div.className=msg.uid===auth.currentUser?.uid?"msg userMsg":"msg otherMsg";
   div.textContent=`${msg.user}: ${msg.text}`;
+
+  // Menu de três pontinhos para apagar chat local
+  if(room!=="chatGlobal"){
+    const menu=document.createElement("div");
+    menu.className="menu-btn";
+    menu.innerHTML=`<div></div><div></div><div></div>`;
+    menu.onclick=e=>{
+      e.stopPropagation();
+      if(confirm("Apagar chat local?")){
+        div.remove();
+      }
+    };
+    div.appendChild(menu);
+  }
+
   chatWindow.appendChild(div);
   chatWindow.scrollTop=chatWindow.scrollHeight;
 }
 
+// CHAT GLOBAL
 db.ref("chatGlobal").on("child_added",snap=>showMessage(snap.val(),"chatGlobal"));
 
+// SOLICITAÇÃO DE CHAT PRIVADO (UMA VEZ)
 function requestPrivateChat(uid,name){
-  if(!auth.currentUser)return alert("Faça login para conversar.");
-  if(uid===auth.currentUser.uid)return;
-  const reqPath=`privateRequests/${uid}`;
-  db.ref(reqPath).push({from:auth.currentUser.uid,fromName:auth.currentUser.displayName});
-  alert(`Solicitação enviada para ${name}.`);
+  const user=auth.currentUser;
+  if(!user) return alert("Faça login para conversar.");
+  if(uid===user.uid) return;
+  if(acceptedChats[uid]) return alert("Você já pode conversar com este usuário.");
+
+  const reqPath=`privateRequests/${uid}/${user.uid}`;
+  db.ref(reqPath).once("value").then(s=>{
+    if(!s.exists()){
+      db.ref(reqPath).set({fromName:user.displayName});
+      alert(`Solicitação enviada para ${name}.`);
+    } else {
+      alert("Solicitação já enviada, aguardando resposta.");
+    }
+  });
 }
 
+// RECEBER SOLICITAÇÃO
 auth.onAuthStateChanged(user=>{
-  if(!user)return;
-  const reqPath=`privateRequests/${user.uid}`;
-  db.ref(reqPath).on("child_added",snap=>{
-    const data=snap.val();
-    const fromUID=data.from;
-    const fromName=data.fromName;
+  if(!user) return;
+  const reqRoot=`privateRequests/${user.uid}`;
+  db.ref(reqRoot).on("child_added",snap=>{
+    const fromUID=snap.key;
+    const fromName=snap.val().fromName;
 
-    // notificação visual discreta
     const icon=alertIcons[fromUID];
     if(icon){
       const dot=document.createElement("div");
@@ -263,20 +287,24 @@ auth.onAuthStateChanged(user=>{
       icon.mobile.appendChild(dot.cloneNode());
     }
 
-    if(confirm(`${fromName} quer conversar com você. Aceitar?`)){
-      const chatId=[user.uid,fromUID].sort().join("_");
-      startPrivateChat(chatId,fromName);
+    if(!acceptedChats[fromUID]){
+      if(confirm(`${fromName} quer conversar com você. Aceitar?`)){
+        const chatId=[user.uid,fromUID].sort().join("_");
+        acceptedChats[fromUID]=true;
+        startPrivateChat(chatId,fromName);
+      }
     }
     snap.ref.remove();
   });
 });
 
+// INICIAR CHAT PRIVADO
 function startPrivateChat(chatId,partnerName){
   currentChat=chatId;
   chatWindow.innerHTML=`<div style='text-align:center;margin:10px;color:#555;'>💬 Conversa privada com ${partnerName}</div>`;
   generalBtn.style.display="inline-block";
 
-  if(privateChatListener)privateChatListener.off();
+  if(privateChatListener) privateChatListener.off();
   privateChatListener=db.ref("private/"+chatId);
   privateChatListener.on("child_added",s=>showMessage(s.val(),chatId));
 
@@ -287,6 +315,7 @@ function startPrivateChat(chatId,partnerName){
   }
 }
 
+// VOLTAR AO CHAT GLOBAL
 generalBtn.onclick=()=>{
   currentChat="global";
   chatWindow.innerHTML="";
@@ -294,11 +323,12 @@ generalBtn.onclick=()=>{
   generalBtn.style.display="none";
 };
 
+// SCROLL HORIZONTAL MOBILE
 let scrollInterval;
 function startMobileScroll(){
   clearInterval(scrollInterval);
   const container=mobileUserLine;
-  if(!container)return;
+  if(!container) return;
   scrollInterval=setInterval(()=>{
     container.scrollLeft+=1;
     if(container.scrollLeft>=container.scrollWidth-container.clientWidth){
