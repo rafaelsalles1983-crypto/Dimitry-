@@ -67,7 +67,8 @@ footer { background:white; color:#555; text-align:center; padding:6px; font-size
   #topBar { position:fixed; top:50px; left:0; right:0; z-index:100; width:100%; height:40px; }
   #mobileUserLine { display:flex; position:fixed; top:90px; left:0; right:0; padding:6px 4px; background:#fafafa; border-bottom:1px solid #ddd; z-index:100; overflow-x:auto; white-space:nowrap; }
   #mainContent { flex-direction:column; margin-top:130px; margin-bottom:120px; height:auto; overflow-y:auto; }
-  #chatWindow { flex:1; overflow-y:auto; width:100%; padding-bottom:70px; }
+  /* Diminuindo altura do chatWindow para liberar espaço aos botões */
+  #chatWindow { flex:1; overflow-y:auto; width:100%; padding-bottom:70px; max-height: calc(100vh - 280px); }
   #chatInput { position:fixed; bottom:40px; left:0; right:0; padding:4px; background:white; z-index:50; width:100%; }
   footer { position:fixed; bottom:0; left:0; right:0; z-index:100; width:100%; height:40px; }
   #userList, #adSidebar { display:none; }
@@ -96,7 +97,7 @@ footer { background:white; color:#555; text-align:center; padding:6px; font-size
     <div id="chatHeader">
       <div id="currentPartner">🌍 Global</div>
       <div class="chatHeaderButtons">
-        <span style="cursor:pointer;color:red;" id="hideChatBtn" onclick="hideChat()" style="display:none;">Apagar chat</span>
+        <span style="cursor:pointer;color:red; display:none;" id="hideChatBtn" onclick="hideChat()">Apagar chat</span>
         <button id="blockBtn" style="display:none;">Bloquear</button>
       </div>
     </div>
@@ -310,14 +311,17 @@ function showMessage(msg,room){
   const div=document.createElement("div");
   div.className=msg.uid===userData.uid?"msg userMsg":"msg otherMsg";
   div.textContent=`${msg.user}: ${msg.text}`;
-  div.onclick=()=>{
-    const icon=alertIcons[msg.uid]?.desktop;
-    if(icon) icon.querySelector(".alert-dot")?.remove();
-    const iconMob=alertIcons[msg.uid]?.mobile;
-    if(iconMob) iconMob.querySelector(".alert-dot")?.remove();
-  };
+  div.onclick=()=>{ removeAlertDot(msg.uid); };
   chatWindow.appendChild(div);
-  chatWindow.scrollTop=chatWindow.scrollHeight;
+  // Scroll automático sempre para última mensagem
+  chatWindow.scrollTop = chatWindow.scrollHeight;
+}
+
+function removeAlertDot(uid){
+  const icon=alertIcons[uid]?.desktop;
+  if(icon) icon.querySelector(".alert-dot")?.remove();
+  const iconMob=alertIcons[uid]?.mobile;
+  if(iconMob) iconMob.querySelector(".alert-dot")?.remove();
 }
 
 // APAGAR CHAT LOCAL
