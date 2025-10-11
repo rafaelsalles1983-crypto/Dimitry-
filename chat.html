@@ -143,8 +143,15 @@ footer { background:white; color:#555; text-align:center; padding:6px; font-size
 <footer>© 2025 Славянский клуб — Aprenda Russo e Português com diversão!</footer>
 
 <script>
-// Config Firebase
-const firebaseConfig = {apiKey:"AIzaSyCYJCgfil5HKrCWtB14zwdicDaEcldHU6A",authDomain:"dimitry-rusian.firebaseapp.com",databaseURL:"https://dimitry-rusian-default-rtdb.firebaseio.com",projectId:"dimitry-rusian",storageBucket:"dimitry-rusian.appspot.com",messagingSenderId:"449029666805",appId:"1:449029666805:web:feaf575a7b7e6f234a52bc"};
+const firebaseConfig = {
+  apiKey:"AIzaSyCYJCgfil5HKrCWtB14zwdicDaEcldHU6A",
+  authDomain:"dimitry-rusian.firebaseapp.com",
+  databaseURL:"https://dimitry-rusian-default-rtdb.firebaseio.com",
+  projectId:"dimitry-rusian",
+  storageBucket:"dimitry-rusian.appspot.com",
+  messagingSenderId:"449029666805",
+  appId:"1:449029666805:web:feaf575a7b7e6f234a52bc"
+};
 firebase.initializeApp(firebaseConfig);
 
 const auth=firebase.auth();
@@ -174,7 +181,7 @@ let currentPartnerUID=null;
 let blockedUsers={};
 let hiddenChats={};
 
-// Login/Logout
+// Login / Logout
 loginBtn.onclick=()=>auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
 logoutBtn.onclick=()=>auth.signOut();
 
@@ -189,6 +196,7 @@ auth.onAuthStateChanged(user=>{
     db.ref("online/"+user.uid).set({name:user.displayName,photo:user.photoURL});
     db.ref("online/"+user.uid).onDisconnect().remove();
     loadBlockedUsers().then(updateUserList);
+    startGlobalChat();
   } else {
     loginBtn.style.display="inline-block";
     logoutBtn.style.display="none";
@@ -202,7 +210,177 @@ auth.onAuthStateChanged(user=>{
   }
 });
 
-// ... código restante continua como na versão anterior, incluindo funções de envio, exibição de mensagens, apagar chat, bloquear/desbloquear ...
+// Carregar bloqueados
+async function loadBlockedUsers(){
+  if(!userData.uid) return;
+  const snap = await db.ref(`blocked/${userData.uid}`).once("value");
+  blockedUsers = snap.val()||{};
+}
+
+// Bloquear / Desbloquear
+function toggleBlock(){
+  if(!currentPartnerUID || !userData.uid) return;
+  const ref=db.ref(`blocked/${userData.uid}/${currentPartnerUID}`);
+  if(blockedUsers[currentPartnerUID]){
+    ref.remove();
+    blockedUsers[currentPartnerUID]=false;
+    blockBtn.textContent="Bloquear";
+    blockBtnMobile.textContent="Bloquear";
+    alert("Usuário desbloqueado.");
+  } else {
+    ref.set(true);
+    blockedUsers[currentPartnerUID]=true;
+    blockBtn.textContent="Desbloquear";
+    blockBtnMobile.textContent="Desbloquear";
+    alert("Usuário bloqueado.");
+  }
+}
+blockBtn.onclick=toggleBlock;
+blockBtnMobile.onclick=toggleBlock;
+
+// Atualizar lista de usuários
+function updateUserList(){
+  db.ref("online").once("value").then(snap=>{
+    const users=snap.val()||{};
+    userList.innerHTML="";
+    mobileUserLine.innerHTML="";
+    alertIcons={};
+
+    const divGlobal=document.createElement("div");
+    divGlobal.className="userItem";
+    divGlobal.innerHTML=`<img src="https://cdn-icons-png.flaticon.com/512/3126/3126540.png"><span>Global</span>`;
+    divGlobal.onclick=startGlobalChat;
+    userList.appendChild(divGlobal);
+
+    const mobGlobal=document.createElement("div");
+    mobGlobal.className="userItemMobile";
+    mobGlobal.innerHTML=`<img src="https://cdn-icons-png.flaticon.com/512/3126/3126540.png" title="Global">`;
+    mobGlobal.onclick=startGlobalChat;
+    mobileUserLine.appendChild(mobGlobal);
+
+    if(userData.uid){
+      const divSelf=document.createElement("div");
+      divSelf.className="userItem";
+      divSelf.innerHTML=`<img src="${userData.photo}"><span>${userData.name}</span>`;
+      divSelf.onclick=()=>alert("Este é você!");
+      userList.appendChild(divSelf);
+
+      const mobSelf=document.createElement("div");
+      mobSelf.className="userItemMobile";
+      mobSelf.innerHTML=`<img src="${userData.photo}" title="${userData.name}">`;
+      mobSelf.onclick=()=>alert("Este é você!");
+      mobileUserLine.appendChild(mobSelf);
+    }
+
+    for(const [uid,u] of Object.entries(users)){
+      if(!u.name || uid===userData.uid) continue;
+      const div=document.createElement("div");
+      div.className="userItem";
+      div.innerHTML=`<img src="${u.photo||'https://cdn-icons-png.flaticon.com/512/847/847969.png'}"><span>${u.name}</span>`;
+      div.onclick=()=>startPrivateChat(uid,u.name);
+      userList.appendChild(div);
+
+      const mob=document.createElement("div");
+      mob.className="userItemMobile";
+      mob.innerHTML=`<img src="${u.photo||'https://cdn-icons-png.flaticon.com/512/847/847969.png'}" title="${u.name}">`;
+      mob.onclick=()=>startPrivateChat(uid,u.name);
+      mobileUserLine.appendChild(mob);
+
+      alertIcons[uid]={desktop:div,mobile:mob};
+    }
+
+    onlineCount.textContent=`👥 Usuários online: ${Object.keys(users).length}`;
+  });
+}
+
+// CHAT GLOBAL
+function startGlobalChat(){
+  currentChat="chatGlobal";
+  currentPartnerUID=null;
+  currentPartnerEl.textContent="🌍 Global";
+  blockBtn.style.display="none";
+  hideChatBtn.style.display="none";
+  blockBtnMobile.style.display="none";
+  hideChatBtnMobile.style.display="none";
+  chatWindow.innerHTML="";
+  generalBtn.style.display="none";
+
+  db.ref("chatGlobal").once("value").then(snap=>{
+    snap.forEach(m=>showMessage(m.val(),"chatGlobal"));
+  });
+}
+
+// CHAT PRIVADO
+function startPrivateChat(uid,name){
+  currentPartnerUID=uid;
+  currentChat=[userData.uid,uid].sort().join("_");
+  currentPartnerEl.textContent=name;
+  blockBtn.style.display="inline-block";
+  hideChatBtn.style.display="inline-block";
+  blockBtnMobile.style.display="inline-block";
+  hideChatBtnMobile.style.display="inline-block";
+  blockBtn.textContent = blockedUsers[uid]?"Desbloquear":"Bloquear";
+  blockBtnMobile.textContent = blockedUsers[uid]?"Desbloquear":"Bloquear";
+  chatWindow.innerHTML=`<div style='text-align:center;margin:10px;color:#555;'>💬 Conversa privada com ${name}</div>`;
+  generalBtn.style.display="inline-block";
+
+  if(privateChatListener) privateChatListener.off();
+  privateChatListener=db.ref("private/"+currentChat);
+  privateChatListener.on("child_added",snap=>{
+    const msg=snap.val();
+    showMessage(msg,currentChat);
+    if(msg.uid!==userData.uid){
+      const icon=alertIcons[msg.uid]?.desktop;
+      if(icon && !icon.querySelector(".alert-dot")){
+        const dot=document.createElement("div");
+        dot.className="alert-dot";
+        icon.appendChild(dot);
+        const dotMob=dot.cloneNode();
+        alertIcons[msg.uid].mobile.appendChild(dotMob);
+      }
+    }
+  });
+}
+
+// MENSAGENS
+sendBtn.onclick=sendMessage;
+msgInput.addEventListener("keypress",e=>{if(e.key==="Enter")sendMessage();});
+
+function sendMessage(){
+  const text=msgInput.value.trim();
+  if(!text || !userData.uid) return;
+  if(currentPartnerUID && blockedUsers[currentPartnerUID]){
+    alert("Você bloqueou este usuário ou está bloqueado.");
+    return;
+  }
+  const path=currentChat==="chatGlobal"?"chatGlobal":"private/"+currentChat;
+  db.ref(path).push({user:userData.name,uid:userData.uid,text,timestamp:Date.now()});
+  msgInput.value="";
+}
+
+function showMessage(msg,room){
+  if(room!=="chatGlobal" && room!==currentChat) return;
+  if(hiddenChats[currentChat] && hiddenChats[currentChat][msg.timestamp]) return; // ignorar mensagens apagadas localmente
+  const div=document.createElement("div");
+  div.className=msg.uid===userData.uid?"msg userMsg":"msg otherMsg";
+  div.textContent=msg.text;
+  chatWindow.appendChild(div);
+  chatWindow.scrollTop=chatWindow.scrollHeight;
+}
+
+// APAGAR CHAT
+function hideChat(){
+  hiddenChats[currentChat]=hiddenChats[currentChat]||{};
+  db.ref(currentChat==="chatGlobal"?"chatGlobal":"private/"+currentChat).once("value").then(snap=>{
+    snap.forEach(m=>{hiddenChats[currentChat][m.val().timestamp]=true;});
+    chatWindow.innerHTML="";
+  });
+}
+hideChatBtn.onclick=hideChat;
+hideChatBtnMobile.onclick=hideChat;
+
+// Atualizar usuários online
+setInterval(updateUserList,5000);
 </script>
 </body>
 </html>
