@@ -48,20 +48,39 @@ header h1{display:flex;align-items:center;gap:8px;color:var(--color-primary);fon
 #chatInput button:hover{background:var(--color-primary-hover);}
 #adSidebar{width:280px;background:#f1f1f1;border-left:1px dashed #ccc;padding:8px;text-align:center;overflow-y:auto;}
 footer{background:white;color:#555;text-align:center;padding:6px;font-size:.85em;border-top:1px solid #ddd;}
-.mobileControlArea{display:none;position:fixed;bottom:100px;left:0;right:0;background:white;padding:8px 4px;display:flex;gap:4px;z-index:80;}
-.mobileControlArea button{flex:1;padding:10px;font-size:.9em;border:none;border-radius:5px;cursor:pointer;opacity:.95;}
+
+/* BOTÕES MENORES NO DESKTOP */
+.desktopControls {
+  display:flex;
+  gap:6px;
+}
+.desktopControls button {
+  padding:4px 8px;
+  font-size:0.85em;
+  border:none;
+  border-radius:5px;
+  cursor:pointer;
+  color:#fff;
+}
+#hideChatBtnDesktop{background:red;}
+#blockBtnDesktop{background:var(--color-primary);}
+
+/* MOBILE */
+.mobileControlArea{display:none;position:fixed;bottom:100px;left:0;right:0;background:white;padding:6px;display:flex;gap:6px;z-index:80;}
+.mobileControlArea button{flex:1;padding:8px;font-size:.9em;border:none;border-radius:5px;cursor:pointer;}
 #hideChatBtnMobile{background:red;color:white;}
 #blockBtnMobile{background:var(--color-primary);color:white;}
+
 @media(max-width:768px){
   header{position:fixed;top:0;left:0;right:0;z-index:100;height:50px;}
   #topBar{position:fixed;top:50px;left:0;right:0;height:40px;z-index:100;}
-  #mobileUserLine{display:flex;position:fixed;top:90px;left:0;right:0;padding:6px 4px;background:#fafafa;border-bottom:1px solid #ddd;z-index:100;overflow-x:auto;white-space:nowrap;}
+  #mobileUserLine{display:flex;position:fixed;top:90px;left:0;right:0;padding:6px 4px;background:#fafafa;border-bottom:1px solid #ddd;z-index:100;overflow-x:auto;}
   #mainContent{flex-direction:column;margin-top:140px;margin-bottom:120px;height:auto;overflow-y:auto;}
   #chatWindow{flex:1;overflow-y:auto;width:100%;padding-bottom:160px;}
   #chatInput{position:fixed;bottom:50px;left:0;right:0;background:white;z-index:70;width:100%;}
   .mobileControlArea{display:flex;bottom:100px;}
   footer{position:fixed;bottom:0;left:0;right:0;height:40px;z-index:90;}
-  #userList,#adSidebar{display:none;}
+  #userList,#adSidebar,.desktopControls{display:none;}
 }
 </style>
 </head>
@@ -86,6 +105,10 @@ footer{background:white;color:#555;text-align:center;padding:6px;font-size:.85em
   <div id="chatContainer">
     <div id="chatHeader">
       <div id="currentPartner">🌍 Global</div>
+      <div class="desktopControls">
+        <button id="hideChatBtnDesktop">Apagar chat</button>
+        <button id="blockBtnDesktop">Bloquear</button>
+      </div>
     </div>
 
     <div id="chatWindow"></div>
@@ -121,7 +144,9 @@ const loginBtn=document.getElementById("loginBtn"),logoutBtn=document.getElement
 msgInput=document.getElementById("msgInput"),sendBtn=document.getElementById("sendBtn"),
 chatWindow=document.getElementById("chatWindow"),userList=document.getElementById("userList"),
 mobileUserLine=document.getElementById("mobileUserLine"),currentPartnerEl=document.getElementById("currentPartner"),
-hideChatBtnMobile=document.getElementById("hideChatBtnMobile"),blockBtnMobile=document.getElementById("blockBtnMobile");
+hideChatBtnMobile=document.getElementById("hideChatBtnMobile"),blockBtnMobile=document.getElementById("blockBtnMobile"),
+hideChatBtnDesktop=document.getElementById("hideChatBtnDesktop"),blockBtnDesktop=document.getElementById("blockBtnDesktop"),
+onlineCount=document.getElementById("onlineCount");
 
 let userData={},currentChat="chatGlobal",currentPartnerUID=null,blocked={},hidden={};
 
@@ -136,12 +161,12 @@ auth.onAuthStateChanged(u=>{
   msgInput.disabled=false;sendBtn.disabled=false;
   db.ref("online/"+u.uid).set({name:u.displayName,photo:u.photoURL});
   db.ref("online/"+u.uid).onDisconnect().remove();
-  loadBlocked().then(updateUsers);
+  loadBlocked();updateUsers();
   startGlobal();
  }else{
   userData={};msgInput.disabled=true;sendBtn.disabled=true;
   loginBtn.style.display="inline-block";logoutBtn.style.display="none";
-  updateUsers();startGlobal();
+  startGlobal();
  }
 });
 
@@ -154,29 +179,34 @@ async function loadBlocked(){
 function toggleBlock(){
  if(!currentPartnerUID||!userData.uid)return;
  const ref=db.ref(`blocked/${userData.uid}/${currentPartnerUID}`);
- if(blocked[currentPartnerUID]){ref.remove();blocked[currentPartnerUID]=false;blockBtnMobile.textContent="Bloquear";}
- else{ref.set(true);blocked[currentPartnerUID]=true;blockBtnMobile.textContent="Desbloquear";}
+ const btns=[blockBtnMobile,blockBtnDesktop];
+ if(blocked[currentPartnerUID]){ref.remove();blocked[currentPartnerUID]=false;btns.forEach(b=>b.textContent="Bloquear");}
+ else{ref.set(true);blocked[currentPartnerUID]=true;btns.forEach(b=>b.textContent="Desbloquear");}
 }
 blockBtnMobile.onclick=toggleBlock;
+blockBtnDesktop.onclick=toggleBlock;
 
-/* === LISTA DE USUÁRIOS === */
-function updateUsers(){
- db.ref("online").once("value").then(s=>{
-  const users=s.val()||{};
-  userList.innerHTML="";mobileUserLine.innerHTML="";
-  for(const [uid,u] of Object.entries(users)){
-   if(uid===userData.uid)continue;
-   const d=document.createElement("div");
-   d.className="userItem";d.innerHTML=`<img src="${u.photo||'https://cdn-icons-png.flaticon.com/512/847/847969.png'}"><span>${u.name}</span>`;
-   d.onclick=()=>startPrivate(uid,u.name);
-   userList.appendChild(d);
-   const m=document.createElement("div");
-   m.className="userItemMobile";m.innerHTML=`<img src="${u.photo||'https://cdn-icons-png.flaticon.com/512/847/847969.png'}" title="${u.name}">`;
-   m.onclick=()=>startPrivate(uid,u.name);
-   mobileUserLine.appendChild(m);
-  }
- });
-}
+/* === LISTA DE USUÁRIOS EM TEMPO REAL === */
+db.ref("online").on("value",snap=>{
+ const users=snap.val()||{};
+ userList.innerHTML="";mobileUserLine.innerHTML="";
+ let count=0;
+ for(const [uid,u] of Object.entries(users)){
+  if(uid===userData.uid)continue;
+  count++;
+  const d=document.createElement("div");
+  d.className="userItem";
+  d.innerHTML=`<img src="${u.photo||'https://cdn-icons-png.flaticon.com/512/847/847969.png'}"><span>${u.name}</span>`;
+  d.onclick=()=>startPrivate(uid,u.name);
+  userList.appendChild(d);
+  const m=document.createElement("div");
+  m.className="userItemMobile";
+  m.innerHTML=`<img src="${u.photo||'https://cdn-icons-png.flaticon.com/512/847/847969.png'}" title="${u.name}">`;
+  m.onclick=()=>startPrivate(uid,u.name);
+  mobileUserLine.appendChild(m);
+ }
+ onlineCount.textContent="👥 Usuários online: "+count;
+});
 
 /* === CHAT GLOBAL === */
 function startGlobal(){
@@ -190,7 +220,8 @@ function startGlobal(){
 function startPrivate(uid,name){
  currentPartnerUID=uid;currentChat=[userData.uid,uid].sort().join("_");
  currentPartnerEl.textContent=name;chatWindow.innerHTML="";
- blockBtnMobile.textContent=blocked[uid]?"Desbloquear":"Bloquear";
+ const btns=[blockBtnMobile,blockBtnDesktop];
+ btns.forEach(b=>b.textContent=blocked[uid]?"Desbloquear":"Bloquear");
  db.ref("private/"+currentChat).off();
  db.ref("private/"+currentChat).on("child_added",snap=>showMsg(snap.val(),currentChat));
 }
@@ -223,15 +254,7 @@ function hideChat(){
  localStorage.setItem(`hidden_${userData.uid}_${currentChat}`,"1");
 }
 hideChatBtnMobile.onclick=hideChat;
-
-/* === MANTER OCULTAÇÃO APÓS RELOAD === */
-window.onload=()=>{
- if(userData.uid&&currentChat){
-  if(localStorage.getItem(`hidden_${userData.uid}_${currentChat}`)==="1")
-   chatWindow.innerHTML="";
- }
- setInterval(updateUsers,7000);
-};
+hideChatBtnDesktop.onclick=hideChat;
 </script>
 </body>
 </html>
