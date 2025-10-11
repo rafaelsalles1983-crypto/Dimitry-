@@ -2,334 +2,277 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Славянский клуб — Chat</title>
-<link rel="stylesheet" href="chat.css">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>чат 🌍</title>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
 <style>
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: #f5f5f5;
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
+:root {
+  --color-bg-light:#f5f5f5;
+  --color-primary:#4CAF50;
+  --color-primary-hover:#45a049;
+  --color-name:#1976d2;
 }
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;font-family:Arial,sans-serif;background:var(--color-bg-light);}
+header{background:#fff;padding:10px;border-bottom:1px solid #ddd;z-index:100;display:flex;align-items:center;gap:8px;justify-content:space-between;}
+header h1{display:flex;align-items:center;gap:8px;color:var(--color-primary);font-size:1.4em;}
+.emoji-head{width:32px;height:32px;}
+#topBar{display:flex;align-items:center;gap:8px;padding:6px 10px;background:#fafafa;border-bottom:1px solid #ddd;flex-wrap:wrap;overflow-x:auto;}
+#topBar button{background:white;color:var(--color-primary);border:1px solid var(--color-primary);padding:6px 10px;border-radius:5px;cursor:pointer;flex-shrink:0;}
+#mobileUserLine{display:none;overflow-x:auto;white-space:nowrap;background:#fafafa;padding:6px 4px;border-bottom:1px solid #ddd;}
+.userItemMobile{width:50px;height:50px;border-radius:50%;overflow:hidden;display:inline-block;margin-right:6px;border:2px solid transparent;cursor:pointer;transition:transform .2s;position:relative;}
+.userItemMobile img{width:100%;height:100%;border-radius:50%;object-fit:cover;}
+.userItemMobile:hover{border-color:var(--color-primary);transform:scale(1.1);}
+.alert-dot{position:absolute;top:0;right:0;width:12px;height:12px;background:red;border-radius:50%;animation:blink 1s infinite;}
+@keyframes blink{50%{opacity:0;}}
+#currentPartner{font-weight:bold;color:var(--color-name);}
+#mainContent{display:flex;flex:1;overflow:hidden;height:calc(100vh - 108px);}
+#userList{width:200px;background:#fff;border-right:1px solid #ddd;overflow-y:auto;padding:8px;}
+.userItem{display:flex;align-items:center;gap:6px;margin-bottom:6px;cursor:pointer;padding:6px;border-radius:5px;position:relative;}
+.userItem:hover{background:#e0f7e9;}
+.userItem img{width:28px;height:28px;border-radius:50%;}
+#chatContainer{flex:1;display:flex;flex-direction:column;overflow:hidden;position:relative;}
+#chatHeader{display:flex;justify-content:space-between;align-items:center;padding:6px 10px;border-bottom:1px solid #ddd;background:#fafafa;position:relative;gap:4px;}
+#chatWindow{flex:1;overflow-y:auto;padding:6px;background:white;}
+.msg{margin:4px 0;padding:6px;border-radius:8px;max-width:80%;word-wrap:break-word;}
+.userMsg{background:#e0f7e9;align-self:flex-end;text-align:right;}
+.otherMsg{background:#fff8dc;align-self:flex-start;text-align:left;}
+#chatInput{display:flex;border-top:1px solid #ddd;background:white;padding:4px;}
+#chatInput input{flex:1;padding:8px;font-size:1em;border:1px solid #ccc;border-radius:5px;}
+#chatInput button{background:var(--color-primary);color:white;border:none;padding:8px 12px;margin-left:4px;border-radius:5px;cursor:pointer;}
+#chatInput button:hover{background:var(--color-primary-hover);}
+#adSidebar{width:280px;background:#f1f1f1;border-left:1px dashed #ccc;padding:8px;text-align:center;overflow-y:auto;}
+footer{background:white;color:#555;text-align:center;padding:6px;font-size:.85em;border-top:1px solid #ddd;}
 
-/* ===== Header ===== */
-header {
-  background: #fff;
-  color: #2e8b57;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 8px 10px;
-  border-bottom: 1px solid #ccc;
+/* BOTÕES MENORES NO DESKTOP */
+.desktopControls {
+  display:flex;
+  gap:6px;
 }
-header h1 {
-  margin: 0;
-  font-size: 1.3em;
-  display: flex;
-  align-items: center;
+.desktopControls button {
+  padding:4px 8px;
+  font-size:0.85em;
+  border:none;
+  border-radius:5px;
+  cursor:pointer;
+  color:#fff;
 }
-header img.emoji-head {
-  width: 30px;
-  height: 30px;
-  margin-left: 5px;
-}
+#hideChatBtnDesktop{background:red;}
+#blockBtnDesktop{background:var(--color-primary);}
 
-/* ===== Layout principal ===== */
-main {
-  display: flex;
-  flex: 1;
-  overflow: hidden;
+/* MOBILE */
+.mobileControlArea{
+  display:none;
+  position:fixed;
+  bottom:100px;
+  left:0;
+  right:0;
+  background:white;
+  padding:4px;
+  display:flex;
+  gap:4px;
+  z-index:80;
 }
+.mobileControlArea button{
+  flex:1;
+  padding:8px;       /* mesmo tamanho do botão Enviar */
+  font-size:1em;     /* mesmo tamanho do botão Enviar */
+  border:none;
+  border-radius:5px;
+  cursor:pointer;
+}
+#hideChatBtnMobile{background:red;color:white;}
+#blockBtnMobile{background:var(--color-primary);color:white;}
 
-/* ===== Lista de usuários ===== */
-#usersList {
-  width: 25%;
-  background: #f0f0f0;
-  border-right: 1px solid #ccc;
-  overflow-y: auto;
-}
-#usersList h3 {
-  text-align: center;
-  margin: 5px 0;
-}
-.user-item {
-  padding: 8px;
-  border-bottom: 1px solid #ddd;
-  cursor: pointer;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-.user-item:hover {
-  background: #e8f5e9;
-}
-.alert-dot {
-  width: 10px;
-  height: 10px;
-  background: red;
-  border-radius: 50%;
-  animation: blink 1s infinite;
-}
-@keyframes blink {
-  50% { opacity: 0; }
-}
-
-/* ===== Área do chat ===== */
-#chatArea {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
-#messages {
-  flex: 1;
-  overflow-y: auto;
-  padding: 10px;
-  background: white;
-}
-.message {
-  margin-bottom: 8px;
-  padding: 6px 10px;
-  border-radius: 10px;
-  max-width: 75%;
-}
-.sent {
-  background: #d1ffd7;
-  align-self: flex-end;
-}
-.received {
-  background: #f0f0f0;
-  align-self: flex-start;
-}
-
-/* ===== Área de entrada ===== */
-#messageForm {
-  display: flex;
-  border-top: 1px solid #ccc;
-  background: #fff;
-  padding: 8px;
-}
-#messageInput {
-  flex: 1;
-  padding: 10px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  margin-right: 8px;
-}
-button {
-  padding: 10px 15px;
-  border: none;
-  border-radius: 8px;
-  background: #2e8b57;
-  color: white;
-  cursor: pointer;
-}
-button:hover {
-  background: #256c45;
-}
-
-/* ===== Botões do desktop ===== */
-#desktopActions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 8px;
-  background: #f8f8f8;
-  padding: 6px 8px;
-  border-bottom: 1px solid #ccc;
-}
-#desktopActions button {
-  background: #2e8b57;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  padding: 6px 10px;
-  cursor: pointer;
-}
-
-/* ===== Botões mobile ===== */
-@media (max-width: 768px) {
-  main {
-    flex-direction: column;
-  }
-  #usersList {
-    width: 100%;
-    height: 25%;
-    order: 1;
-  }
-  #chatArea {
-    width: 100%;
-    order: 2;
-    flex: 1;
-  }
-  #desktopActions {
-    display: none;
-  }
-  .mobile-actions {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    gap: 5px;
-    margin-bottom: 5px;
-    padding: 0 5px;
-  }
-  .mobile-actions button {
-    flex: 1;
-    height: 45px;
-    border: none;
-    border-radius: 8px;
-    font-weight: bold;
-    font-size: 0.9em;
-    color: white;
-  }
-  #deleteChatBtn {
-    background-color: #d9534f;
-  }
-  #blockUserBtn {
-    background-color: #0275d8;
-  }
-}
-
-/* ===== Footer ===== */
-footer {
-  text-align: center;
-  padding: 10px;
-  background: #2e8b57;
-  color: white;
-  font-size: 0.9em;
+@media(max-width:768px){
+  header{position:fixed;top:0;left:0;right:0;z-index:100;height:50px;}
+  #topBar{position:fixed;top:50px;left:0;right:0;height:40px;z-index:100;}
+  #mobileUserLine{display:flex;position:fixed;top:90px;left:0;right:0;padding:6px 4px;background:#fafafa;border-bottom:1px solid #ddd;z-index:100;overflow-x:auto;}
+  #mainContent{flex-direction:column;margin-top:140px;margin-bottom:120px;height:auto;overflow-y:auto;}
+  #chatWindow{flex:1;overflow-y:auto;width:100%;padding-bottom:160px;}
+  #chatInput{position:fixed;bottom:50px;left:0;right:0;background:white;z-index:70;width:100%;}
+  .mobileControlArea{display:flex;bottom:100px;}
+  footer{position:fixed;bottom:0;left:0;right:0;height:40px;z-index:90;}
+  #userList,#adSidebar,.desktopControls{display:none;}
 }
 </style>
 </head>
 <body>
 
 <header>
-  <h1>Славянский клуб <img src="emoji_dimitry.png" class="emoji-head"></h1>
-  <button id="logoutBtn">Sair</button>
+  <h1>Славянский клуб <img src="emoji_dimitry.png" alt="Dimitry" class="emoji-head"></h1>
 </header>
 
-<main>
-  <div id="usersList">
-    <h3>Usuários</h3>
-    <div id="userContainer"></div>
-  </div>
+<div id="topBar">
+  <button id="backBtn" onclick="window.location.href='index.html'">⬅ Voltar</button>
+  <button id="loginBtn">Login com Google</button>
+  <button id="logoutBtn" style="display:none;">Logout</button>
+  <span id="alertaLogin">⚠️ Faça login para enviar mensagens.</span>
+  <span id="onlineCount">👥 Usuários online: 0</span>
+</div>
 
-  <div id="chatArea">
-    <div id="desktopActions">
-      <button id="deleteChatBtn" onclick="deleteChat()">🗑️ Apagar Chat</button>
-      <button id="blockUserBtn" onclick="toggleBlockUser()">🚫 Bloquear</button>
+<div id="mobileUserLine"></div>
+
+<div id="mainContent">
+  <div id="userList"></div>
+  <div id="chatContainer">
+    <div id="chatHeader">
+      <div id="currentPartner">🌍 Global</div>
+      <div class="desktopControls">
+        <button id="hideChatBtnDesktop">Apagar chat</button>
+        <button id="blockBtnDesktop">Bloquear</button>
+      </div>
     </div>
 
-    <div id="messages"></div>
+    <div id="chatWindow"></div>
 
-    <div class="mobile-actions">
-      <button id="deleteChatBtnMobile" onclick="deleteChat()">🗑️ Apagar</button>
-      <button id="blockUserBtnMobile" onclick="toggleBlockUser()">🚫 Bloquear</button>
+    <!-- Botões Mobile -->
+    <div class="mobileControlArea">
+      <button id="hideChatBtnMobile">Apagar chat</button>
+      <button id="blockBtnMobile">Bloquear</button>
     </div>
 
-    <form id="messageForm">
-      <input type="text" id="messageInput" placeholder="Digite sua mensagem...">
-      <button type="submit">Enviar</button>
-    </form>
+    <div id="chatInput">
+      <input type="text" id="msgInput" placeholder="Digite sua mensagem..." disabled>
+      <button id="sendBtn" disabled>Enviar</button>
+    </div>
   </div>
-</main>
+  <div id="adSidebar">Publicidade aqui</div>
+</div>
 
-<footer>© 2025 Славянский клуб</footer>
+<footer>© 2025 Славянский клуб — Aprenda Russo e Português com diversão!</footer>
 
 <script>
-// ===== Mock de dados =====
-let currentUser = "Dimitry";
-let users = ["Dimitry", "Anna", "Igor"];
-let messages = {}; // { "Dimitry-Anna": [...], "Anna-Igor": [...] }
-let blocked = {}; // { "Dimitry": ["Anna"] }
-let activeChat = null;
+/* === CONFIG FIREBASE === */
+const firebaseConfig={apiKey:"AIzaSyCYJCgfil5HKrCWtB14zwdicDaEcldHU6A",
+authDomain:"dimitry-rusian.firebaseapp.com",
+databaseURL:"https://dimitry-rusian-default-rtdb.firebaseio.com",
+projectId:"dimitry-rusian",storageBucket:"dimitry-rusian.appspot.com",
+messagingSenderId:"449029666805",appId:"1:449029666805:web:feaf575a7b7e6f234a52bc"};
+firebase.initializeApp(firebaseConfig);
+const auth=firebase.auth(),db=firebase.database();
 
-// ===== Renderizar usuários =====
-function renderUsers() {
-  const container = document.getElementById("userContainer");
-  container.innerHTML = "";
-  users.forEach(u => {
-    if (u === currentUser) return;
-    const div = document.createElement("div");
-    div.classList.add("user-item");
-    div.innerHTML = `<span>${u}</span><span class="alert-dot" id="dot-${u}" style="display:none;"></span>`;
-    div.onclick = () => openChat(u);
-    container.appendChild(div);
-  });
-}
-renderUsers();
+/* === ELEMENTOS === */
+const loginBtn=document.getElementById("loginBtn"),logoutBtn=document.getElementById("logoutBtn"),
+msgInput=document.getElementById("msgInput"),sendBtn=document.getElementById("sendBtn"),
+chatWindow=document.getElementById("chatWindow"),userList=document.getElementById("userList"),
+mobileUserLine=document.getElementById("mobileUserLine"),currentPartnerEl=document.getElementById("currentPartner"),
+hideChatBtnMobile=document.getElementById("hideChatBtnMobile"),blockBtnMobile=document.getElementById("blockBtnMobile"),
+hideChatBtnDesktop=document.getElementById("hideChatBtnDesktop"),blockBtnDesktop=document.getElementById("blockBtnDesktop"),
+onlineCount=document.getElementById("onlineCount");
 
-// ===== Abrir chat =====
-function openChat(user) {
-  activeChat = user;
-  document.querySelectorAll(".alert-dot").forEach(dot => dot.style.display = "none");
-  renderMessages();
-}
+let userData={},currentChat="chatGlobal",currentPartnerUID=null,blocked={},hidden={};
 
-// ===== Enviar mensagem =====
-document.getElementById("messageForm").addEventListener("submit", e => {
-  e.preventDefault();
-  if (!activeChat) return;
-  const text = document.getElementById("messageInput").value.trim();
-  if (text === "") return;
+/* === LOGIN === */
+loginBtn.onclick=()=>auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
+logoutBtn.onclick=()=>auth.signOut();
 
-  const key = `${currentUser}-${activeChat}`;
-  if (!messages[key]) messages[key] = [];
-  messages[key].push({ sender: currentUser, text });
-
-  // Notificar destinatário
-  const reverseKey = `${activeChat}-${currentUser}`;
-  if (!messages[reverseKey]) messages[reverseKey] = [];
-  messages[reverseKey].push({ sender: currentUser, text });
-
-  const dot = document.getElementById(`dot-${currentUser}`);
-  if (dot) dot.style.display = "block";
-
-  document.getElementById("messageInput").value = "";
-  renderMessages();
+auth.onAuthStateChanged(u=>{
+ if(u){
+  userData={uid:u.uid,name:u.displayName,photo:u.photoURL};
+  loginBtn.style.display="none";logoutBtn.style.display="inline-block";
+  msgInput.disabled=false;sendBtn.disabled=false;
+  db.ref("online/"+u.uid).set({name:u.displayName,photo:u.photoURL});
+  db.ref("online/"+u.uid).onDisconnect().remove();
+  loadBlocked();updateUsers();
+  startGlobal();
+ }else{
+  userData={};msgInput.disabled=true;sendBtn.disabled=true;
+  loginBtn.style.display="inline-block";logoutBtn.style.display="none";
+  startGlobal();
+ }
 });
 
-// ===== Renderizar mensagens =====
-function renderMessages() {
-  const box = document.getElementById("messages");
-  box.innerHTML = "";
-  if (!activeChat) return;
-  const key = `${currentUser}-${activeChat}`;
-  const chatMsgs = messages[key] || [];
-  chatMsgs.forEach(m => {
-    const div = document.createElement("div");
-    div.classList.add("message", m.sender === currentUser ? "sent" : "received");
-    div.textContent = m.text;
-    box.appendChild(div);
-  });
-  box.scrollTop = box.scrollHeight;
+/* === BLOQUEAR === */
+async function loadBlocked(){
+ if(!userData.uid)return;
+ const snap=await db.ref("blocked/"+userData.uid).once("value");
+ blocked=snap.val()||{};
+}
+function toggleBlock(){
+ if(!currentPartnerUID||!userData.uid)return;
+ const ref=db.ref(`blocked/${userData.uid}/${currentPartnerUID}`);
+ const btns=[blockBtnMobile,blockBtnDesktop];
+ if(blocked[currentPartnerUID]){ref.remove();blocked[currentPartnerUID]=false;btns.forEach(b=>b.textContent="Bloquear");}
+ else{ref.set(true);blocked[currentPartnerUID]=true;btns.forEach(b=>b.textContent="Desbloquear");}
+}
+blockBtnMobile.onclick=toggleBlock;
+blockBtnDesktop.onclick=toggleBlock;
+
+/* === LISTA DE USUÁRIOS EM TEMPO REAL === */
+db.ref("online").on("value",snap=>{
+ const users=snap.val()||{};
+ userList.innerHTML="";mobileUserLine.innerHTML="";
+ let count=0;
+ for(const [uid,u] of Object.entries(users)){
+  if(uid===userData.uid)continue;
+  count++;
+  const d=document.createElement("div");
+  d.className="userItem";
+  d.innerHTML=`<img src="${u.photo||'https://cdn-icons-png.flaticon.com/512/847/847969.png'}"><span>${u.name}</span>`;
+  d.onclick=()=>startPrivate(uid,u.name);
+  userList.appendChild(d);
+  const m=document.createElement("div");
+  m.className="userItemMobile";
+  m.innerHTML=`<img src="${u.photo||'https://cdn-icons-png.flaticon.com/512/847/847969.png'}" title="${u.name}">`;
+  m.onclick=()=>startPrivate(uid,u.name);
+  mobileUserLine.appendChild(m);
+ }
+ onlineCount.textContent="👥 Usuários online: "+count;
+});
+
+/* === CHAT GLOBAL === */
+function startGlobal(){
+ currentChat="chatGlobal";currentPartnerUID=null;
+ currentPartnerEl.textContent="🌍 Global";chatWindow.innerHTML="";
+ db.ref("chatGlobal").off();
+ db.ref("chatGlobal").on("child_added",snap=>showMsg(snap.val(),"chatGlobal"));
 }
 
-// ===== Apagar chat (somente para o usuário atual) =====
-function deleteChat() {
-  if (!activeChat) return;
-  const key = `${currentUser}-${activeChat}`;
-  delete messages[key];
-  document.getElementById("messages").innerHTML = "";
-  alert("Chat apagado apenas para você!");
+/* === CHAT PRIVADO === */
+function startPrivate(uid,name){
+ currentPartnerUID=uid;currentChat=[userData.uid,uid].sort().join("_");
+ currentPartnerEl.textContent=name;chatWindow.innerHTML="";
+ const btns=[blockBtnMobile,blockBtnDesktop];
+ btns.forEach(b=>b.textContent=blocked[uid]?"Desbloquear":"Bloquear");
+ db.ref("private/"+currentChat).off();
+ db.ref("private/"+currentChat).on("child_added",snap=>showMsg(snap.val(),currentChat));
 }
 
-// ===== Bloquear / Desbloquear =====
-function toggleBlockUser() {
-  if (!activeChat) return;
-  if (!blocked[currentUser]) blocked[currentUser] = [];
-  const idx = blocked[currentUser].indexOf(activeChat);
-  if (idx === -1) {
-    blocked[currentUser].push(activeChat);
-    alert(`Você bloqueou ${activeChat}.`);
-  } else {
-    blocked[currentUser].splice(idx, 1);
-    alert(`Você desbloqueou ${activeChat}.`);
-  }
+/* === ENVIAR === */
+sendBtn.onclick=()=>{sendMsg();};
+msgInput.addEventListener("keypress",e=>{if(e.key==="Enter")sendMsg();});
+function sendMsg(){
+ const text=msgInput.value.trim();if(!text)return;
+ if(currentPartnerUID&&blocked[currentPartnerUID]){alert("Você bloqueou este usuário.");return;}
+ const path=currentChat==="chatGlobal"?"chatGlobal":"private/"+currentChat;
+ db.ref(path).push({user:userData.name,uid:userData.uid,text,timestamp:Date.now()});
+ msgInput.value="";
 }
+
+/* === MOSTRAR === */
+function showMsg(m,room){
+ if(room!=="chatGlobal"&&room!==currentChat)return;
+ if(hidden[currentChat])return;
+ const d=document.createElement("div");
+ d.className=m.uid===userData.uid?"msg userMsg":"msg otherMsg";
+ d.textContent=m.text;chatWindow.appendChild(d);
+ chatWindow.scrollTop=chatWindow.scrollHeight;
+}
+
+/* === APAGAR CHAT LOCAL === */
+function hideChat(){
+ hidden[currentChat]=true;
+ chatWindow.innerHTML="";
+ localStorage.setItem(`hidden_${userData.uid}_${currentChat}`,"1");
+}
+hideChatBtnMobile.onclick=hideChat;
+hideChatBtnDesktop.onclick=hideChat;
 </script>
 </body>
 </html>
