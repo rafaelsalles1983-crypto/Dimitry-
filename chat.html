@@ -38,9 +38,6 @@ header h1{display:flex;align-items:center;gap:8px;color:var(--color-primary);fon
 .userItem img{width:28px;height:28px;border-radius:50%;}
 #chatContainer{flex:1;display:flex;flex-direction:column;overflow:hidden;position:relative;}
 #chatHeader{display:flex;justify-content:space-between;align-items:center;padding:6px 10px;border-bottom:1px solid #ddd;background:#fafafa;position:relative;gap:4px;}
-.actionButtons{display:flex;gap:5px;}
-.actionButtons button{background:var(--color-primary);color:white;border:none;padding:4px 8px;font-size:0.8em;border-radius:5px;cursor:pointer;}
-.actionButtons button:hover{background:var(--color-primary-hover);}
 #chatWindow{flex:1;overflow-y:auto;padding:6px;background:white;}
 .msg{margin:4px 0;padding:6px;border-radius:8px;max-width:80%;word-wrap:break-word;}
 .userMsg{background:#e0f7e9;align-self:flex-end;text-align:right;}
@@ -60,8 +57,9 @@ footer{background:white;color:#555;text-align:center;padding:6px;font-size:.85em
   #topBar{position:fixed;top:50px;left:0;right:0;height:40px;z-index:100;}
   #mobileUserLine{display:flex;position:fixed;top:90px;left:0;right:0;padding:6px 4px;background:#fafafa;border-bottom:1px solid #ddd;z-index:100;overflow-x:auto;white-space:nowrap;}
   #mainContent{flex-direction:column;margin-top:140px;margin-bottom:120px;height:auto;overflow-y:auto;}
-  #chatWindow{flex:1;overflow-y:auto;width:100%;padding-bottom:200px;}
-  .mobileControlArea{display:flex;bottom:120px;}
+  #chatWindow{flex:1;overflow-y:auto;width:100%;padding-bottom:160px;}
+  #chatInput{position:fixed;bottom:50px;left:0;right:0;background:white;z-index:70;width:100%;}
+  .mobileControlArea{display:flex;bottom:100px;}
   footer{position:fixed;bottom:0;left:0;right:0;height:40px;z-index:90;}
   #userList,#adSidebar{display:none;}
 }
@@ -88,10 +86,6 @@ footer{background:white;color:#555;text-align:center;padding:6px;font-size:.85em
   <div id="chatContainer">
     <div id="chatHeader">
       <div id="currentPartner">🌍 Global</div>
-      <div class="actionButtons">
-        <button id="hideChatBtn">🧹 Apagar</button>
-        <button id="blockBtn">🚫 Bloquear</button>
-      </div>
     </div>
 
     <div id="chatWindow"></div>
@@ -112,10 +106,8 @@ footer{background:white;color:#555;text-align:center;padding:6px;font-size:.85em
 
 <footer>© 2025 Славянский клуб — Aprenda Russo e Português com diversão!</footer>
 
-<!-- 🔔 Som de notificação -->
-<audio id="notifSound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_466c3bbfb0.mp3?filename=notification-3-19899.mp3" preload="auto"></audio>
-
 <script>
+/* === CONFIG FIREBASE === */
 const firebaseConfig={apiKey:"AIzaSyCYJCgfil5HKrCWtB14zwdicDaEcldHU6A",
 authDomain:"dimitry-rusian.firebaseapp.com",
 databaseURL:"https://dimitry-rusian-default-rtdb.firebaseio.com",
@@ -124,16 +116,16 @@ messagingSenderId:"449029666805",appId:"1:449029666805:web:feaf575a7b7e6f234a52b
 firebase.initializeApp(firebaseConfig);
 const auth=firebase.auth(),db=firebase.database();
 
+/* === ELEMENTOS === */
 const loginBtn=document.getElementById("loginBtn"),logoutBtn=document.getElementById("logoutBtn"),
 msgInput=document.getElementById("msgInput"),sendBtn=document.getElementById("sendBtn"),
 chatWindow=document.getElementById("chatWindow"),userList=document.getElementById("userList"),
 mobileUserLine=document.getElementById("mobileUserLine"),currentPartnerEl=document.getElementById("currentPartner"),
-hideChatBtnMobile=document.getElementById("hideChatBtnMobile"),blockBtnMobile=document.getElementById("blockBtnMobile"),
-hideChatBtn=document.getElementById("hideChatBtn"),blockBtn=document.getElementById("blockBtn"),
-notifSound=document.getElementById("notifSound");
+hideChatBtnMobile=document.getElementById("hideChatBtnMobile"),blockBtnMobile=document.getElementById("blockBtnMobile");
 
 let userData={},currentChat="chatGlobal",currentPartnerUID=null,blocked={},hidden={};
 
+/* === LOGIN === */
 loginBtn.onclick=()=>auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
 logoutBtn.onclick=()=>auth.signOut();
 
@@ -162,15 +154,9 @@ async function loadBlocked(){
 function toggleBlock(){
  if(!currentPartnerUID||!userData.uid)return;
  const ref=db.ref(`blocked/${userData.uid}/${currentPartnerUID}`);
- if(blocked[currentPartnerUID]){
-  ref.remove();blocked[currentPartnerUID]=false;
-  blockBtn.textContent="🚫 Bloquear";blockBtnMobile.textContent="Bloquear";
- } else {
-  ref.set(true);blocked[currentPartnerUID]=true;
-  blockBtn.textContent="✅ Desbloquear";blockBtnMobile.textContent="Desbloquear";
- }
+ if(blocked[currentPartnerUID]){ref.remove();blocked[currentPartnerUID]=false;blockBtnMobile.textContent="Bloquear";}
+ else{ref.set(true);blocked[currentPartnerUID]=true;blockBtnMobile.textContent="Desbloquear";}
 }
-blockBtn.onclick=toggleBlock;
 blockBtnMobile.onclick=toggleBlock;
 
 /* === LISTA DE USUÁRIOS === */
@@ -178,22 +164,17 @@ function updateUsers(){
  db.ref("online").once("value").then(s=>{
   const users=s.val()||{};
   userList.innerHTML="";mobileUserLine.innerHTML="";
-  let count=0;
   for(const [uid,u] of Object.entries(users)){
    if(uid===userData.uid)continue;
-   count++;
    const d=document.createElement("div");
-   d.className="userItem";
-   d.innerHTML=`<img src="${u.photo}"><span>${u.name}</span>`;
+   d.className="userItem";d.innerHTML=`<img src="${u.photo||'https://cdn-icons-png.flaticon.com/512/847/847969.png'}"><span>${u.name}</span>`;
    d.onclick=()=>startPrivate(uid,u.name);
    userList.appendChild(d);
    const m=document.createElement("div");
-   m.className="userItemMobile";
-   m.innerHTML=`<img src="${u.photo}" title="${u.name}">`;
+   m.className="userItemMobile";m.innerHTML=`<img src="${u.photo||'https://cdn-icons-png.flaticon.com/512/847/847969.png'}" title="${u.name}">`;
    m.onclick=()=>startPrivate(uid,u.name);
    mobileUserLine.appendChild(m);
   }
-  document.getElementById("onlineCount").textContent=`👥 Usuários online: ${count}`;
  });
 }
 
@@ -209,14 +190,13 @@ function startGlobal(){
 function startPrivate(uid,name){
  currentPartnerUID=uid;currentChat=[userData.uid,uid].sort().join("_");
  currentPartnerEl.textContent=name;chatWindow.innerHTML="";
- blockBtn.textContent=blocked[uid]?"✅ Desbloquear":"🚫 Bloquear";
  blockBtnMobile.textContent=blocked[uid]?"Desbloquear":"Bloquear";
  db.ref("private/"+currentChat).off();
  db.ref("private/"+currentChat).on("child_added",snap=>showMsg(snap.val(),currentChat));
 }
 
 /* === ENVIAR === */
-sendBtn.onclick=sendMsg;
+sendBtn.onclick=()=>{sendMsg();};
 msgInput.addEventListener("keypress",e=>{if(e.key==="Enter")sendMsg();});
 function sendMsg(){
  const text=msgInput.value.trim();if(!text)return;
@@ -232,30 +212,25 @@ function showMsg(m,room){
  if(hidden[currentChat])return;
  const d=document.createElement("div");
  d.className=m.uid===userData.uid?"msg userMsg":"msg otherMsg";
- d.textContent=m.text;
- chatWindow.appendChild(d);
+ d.textContent=m.text;chatWindow.appendChild(d);
  chatWindow.scrollTop=chatWindow.scrollHeight;
-
- if(m.uid!==userData.uid){
-   notifSound.play().catch(()=>{});
- }
 }
 
 /* === APAGAR CHAT LOCAL === */
 function hideChat(){
  hidden[currentChat]=true;
- localStorage.setItem(`hidden_${userData.uid}_${currentChat}`,"1");
  chatWindow.innerHTML="";
+ localStorage.setItem(`hidden_${userData.uid}_${currentChat}`,"1");
 }
-hideChatBtn.onclick=hideChat;
 hideChatBtnMobile.onclick=hideChat;
 
-/* === RESTAURAÇÃO === */
+/* === MANTER OCULTAÇÃO APÓS RELOAD === */
 window.onload=()=>{
  if(userData.uid&&currentChat){
-  if(localStorage.getItem(`hidden_${userData.uid}_${currentChat}`)==="1") chatWindow.innerHTML="";
+  if(localStorage.getItem(`hidden_${userData.uid}_${currentChat}`)==="1")
+   chatWindow.innerHTML="";
  }
- setInterval(updateUsers,6000);
+ setInterval(updateUsers,7000);
 };
 </script>
 </body>
