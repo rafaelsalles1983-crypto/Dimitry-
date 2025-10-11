@@ -35,8 +35,6 @@ header h1 { display:flex; align-items:center; gap:8px; color: var(--color-primar
 .alert-dot { position:absolute; top:0; right:0; width:12px; height:12px; background:red; border-radius:50%; animation: blink 1s infinite; }
 @keyframes blink { 50% { opacity:0; } }
 
-#currentPartner { font-weight:bold; color:var(--color-name); }
-
 #mainContent { display:flex; flex:1; overflow:hidden; height: calc(100vh - 108px); }
 
 #userList { width:200px; background:#fff; border-right:1px solid #ddd; overflow-y:auto; padding:8px; }
@@ -86,11 +84,12 @@ footer { background:white; color:#555; text-align:center; padding:6px; font-size
   #topBar { position:fixed; top:50px; left:0; right:0; z-index:100; width:100%; height:40px; }
   #mobileUserLine { display:flex; position:fixed; top:90px; left:0; right:0; padding:6px 4px; background:#fafafa; border-bottom:1px solid #ddd; z-index:100; overflow-x:auto; white-space:nowrap; }
   #mainContent { flex-direction:column; margin-top:130px; margin-bottom:120px; height:auto; overflow-y:auto; }
-  #chatWindow { flex:1; overflow-y:auto; width:100%; padding-bottom:70px; max-height: calc(100vh - 280px); }
+  #chatWindow { flex:1; overflow-y:auto; width:100%; padding-bottom:100px; max-height: calc(100vh - 280px); }
   #chatInput { position:fixed; bottom:40px; left:0; right:0; padding:4px; background:white; z-index:50; width:100%; }
   footer { position:fixed; bottom:0; left:0; right:0; z-index:100; width:100%; height:40px; }
   #userList, #adSidebar { display:none; }
   .msg { padding:4px 6px; font-size:0.9em; }
+  #chatButtons { position:fixed; top:auto; bottom:60px; right:10px; flex-direction:row; gap:6px; }
 }
 </style>
 </head>
@@ -148,7 +147,6 @@ const generalBtn=document.getElementById("generalBtn");
 const mobileUserLine=document.getElementById("mobileUserLine");
 const blockBtn=document.getElementById("blockBtn");
 const hideChatBtn=document.getElementById("hideChatBtn");
-const currentPartnerEl=document.createElement("div"); // opcional para exibir
 
 let currentChat="global";
 let privateChatListener=null;
@@ -213,7 +211,6 @@ function updateUserList(){
     mobileUserLine.innerHTML="";
     alertIcons={};
 
-    // Global
     const divGlobal=document.createElement("div");
     divGlobal.className="userItem";
     divGlobal.innerHTML=`<img src="https://cdn-icons-png.flaticon.com/512/3126/3126540.png"><span>Global</span>`;
@@ -226,7 +223,6 @@ function updateUserList(){
     mobGlobal.onclick=startGlobalChat;
     mobileUserLine.appendChild(mobGlobal);
 
-    // Usuário logado
     if(userData.uid){
       const divSelf=document.createElement("div");
       divSelf.className="userItem";
@@ -241,7 +237,6 @@ function updateUserList(){
       mobileUserLine.appendChild(mobSelf);
     }
 
-    // Outros usuários
     for(const [uid,u] of Object.entries(users)){
       if(!u.name || uid===userData.uid) continue;
       const div=document.createElement("div");
@@ -339,11 +334,17 @@ function removeAlertDot(uid){
   if(iconMob) iconMob.querySelector(".alert-dot")?.remove();
 }
 
+// Apagar chat permanentemente
 function hideChat(){
-  if(confirm("Apagar este chat localmente?")){
-    chatWindow.innerHTML=`<div style='text-align:center;margin:10px;color:#555;'>💬 Chat apagado. Você pode retomar a conversa clicando no usuário novamente.</div>`;
+  if(!currentChat || !userData.uid) return;
+  if(confirm("Apagar este chat permanentemente?")){
+    const path=currentChat==="global"?"chatGlobal":"private/"+currentChat;
+    db.ref(path).remove().then(()=>{
+      chatWindow.innerHTML="<div style='text-align:center;margin:10px;color:#555;'>💬 Chat apagado.</div>";
+    });
   }
 }
+
 generalBtn.onclick=startGlobalChat;
 
 </script>
