@@ -45,17 +45,29 @@ header h1 { display:flex; align-items:center; gap:8px; color: var(--color-primar
 .userItem img { width:28px; height:28px; border-radius:50%; }
 
 #chatContainer { flex:1; display:flex; flex-direction:column; overflow:hidden; position:relative; }
+
 #chatWindow { flex:1; overflow-y:auto; padding:10px; background:white; position:relative; }
+
 .msg { margin:4px 0; padding:6px 8px; border-radius:8px; max-width:80%; word-wrap:break-word; position:relative; cursor:pointer; font-size:0.95em; }
 .userMsg { background:#e0f7e9; align-self:flex-end; text-align:right; }
 .otherMsg { background:#fff8dc; align-self:flex-start; text-align:left; }
 
-/* Botões flutuantes dentro do chat */
 #chatButtons {
-  position:absolute; top:10px; right:10px; display:flex; flex-direction:column; gap:6px; z-index:50;
+  position:absolute;
+  top:10px;
+  right:10px;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  z-index:50;
 }
 #chatButtons button {
-  background:white; color:var(--color-primary); border:1px solid var(--color-primary); padding:6px 10px; border-radius:5px; cursor:pointer;
+  background:white;
+  color:var(--color-primary);
+  border:1px solid var(--color-primary);
+  padding:6px 10px;
+  border-radius:5px;
+  cursor:pointer;
 }
 #chatButtons button:hover { background:var(--color-primary); color:white; }
 
@@ -78,7 +90,7 @@ footer { background:white; color:#555; text-align:center; padding:6px; font-size
   #chatInput { position:fixed; bottom:40px; left:0; right:0; padding:4px; background:white; z-index:50; width:100%; }
   footer { position:fixed; bottom:0; left:0; right:0; z-index:100; width:100%; height:40px; }
   #userList, #adSidebar { display:none; }
-  .msg { padding:4px 6px; font-size:0.9em; } /* Menor padding no mobile */
+  .msg { padding:4px 6px; font-size:0.9em; }
 }
 </style>
 </head>
@@ -117,7 +129,7 @@ footer { background:white; color:#555; text-align:center; padding:6px; font-size
 <footer>© 2025 Славянский клуб — Aprenda Russo e Português com diversão!</footer>
 
 <script>
-// --- Firebase e lógica igual ao seu script anterior ---
+// --- Firebase ---
 const firebaseConfig = {apiKey:"AIzaSyCYJCgfil5HKrCWtB14zwdicDaEcldHU6A",authDomain:"dimitry-rusian.firebaseapp.com",databaseURL:"https://dimitry-rusian-default-rtdb.firebaseio.com",projectId:"dimitry-rusian",storageBucket:"dimitry-rusian.appspot.com",messagingSenderId:"449029666805",appId:"1:449029666805:web:feaf575a7b7e6f234a52bc"};
 firebase.initializeApp(firebaseConfig);
 
@@ -134,9 +146,9 @@ const alertaLogin=document.getElementById("alertaLogin");
 const onlineCount=document.getElementById("onlineCount");
 const generalBtn=document.getElementById("generalBtn");
 const mobileUserLine=document.getElementById("mobileUserLine");
-const currentPartnerEl=document.getElementById("currentPartner");
 const blockBtn=document.getElementById("blockBtn");
 const hideChatBtn=document.getElementById("hideChatBtn");
+const currentPartnerEl=document.createElement("div"); // opcional para exibir
 
 let currentChat="global";
 let privateChatListener=null;
@@ -178,8 +190,162 @@ async function loadBlockedUsers(){
   blockedUsers = snap.val()||{};
 }
 
-// Funções de chat: startGlobalChat(), startPrivateChat(), sendMessage(), showMessage(), removeAlertDot(), hideChat(), toggleBlock()
-// Mesma lógica que você já tinha, adaptada ao novo layout de botões flutuantes
+function toggleBlock(){
+  if(!currentPartnerUID || !userData.uid) return;
+  const ref=db.ref(`blocked/${userData.uid}/${currentPartnerUID}`);
+  if(blockedUsers[currentPartnerUID]){
+    ref.remove();
+    blockedUsers[currentPartnerUID]=false;
+    blockBtn.textContent="Bloquear";
+    alert("Usuário desbloqueado.");
+  } else {
+    ref.set(true);
+    blockedUsers[currentPartnerUID]=true;
+    blockBtn.textContent="Desbloquear";
+    alert("Usuário bloqueado.");
+  }
+}
+
+function updateUserList(){
+  db.ref("online").once("value").then(snap=>{
+    const users=snap.val()||{};
+    userList.innerHTML="";
+    mobileUserLine.innerHTML="";
+    alertIcons={};
+
+    // Global
+    const divGlobal=document.createElement("div");
+    divGlobal.className="userItem";
+    divGlobal.innerHTML=`<img src="https://cdn-icons-png.flaticon.com/512/3126/3126540.png"><span>Global</span>`;
+    divGlobal.onclick=startGlobalChat;
+    userList.appendChild(divGlobal);
+
+    const mobGlobal=document.createElement("div");
+    mobGlobal.className="userItemMobile";
+    mobGlobal.innerHTML=`<img src="https://cdn-icons-png.flaticon.com/512/3126/3126540.png" title="Global">`;
+    mobGlobal.onclick=startGlobalChat;
+    mobileUserLine.appendChild(mobGlobal);
+
+    // Usuário logado
+    if(userData.uid){
+      const divSelf=document.createElement("div");
+      divSelf.className="userItem";
+      divSelf.innerHTML=`<img src="${userData.photo}"><span>${userData.name}</span>`;
+      divSelf.onclick=()=>alert("Este é você!");
+      userList.appendChild(divSelf);
+
+      const mobSelf=document.createElement("div");
+      mobSelf.className="userItemMobile";
+      mobSelf.innerHTML=`<img src="${userData.photo}" title="${userData.name}">`;
+      mobSelf.onclick=()=>alert("Este é você!");
+      mobileUserLine.appendChild(mobSelf);
+    }
+
+    // Outros usuários
+    for(const [uid,u] of Object.entries(users)){
+      if(!u.name || uid===userData.uid) continue;
+      const div=document.createElement("div");
+      div.className="userItem";
+      div.innerHTML=`<img src="${u.photo||'https://cdn-icons-png.flaticon.com/512/847/847969.png'}"><span>${u.name}</span>`;
+      div.onclick=()=>startPrivateChat(uid,u.name);
+      userList.appendChild(div);
+
+      const mob=document.createElement("div");
+      mob.className="userItemMobile";
+      mob.innerHTML=`<img src="${u.photo||'https://cdn-icons-png.flaticon.com/512/847/847969.png'}" title="${u.name}">`;
+      mob.onclick=()=>startPrivateChat(uid,u.name);
+      mobileUserLine.appendChild(mob);
+
+      alertIcons[uid]={desktop:div,mobile:mob};
+    }
+
+    onlineCount.textContent=`👥 Usuários online: ${Object.keys(users).length}`;
+  });
+}
+
+// Chat Global
+function startGlobalChat(){
+  currentChat="global";
+  currentPartnerUID=null;
+  chatWindow.innerHTML="";
+  generalBtn.style.display="none";
+  blockBtn.style.display="none";
+  hideChatBtn.style.display="none";
+  db.ref("chatGlobal").once("value").then(s=>{
+    s.forEach(m=>showMessage(m.val(),"chatGlobal"));
+  });
+}
+
+// Chat privado persistente
+function startPrivateChat(uid,name){
+  currentPartnerUID=uid;
+  currentChat=[userData.uid,uid].sort().join("_");
+  chatWindow.innerHTML="";
+  generalBtn.style.display="inline-block";
+  blockBtn.style.display="inline-block";
+  hideChatBtn.style.display="inline-block";
+  blockBtn.textContent = blockedUsers[uid]?"Desbloquear":"Bloquear";
+
+  db.ref("private/"+currentChat).once("value").then(s=>{
+    s.forEach(m=>showMessage(m.val(),"private/"+currentChat));
+  });
+
+  if(privateChatListener) privateChatListener.off();
+  privateChatListener=db.ref("private/"+currentChat);
+  privateChatListener.on("child_added",snap=>{
+    const msg=snap.val();
+    showMessage(msg,"private/"+currentChat);
+    if(msg.uid!==userData.uid){
+      const icon=alertIcons[msg.uid]?.desktop;
+      if(icon && !icon.querySelector(".alert-dot")){
+        const dot=document.createElement("div");
+        dot.className="alert-dot";
+        icon.appendChild(dot);
+        const dotMob=dot.cloneNode();
+        alertIcons[msg.uid].mobile.appendChild(dotMob);
+      }
+    }
+  });
+}
+
+sendBtn.onclick=sendMessage;
+msgInput.addEventListener("keypress",e=>{if(e.key==="Enter")sendMessage();});
+
+function sendMessage(){
+  const text=msgInput.value.trim();
+  if(!text || !userData.uid) return;
+  if(currentPartnerUID && blockedUsers[currentPartnerUID]){
+    alert("Você bloqueou este usuário ou está bloqueado.");
+    return;
+  }
+  const path=currentChat==="global"?"chatGlobal":"private/"+currentChat;
+  db.ref(path).push({user:userData.name,uid:userData.uid,text,timestamp:Date.now()});
+  msgInput.value="";
+}
+
+function showMessage(msg,room){
+  const div=document.createElement("div");
+  div.className=msg.uid===userData.uid?"msg userMsg":"msg otherMsg";
+  div.textContent=`${msg.user}: ${msg.text}`;
+  div.onclick=()=>removeAlertDot(msg.uid);
+  chatWindow.appendChild(div);
+  chatWindow.scrollTop = chatWindow.scrollHeight;
+}
+
+function removeAlertDot(uid){
+  const icon=alertIcons[uid]?.desktop;
+  if(icon) icon.querySelector(".alert-dot")?.remove();
+  const iconMob=alertIcons[uid]?.mobile;
+  if(iconMob) iconMob.querySelector(".alert-dot")?.remove();
+}
+
+function hideChat(){
+  if(confirm("Apagar este chat localmente?")){
+    chatWindow.innerHTML=`<div style='text-align:center;margin:10px;color:#555;'>💬 Chat apagado. Você pode retomar a conversa clicando no usuário novamente.</div>`;
+  }
+}
+generalBtn.onclick=startGlobalChat;
+
 </script>
 </body>
 </html>
