@@ -760,6 +760,34 @@ document.getElementById('modoBtn').addEventListener('click', () => {
   © 2025 Славянский клуб — Aprenda Russo e Português com diversão!
 </footer>
 
+ 
+<script>
+// ===== Alternar modo claro/escuro =====
+const modoBtn = document.getElementById("modoBtn");
+const body = document.body;
+
+// Carregar preferência anterior (se existir)
+if (localStorage.getItem("modo") === "escuro") {
+  body.classList.add("dark-mode");
+  modoBtn.textContent = "☀️";
+}
+
+// Evento de clique no botão
+modoBtn.addEventListener("click", () => {
+  body.classList.toggle("dark-mode");
+
+  // Atualiza o ícone e salva preferência
+  if (body.classList.contains("dark-mode")) {
+    modoBtn.textContent = "☀️";
+    localStorage.setItem("modo", "escuro");
+  } else {
+    modoBtn.textContent = "🌙";
+    localStorage.setItem("modo", "claro");
+  }
+});
+</script>
+
 </body>
 </html>
+
 
