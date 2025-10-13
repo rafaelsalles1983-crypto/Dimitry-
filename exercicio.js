@@ -33,36 +33,30 @@ const exercises = [
 let currentExercise = 0;
 let selectedLeft = null;
 let matchesThisRound = 0;
-let resultsThisRound = []; // {leftEl, rightEl, correct}
-let allResults = []; // acumula resultado total para o relatório final
+let resultsThisRound = []; 
+let allResults = []; 
 let correctAnswers = 0;
 let totalAnswers = 0;
 
 // ===================== SOM (WebAudio) =====================
-// função para tocar um "click" curto (sem depender de arquivo externo)
 function playClickSound() {
   try {
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
     const o = ctx.createOscillator();
     const g = ctx.createGain();
     o.type = 'square';
-    o.frequency.value = 800; // frequência
+    o.frequency.value = 800;
     g.gain.value = 0.0001;
     o.connect(g);
     g.connect(ctx.destination);
     const now = ctx.currentTime;
-    // rampa rápida para evitar estalo
     g.gain.setValueAtTime(0.0001, now);
     g.gain.exponentialRampToValueAtTime(0.05, now + 0.005);
     o.start(now);
     g.gain.exponentialRampToValueAtTime(0.0001, now + 0.12);
     o.stop(now + 0.13);
-    // fechar contexto após pequeno delay para liberar recursos
     setTimeout(()=>{ try{ ctx.close(); }catch(e){} }, 300);
-  } catch(e) {
-    // fallback silencioso se WebAudio bloqueado
-    // console.warn('Audio não disponível', e);
-  }
+  } catch(e) {}
 }
 
 // ===================== FUNÇÃO PRINCIPAL =====================
@@ -70,7 +64,6 @@ function loadExercise() {
   const container = document.getElementById("cruzadoContainer");
   container.innerHTML = "";
 
-  // reset da rodada
   matchesThisRound = 0;
   resultsThisRound = [];
   selectedLeft = null;
@@ -84,19 +77,16 @@ function loadExercise() {
   }
 
   const { russian, portuguese } = exercises[currentExercise];
-  // se o site estiver em português mostramos russo à esquerda e pt à direita
   const leftWords = isPortuguese ? russian : portuguese;
   const rightWords = isPortuguese ? portuguese : russian;
   const shuffledRight = [...rightWords].sort(() => Math.random() - 0.5);
 
-  // criar colunas
   const leftCol = document.createElement("div");
   leftCol.classList.add("column");
   leftWords.forEach(word => {
     const div = document.createElement("div");
     div.textContent = word;
-    div.className = "word clickable"; // classe "clickable" para estilo
-    // guardamos atributo para referência (texto)
+    div.className = "word clickable";
     div.dataset.word = word;
     div.addEventListener('click', () => selectLeft(div, word));
     leftCol.appendChild(div);
@@ -122,14 +112,12 @@ function loadExercise() {
   updateProgress();
 }
 
-// ===================== SELEÇÃO E FEEDBACK VISUAL =====================
+// ===================== SELEÇÃO E FEEDBACK =====================
 function selectLeft(div, word) {
   playClickSound();
-  // efeito de clique visual
   div.classList.add('clicked');
   setTimeout(() => div.classList.remove('clicked'), 220);
 
-  // troca de seleção
   if (selectedLeft) selectedLeft.classList.remove("selected");
   selectedLeft = div;
   div.classList.add("selected");
@@ -139,7 +127,6 @@ function selectRight(div, word) {
   if (!selectedLeft) return;
 
   playClickSound();
-  // efeito visual no placeholder
   div.classList.add('clicked');
   setTimeout(() => div.classList.remove('clicked'), 220);
 
@@ -148,40 +135,25 @@ function selectRight(div, word) {
   const { russian, portuguese } = exercises[currentExercise];
 
   const leftWord = selectedLeft.dataset.word;
-  let correctAnswer;
-  if (isPortuguese) {
-    const index = russian.indexOf(leftWord);
-    correctAnswer = portuguese[index];
-  } else {
-    const index = portuguese.indexOf(leftWord);
-    correctAnswer = russian[index];
-  }
+  let correctAnswer = isPortuguese ? portuguese[russian.indexOf(leftWord)] : russian[portuguese.indexOf(leftWord)];
 
   const isCorrect = (word === correctAnswer);
-  // não colorimos ainda: apenas guardamos a referência das elements
   resultsThisRound.push({ leftEl: selectedLeft, rightEl: div, correct: isCorrect });
 
-  // desabilitar futuros cliques nessas duas cartas
   selectedLeft.classList.add('disabled');
   div.classList.add('disabled');
-  // removemos a seleção visual
   selectedLeft.classList.remove('selected');
   selectedLeft = null;
 
-  // atualizar contadores de performance
   totalAnswers++;
   if (isCorrect) correctAnswers++;
 
   matchesThisRound++;
 
-  // se completar as 3 correspondências, revelar cores então avançar
   if (matchesThisRound >= 3) {
-    // revelar com pequeno delay para o usuário ver os cliques
     setTimeout(() => {
       revealRoundResults();
-      // depois de mostrar cores por 1s avançar
       setTimeout(() => {
-        // armazena essa rodada no relatório global
         resultsThisRound.forEach(r => allResults.push(r));
         currentExercise++;
         loadExercise();
@@ -190,7 +162,6 @@ function selectRight(div, word) {
   }
 }
 
-// revela cores no final da rodada
 function revealRoundResults() {
   resultsThisRound.forEach(pair => {
     if (pair.correct) {
@@ -209,14 +180,12 @@ function updateProgress() {
   const text = lang === 'pt'
     ? `Exercício ${currentExercise + 1} de ${exercises.length}`
     : `Упражнение ${currentExercise + 1} из ${exercises.length}`;
-  const progressText = document.getElementById("progressText");
-  if (progressText) progressText.textContent = text;
+  document.getElementById("progressText").textContent = text;
   const percent = ((currentExercise) / exercises.length) * 100;
-  const bar = document.getElementById("progressBar");
-  if (bar) bar.style.width = percent + "%";
+  document.getElementById("progressBar").style.width = percent + "%";
 }
 
-// ===================== RESULTADO FINAL E REFAZER ERRADAS =====================
+// ===================== RESULTADO FINAL =====================
 function showFinalResults() {
   const container = document.getElementById("cruzadoContainer");
   container.innerHTML = "";
@@ -233,47 +202,32 @@ function showFinalResults() {
   header.innerHTML = `<h2>${title}</h2><p>${score}</p>`;
   container.appendChild(header);
 
-  // lista com todas as jogadas coloridas
+  // Mostrar apenas erros
   const list = document.createElement('div');
   list.className = 'results-list';
-  allResults.forEach(r => {
+  allResults.filter(r => !r.correct).forEach(r => {
     const el = document.createElement('div');
-    el.className = 'result-item';
+    el.className = 'result-item wrong';
     el.textContent = `${r.leftEl.dataset.word} → ${r.rightEl.dataset.word}`;
-    el.classList.add(r.correct ? 'correct' : 'wrong');
     list.appendChild(el);
   });
   container.appendChild(list);
 
-  // botão refazer apenas as rodadas com erro
   const retryBtn = document.createElement('button');
   retryBtn.className = 'retry-btn';
-  retryBtn.textContent = isPortuguese ? '🔁 Refazer apenas rodadas erradas' : '🔁 Повторить только ошибки';
+  retryBtn.textContent = isPortuguese ? '🔁 Refazer apenas erros' : '🔁 Повторить только ошибки';
   retryBtn.addEventListener('click', restartMistakesOnly);
   container.appendChild(retryBtn);
 }
 
-// refazer só as rodadas que tiveram erro
+// ===================== REFAZER ERROS =====================
 function restartMistakesOnly() {
-  // identificar exercises que tiveram pelo menos um erro
-  const exercisesWithErrors = new Set();
-  allResults.forEach((r, idx) => {
-    if (!r.correct) {
-      // cada resultado corresponde a uma jogada; precisamos mapear de volta ao exercício index.
-      // armazenamos info da propriedade 'leftEl' -> seu atributo data-exercise (vamos preencher abaixo)
-      // Como simplificação, registramos por ordem: cada rodada teve 3 resultados; calc índice do exercício
-    }
-  });
-
-  // Como não armazenamos o índice do exercício em allResults, vamos reconstruir usando o número de exercícios:
-  // vamos assumir que allResults foi empurrado na ordem das rodadas: 3 items por rodada.
   const rounds = [];
-  for (let i = 0; i < allResults.length; i += 3) {
-    rounds.push(allResults.slice(i, i + 3));
-  }
+  for (let i = 0; i < allResults.length; i += 3) rounds.push(allResults.slice(i, i + 3));
+
   const errorRoundIndexes = [];
   rounds.forEach((round, idx) => {
-    if (round.some(r => r && !r.correct)) errorRoundIndexes.push(idx);
+    if (round.some(r => !r.correct)) errorRoundIndexes.push(idx);
   });
 
   if (errorRoundIndexes.length === 0) {
@@ -281,17 +235,11 @@ function restartMistakesOnly() {
     return;
   }
 
-  // reconstruir um novo array de exercícios contendo apenas os rounds com erro
   const newExercises = errorRoundIndexes.map(i => exercises[i]);
-  // substituir exercícios atuais temporariamente
-  // OBS: para simplicidade, iremos trocar as variáveis e reiniciar
-  // salvamos backups
-  window._backupExercises = exercises.slice(); // referencia original
-  // substituir global exercises (mutação segura)
+  window._backupExercises = exercises.slice();
   while(exercises.length) exercises.pop();
   newExercises.forEach(e => exercises.push(e));
 
-  // reset e iniciar
   currentExercise = 0;
   correctAnswers = 0;
   totalAnswers = 0;
@@ -314,7 +262,6 @@ window.addEventListener('load', () => {
   `;
 
   document.getElementById("startBtn").addEventListener("click", () => {
-    // reset completo
     currentExercise = 0;
     correctAnswers = 0;
     totalAnswers = 0;
