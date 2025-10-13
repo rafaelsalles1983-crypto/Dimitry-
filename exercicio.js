@@ -1,4 +1,4 @@
-// Lista de exercícios com traduções corretas
+// ===================== LISTA DE EXERCÍCIOS =====================
 const exercises = [
   { russian: ['Привет','Спасибо','Пожалуйста'], portuguese: ['Olá','Obrigado','Por favor'] },
   { russian: ['Как дела?','Хорошо','Плохо'], portuguese: ['Como você está?','Bem','Mal'] },
@@ -30,123 +30,298 @@ const exercises = [
 ];
 
 
+// estado
 let currentExercise = 0;
-let selectedRus = null;
+let selectedLeft = null;
+let matchesThisRound = 0;
+let resultsThisRound = []; // {leftEl, rightEl, correct}
+let allResults = []; // acumula resultado total para o relatório final
+let correctAnswers = 0;
+let totalAnswers = 0;
 
-// Função principal
+// ===================== SOM (WebAudio) =====================
+// função para tocar um "click" curto (sem depender de arquivo externo)
+function playClickSound() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    o.type = 'square';
+    o.frequency.value = 800; // frequência
+    g.gain.value = 0.0001;
+    o.connect(g);
+    g.connect(ctx.destination);
+    const now = ctx.currentTime;
+    // rampa rápida para evitar estalo
+    g.gain.setValueAtTime(0.0001, now);
+    g.gain.exponentialRampToValueAtTime(0.05, now + 0.005);
+    o.start(now);
+    g.gain.exponentialRampToValueAtTime(0.0001, now + 0.12);
+    o.stop(now + 0.13);
+    // fechar contexto após pequeno delay para liberar recursos
+    setTimeout(()=>{ try{ ctx.close(); }catch(e){} }, 300);
+  } catch(e) {
+    // fallback silencioso se WebAudio bloqueado
+    // console.warn('Audio não disponível', e);
+  }
+}
+
+// ===================== FUNÇÃO PRINCIPAL =====================
 function loadExercise() {
   const container = document.getElementById("cruzadoContainer");
   container.innerHTML = "";
 
+  // reset da rodada
+  matchesThisRound = 0;
+  resultsThisRound = [];
+  selectedLeft = null;
+
+  const lang = localStorage.getItem('lang') || 'pt';
+  const isPortuguese = lang === 'pt';
+
   if (currentExercise >= exercises.length) {
-    container.innerHTML = "<h2>🎉 Parabéns! Você concluiu todos os exercícios!</h2>";
-    document.getElementById("progressText").textContent = "";
+    showFinalResults();
     return;
   }
 
   const { russian, portuguese } = exercises[currentExercise];
-  const shuffledPt = [...portuguese].sort(() => Math.random() - 0.5);
+  // se o site estiver em português mostramos russo à esquerda e pt à direita
+  const leftWords = isPortuguese ? russian : portuguese;
+  const rightWords = isPortuguese ? portuguese : russian;
+  const shuffledRight = [...rightWords].sort(() => Math.random() - 0.5);
 
-  const rusCol = document.createElement("div");
-  rusCol.classList.add("column");
-  russian.forEach(word => {
+  // criar colunas
+  const leftCol = document.createElement("div");
+  leftCol.classList.add("column");
+  leftWords.forEach(word => {
     const div = document.createElement("div");
     div.textContent = word;
-    div.classList.add("word");
-    div.onclick = () => selectRus(div, word);
-    rusCol.appendChild(div);
+    div.className = "word clickable"; // classe "clickable" para estilo
+    // guardamos atributo para referência (texto)
+    div.dataset.word = word;
+    div.addEventListener('click', () => selectLeft(div, word));
+    leftCol.appendChild(div);
   });
 
-  const ptCol = document.createElement("div");
-  ptCol.classList.add("column");
-  shuffledPt.forEach(word => {
+  const rightCol = document.createElement("div");
+  rightCol.classList.add("column");
+  shuffledRight.forEach(word => {
     const div = document.createElement("div");
     div.textContent = word;
-    div.classList.add("placeholder");
-    div.onclick = () => selectPt(div, word);
-    ptCol.appendChild(div);
+    div.className = "placeholder clickable";
+    div.dataset.word = word;
+    div.addEventListener('click', () => selectRight(div, word));
+    rightCol.appendChild(div);
   });
 
   const row = document.createElement("div");
   row.classList.add("container");
-  row.appendChild(rusCol);
-  row.appendChild(ptCol);
+  row.appendChild(leftCol);
+  row.appendChild(rightCol);
 
   container.appendChild(row);
   updateProgress();
 }
 
-// Selecionar palavras
-function selectRus(div, word) {
-  if (selectedRus) selectedRus.classList.remove("selected");
-  selectedRus = div;
+// ===================== SELEÇÃO E FEEDBACK VISUAL =====================
+function selectLeft(div, word) {
+  playClickSound();
+  // efeito de clique visual
+  div.classList.add('clicked');
+  setTimeout(() => div.classList.remove('clicked'), 220);
+
+  // troca de seleção
+  if (selectedLeft) selectedLeft.classList.remove("selected");
+  selectedLeft = div;
   div.classList.add("selected");
 }
 
-function selectPt(div, word) {
-  if (!selectedRus) return;
+function selectRight(div, word) {
+  if (!selectedLeft) return;
 
-  const rusWord = selectedRus.textContent;
-  const correctIndex = exercises[currentExercise].russian.indexOf(rusWord);
-  const correctAnswer = exercises[currentExercise].portuguese[correctIndex];
+  playClickSound();
+  // efeito visual no placeholder
+  div.classList.add('clicked');
+  setTimeout(() => div.classList.remove('clicked'), 220);
 
-  if (word === correctAnswer) {
-    selectedRus.classList.add("correct");
-    div.classList.add("correct");
-    selectedRus.onclick = null;
-    div.onclick = null;
+  const lang = localStorage.getItem('lang') || 'pt';
+  const isPortuguese = lang === 'pt';
+  const { russian, portuguese } = exercises[currentExercise];
+
+  const leftWord = selectedLeft.dataset.word;
+  let correctAnswer;
+  if (isPortuguese) {
+    const index = russian.indexOf(leftWord);
+    correctAnswer = portuguese[index];
   } else {
-    selectedRus.classList.add("wrong");
-    div.classList.add("wrong");
+    const index = portuguese.indexOf(leftWord);
+    correctAnswer = russian[index];
+  }
+
+  const isCorrect = (word === correctAnswer);
+  // não colorimos ainda: apenas guardamos a referência das elements
+  resultsThisRound.push({ leftEl: selectedLeft, rightEl: div, correct: isCorrect });
+
+  // desabilitar futuros cliques nessas duas cartas
+  selectedLeft.classList.add('disabled');
+  div.classList.add('disabled');
+  // removemos a seleção visual
+  selectedLeft.classList.remove('selected');
+  selectedLeft = null;
+
+  // atualizar contadores de performance
+  totalAnswers++;
+  if (isCorrect) correctAnswers++;
+
+  matchesThisRound++;
+
+  // se completar as 3 correspondências, revelar cores então avançar
+  if (matchesThisRound >= 3) {
+    // revelar com pequeno delay para o usuário ver os cliques
     setTimeout(() => {
-      selectedRus.classList.remove("wrong");
-      div.classList.remove("wrong");
-    }, 800);
-  }
-
-  selectedRus.classList.remove("selected");
-  selectedRus = null;
-  checkCompletion();
-}
-
-// Verifica fim do exercício
-function checkCompletion() {
-  const done = [...document.querySelectorAll(".correct")].length;
-  const total = exercises[currentExercise].russian.length * 2;
-
-  if (done === total) {
-    currentExercise++;
-    setTimeout(loadExercise, 1000);
+      revealRoundResults();
+      // depois de mostrar cores por 1s avançar
+      setTimeout(() => {
+        // armazena essa rodada no relatório global
+        resultsThisRound.forEach(r => allResults.push(r));
+        currentExercise++;
+        loadExercise();
+      }, 1000);
+    }, 300);
   }
 }
 
-// Atualiza progresso
+// revela cores no final da rodada
+function revealRoundResults() {
+  resultsThisRound.forEach(pair => {
+    if (pair.correct) {
+      pair.leftEl.classList.add('correct');
+      pair.rightEl.classList.add('correct');
+    } else {
+      pair.leftEl.classList.add('wrong');
+      pair.rightEl.classList.add('wrong');
+    }
+  });
+}
+
+// ===================== PROGRESSO =====================
 function updateProgress() {
-  document.getElementById("progressText").textContent =
-    `Exercício ${currentExercise + 1} de ${exercises.length}`;
+  const lang = localStorage.getItem('lang') || 'pt';
+  const text = lang === 'pt'
+    ? `Exercício ${currentExercise + 1} de ${exercises.length}`
+    : `Упражнение ${currentExercise + 1} из ${exercises.length}`;
+  const progressText = document.getElementById("progressText");
+  if (progressText) progressText.textContent = text;
   const percent = ((currentExercise) / exercises.length) * 100;
-  document.getElementById("progressBar").style.width = percent + "%";
+  const bar = document.getElementById("progressBar");
+  if (bar) bar.style.width = percent + "%";
 }
 
-// Cria o botão inicial
-window.onload = () => {
+// ===================== RESULTADO FINAL E REFAZER ERRADAS =====================
+function showFinalResults() {
   const container = document.getElementById("cruzadoContainer");
+  container.innerHTML = "";
+  const lang = localStorage.getItem('lang') || 'pt';
+  const isPortuguese = lang === 'pt';
+
+  const correctCount = allResults.filter(r => r.correct).length;
+  const percent = allResults.length ? Math.round((correctCount / allResults.length) * 100) : 0;
+
+  const title = isPortuguese ? "🎯 Resultado final" : "🎯 Итоговый результат";
+  const score = isPortuguese ? `✅ Acertos: ${percent}%` : `✅ Правильных ответов: ${percent}%`;
+
+  const header = document.createElement('div');
+  header.innerHTML = `<h2>${title}</h2><p>${score}</p>`;
+  container.appendChild(header);
+
+  // lista com todas as jogadas coloridas
+  const list = document.createElement('div');
+  list.className = 'results-list';
+  allResults.forEach(r => {
+    const el = document.createElement('div');
+    el.className = 'result-item';
+    el.textContent = `${r.leftEl.dataset.word} → ${r.rightEl.dataset.word}`;
+    el.classList.add(r.correct ? 'correct' : 'wrong');
+    list.appendChild(el);
+  });
+  container.appendChild(list);
+
+  // botão refazer apenas as rodadas com erro
+  const retryBtn = document.createElement('button');
+  retryBtn.className = 'retry-btn';
+  retryBtn.textContent = isPortuguese ? '🔁 Refazer apenas rodadas erradas' : '🔁 Повторить только ошибки';
+  retryBtn.addEventListener('click', restartMistakesOnly);
+  container.appendChild(retryBtn);
+}
+
+// refazer só as rodadas que tiveram erro
+function restartMistakesOnly() {
+  // identificar exercises que tiveram pelo menos um erro
+  const exercisesWithErrors = new Set();
+  allResults.forEach((r, idx) => {
+    if (!r.correct) {
+      // cada resultado corresponde a uma jogada; precisamos mapear de volta ao exercício index.
+      // armazenamos info da propriedade 'leftEl' -> seu atributo data-exercise (vamos preencher abaixo)
+      // Como simplificação, registramos por ordem: cada rodada teve 3 resultados; calc índice do exercício
+    }
+  });
+
+  // Como não armazenamos o índice do exercício em allResults, vamos reconstruir usando o número de exercícios:
+  // vamos assumir que allResults foi empurrado na ordem das rodadas: 3 items por rodada.
+  const rounds = [];
+  for (let i = 0; i < allResults.length; i += 3) {
+    rounds.push(allResults.slice(i, i + 3));
+  }
+  const errorRoundIndexes = [];
+  rounds.forEach((round, idx) => {
+    if (round.some(r => r && !r.correct)) errorRoundIndexes.push(idx);
+  });
+
+  if (errorRoundIndexes.length === 0) {
+    alert(localStorage.getItem('lang') === 'pt' ? 'Nenhuma rodada com erro para refazer.' : 'Нет ошибок для повторения.');
+    return;
+  }
+
+  // reconstruir um novo array de exercícios contendo apenas os rounds com erro
+  const newExercises = errorRoundIndexes.map(i => exercises[i]);
+  // substituir exercícios atuais temporariamente
+  // OBS: para simplicidade, iremos trocar as variáveis e reiniciar
+  // salvamos backups
+  window._backupExercises = exercises.slice(); // referencia original
+  // substituir global exercises (mutação segura)
+  while(exercises.length) exercises.pop();
+  newExercises.forEach(e => exercises.push(e));
+
+  // reset e iniciar
+  currentExercise = 0;
+  correctAnswers = 0;
+  totalAnswers = 0;
+  matchesThisRound = 0;
+  resultsThisRound = [];
+  allResults = [];
+  loadExercise();
+}
+
+// ===================== BOTÃO INICIAL =====================
+window.addEventListener('load', () => {
+  const container = document.getElementById("cruzadoContainer");
+  const lang = localStorage.getItem('lang') || 'pt';
+  const startText = lang === 'pt' ? "▶ Iniciar Exercício" : "▶ Начать упражнение";
+
   container.innerHTML = `
     <div id="startButtonContainer" style="text-align:center; margin-top:40px;">
-      <button id="startBtn" style="
-        padding:12px 20px;
-        font-size:1em;
-        background-color:#4CAF50;
-        color:white;
-        border:none;
-        border-radius:8px;
-        cursor:pointer;
-      ">▶ Iniciar Exercício</button>
+      <button id="startBtn" class="start-btn">${startText}</button>
     </div>
   `;
 
-  const startBtn = document.getElementById("startBtn");
-  startBtn.addEventListener("click", () => {
+  document.getElementById("startBtn").addEventListener("click", () => {
+    // reset completo
+    currentExercise = 0;
+    correctAnswers = 0;
+    totalAnswers = 0;
+    matchesThisRound = 0;
+    resultsThisRound = [];
+    allResults = [];
     loadExercise();
   });
-};
+});
