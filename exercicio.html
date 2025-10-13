@@ -217,29 +217,43 @@
       transition: background 0.2s, color 0.2s, transform 0.1s;
     }
 
-    /* ===== Palavras cruzadas no modo escuro ===== */
+    /* ===== Palavras cruzadas no modo escuro com destaque ===== */
     body.dark-mode .word, 
     body.dark-mode .placeholder {
       background-color: #1e1e1e;
       color: #f5f5f5;
-      border: 1px solid #333;
+      border: 1.5px solid #444;
+      border-radius: 10px;
+      padding: 12px;
+      margin: 6px 4px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+      transition: background 0.2s, color 0.2s, transform 0.1s, box-shadow 0.2s;
     }
 
     body.dark-mode .word.selected {
       background-color: #2a2a2a;
+      border-color: #4CAF50;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
     }
 
-    /* cores de correto e errado permanecem */
-    body.dark-mode .correct { background-color: #4CAF50 !important; color: #fff !important; }
-    body.dark-mode .wrong { background-color: #e74c3c !important; color: #fff !important; }
+    body.dark-mode .correct { 
+      background-color: #4CAF50 !important; 
+      color: #fff !important; 
+      border-color: rgba(0,0,0,0.05) !important; 
+    }
 
+    body.dark-mode .wrong { 
+      background-color: #e74c3c !important; 
+      color: #fff !important; 
+      border-color: rgba(0,0,0,0.05) !important; 
+    }
   </style>
 </head>
 
 <body>
   <!-- Header -->
   <header>
-    <h1>Славянский клуб <img src="emoji_dimitry.png" alt="Dimitry" class="emoji-head"> </h1>	 
+    <h1>Славянский клуб <img src="emoji_dimitry.png" alt="Dimitry" class="emoji-head"></h1>	 
     <button id="languageToggle">PT</button>
     <button id="darkModeToggle">🌙</button>
   </header>
