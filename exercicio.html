@@ -122,6 +122,85 @@ footer {
   margin-right: 8px;
 }
 
+/* Clique e estado visual */
+.clickable {
+  cursor: pointer;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, background-color 0.2s;
+  user-select: none;
+  padding: 10px;
+  margin: 6px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  background: #fff;
+  min-width: 140px;
+  text-align: center;
+}
+
+/* efeito breve ao clicar */
+.clickable.clicked {
+  transform: scale(1.06);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+}
+
+/* estado selecionado (esquerda) */
+.word.selected {
+  outline: 3px solid rgba(76,175,80,0.35);
+  background: #f0fff4;
+}
+
+/* desativado (já usado nessa rodada) */
+.clickable.disabled {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* cores só mostradas ao revelar */
+.correct {
+  background: #4CAF50 !important;
+  color: #fff !important;
+  border-color: rgba(0,0,0,0.05) !important;
+}
+
+.wrong {
+  background: #e74c3c !important;
+  color: #fff !important;
+  border-color: rgba(0,0,0,0.05) !important;
+}
+
+/* resultados finais */
+.results-list { margin-top: 12px; display: grid; gap:8px; }
+.result-item { padding: 8px 10px; border-radius:8px; color:#fff; }
+.result-item.correct { background:#4CAF50; }
+.result-item.wrong { background:#e74c3c; }
+
+/* botão retry */
+.retry-btn {
+  margin-top: 14px;
+  padding: 10px 14px;
+  background: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+/* ===== Botão Iniciar exercícios ===== */
+#startBtn {
+  display: inline-block;
+  padding: 12px 20px;
+  font-size: 1em;
+  background-color: #4CAF50; /* mesmo verde padrão da página */
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+#startBtn:hover {
+  background-color: #45A049; /* hover idêntico ao backBtn e toggles */
+}
+
   </style>
 </head>
 
@@ -197,36 +276,77 @@ footer {
   <!-- Scripts -->
   <script src="exercicio.js"></script>
 
-  <script>
-    const darkModeToggle = document.getElementById('darkModeToggle');
-    const languageToggle = document.getElementById('languageToggle');
+  
+<script>
+const darkModeToggle = document.getElementById('darkModeToggle');
+const languageToggle = document.getElementById('languageToggle');
 
-    // === Verifica o tema salvo no localStorage ===
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme === 'dark') {
-      document.body.classList.add('dark-mode');
-      darkModeToggle.textContent = '☀️';
-    } else {
-      document.body.classList.remove('dark-mode');
-      darkModeToggle.textContent = '🌙';
-    }
+// ======== Tema salvo ========
+const savedTheme = localStorage.getItem('theme');
+if (savedTheme === 'dark') {
+  document.body.classList.add('dark-mode');
+  darkModeToggle.textContent = '☀️';
+} else {
+  darkModeToggle.textContent = '🌙';
+}
 
-    // === Alternância do modo escuro com persistência ===
-    darkModeToggle.addEventListener('click', () => {
-      document.body.classList.toggle('dark-mode');
-      const isDark = document.body.classList.contains('dark-mode');
-      darkModeToggle.textContent = isDark ? '☀️' : '🌙';
-      localStorage.setItem('theme', isDark ? 'dark' : 'light');
-    });
+// ======== Alternar modo escuro ========
+darkModeToggle.addEventListener('click', () => {
+  document.body.classList.toggle('dark-mode');
+  const isDark = document.body.classList.contains('dark-mode');
+  darkModeToggle.textContent = isDark ? '☀️' : '🌙';
+  localStorage.setItem('theme', isDark ? 'dark' : 'light');
+});
 
-    // === Alternância do idioma (igual ao jogo.html) ===
-    languageToggle.addEventListener('click', () => {
-      if (languageToggle.textContent === 'PT') {
-        languageToggle.textContent = 'РУ';
-      } else {
-        languageToggle.textContent = 'PT';
-      }
-    });
-  </script>
+// ======== Sistema de idiomas ========
+const texts = {
+  pt: {
+    title: "📝 Exercício Interativo",
+    footer: "© 2025 Славянский клуб — Aprenda Russo e Português com diversão!",
+    backBtn: "🔙 Voltar",
+    nav: ["📈 Selecionar", "📝 Exercícios", "🎨 Jogos", "💬 Chat"],
+    mascot: "🐻 Dimitry"
+  },
+  ru: {
+    title: "📝 Интерактивное упражнение",
+    footer: "© 2025 Славянский клуб — Учите русский и португальский с удовольствием!",
+    backBtn: "🔙 Назад",
+    nav: ["📈 Выбор", "📝 Упражнения", "🎨 Игры", "💬 Чат"],
+    mascot: "🐻 Димитрий"
+  }
+};
+
+// Define idioma salvo ou padrão
+let currentLang = localStorage.getItem('lang') || 'pt';
+applyLanguage(currentLang);
+
+// Alternar idioma
+languageToggle.addEventListener('click', () => {
+  currentLang = currentLang === 'pt' ? 'ru' : 'pt';
+  localStorage.setItem('lang', currentLang);
+  applyLanguage(currentLang);
+});
+
+// ======== Aplicar idioma ========
+function applyLanguage(lang) {
+  const t = texts[lang];
+  document.querySelector("main h2").textContent = t.title;
+  document.querySelector("footer").textContent = t.footer;
+  document.getElementById("backBtn").textContent = t.backBtn;
+
+  // O botão mostra o idioma oposto
+  languageToggle.textContent = lang === 'pt' ? 'РУ' : 'PT';
+
+  // Atualizar links do menu lateral
+  const navLinks = document.querySelectorAll("aside nav a");
+  navLinks.forEach((link, i) => {
+    link.textContent = t.nav[i];
+  });
+
+  // Atualizar nome do mascote
+  const mascoteDiv = document.querySelector(".mascote");
+  mascoteDiv.textContent = t.mascot;
+}
+</script>
 </body>
 </html>
