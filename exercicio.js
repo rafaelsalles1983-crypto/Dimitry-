@@ -29,7 +29,6 @@ const exercises = [
   { russian: ['Стул','Окно','Дверь'], portuguese: ['Cadeira','Janela','Porta'] }
 ];
 
-
 // estado
 let currentExercise = 0;
 let selectedLeft = null;
