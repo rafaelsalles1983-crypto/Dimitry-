@@ -125,6 +125,133 @@ body.dark-mode footer {
 }
 
 
+/* ===== Overlay completo ===== */
+.overlay {
+  display: none; /* Inicialmente escondido */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7); /* Fundo semi-transparente */
+  justify-content: center; /* Centraliza horizontal */
+  align-items: center;     /* Centraliza vertical */
+  z-index: 1000;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.overlay.show {
+  display: flex;
+  opacity: 1;
+}
+
+.overlay-content {
+  background: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  max-width: 90%;
+  max-height: 90%;
+  overflow-y: auto;
+  position: relative;
+  transform: scale(0.8);
+  transition: transform 0.3s ease;
+  text-align: center;
+  font-size: 1.5em;
+}
+
+.overlay.show .overlay-content {
+  transform: scale(1);
+}
+
+/* Palavras clicáveis */
+.overlay-content .word {
+  display: inline-block;
+  margin: 5px 8px;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  background: #eee;
+  user-select: none; /* Evita seleção acidental */
+}
+
+.overlay-content .word:hover {
+  background: #ddd;
+}
+
+.overlay-content .word.selected {
+  background: #4CAF50;
+  color: white;
+}
+
+/* Botão de fechar */
+.overlay-content .close-btn {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-size: 1.5em;
+  cursor: pointer;
+}
+
+/* Barra de progresso */
+.overlay-content .progress-container {
+  width: 100%;
+  background: #f0f0f0;
+  border-radius: 5px;
+  margin-bottom: 15px;
+}
+
+.overlay-content .progress-bar {
+  height: 20px;
+  width: 0%;
+  background: #4CAF50;
+  border-radius: 5px;
+  text-align: center;
+  color: white;
+  line-height: 20px;
+  font-size: 0.9em;
+  transition: width 0.3s ease;
+}
+
+/* Botões dentro do overlay */
+.overlay-content button {
+  background: #4CAF50;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  margin-top: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1em;
+  transition: background 0.2s;
+}
+
+.overlay-content button:hover {
+  background: #45a049;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .overlay-content {
+    font-size: 1.2em;
+    padding: 15px;
+  }
+
+  .overlay-content .word {
+    margin: 4px 6px;
+    padding: 4px 8px;
+  }
+
+  .overlay-content button {
+    font-size: 0.9em;
+    padding: 6px 12px;
+  }
+}
+
+
+
+ 
 </style>
 </head>
 <body>
@@ -790,6 +917,7 @@ modoBtn.addEventListener("click", () => {
 
 </body>
 </html>
+
 
 
 
