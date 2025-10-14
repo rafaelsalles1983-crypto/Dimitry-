@@ -115,6 +115,7 @@ footer{background:white;color:#555;text-align:center;padding:6px;font-size:.85em
 </div>
 
 <footer>© 2025 Славянский клуб — Aprenda Russo e Português com diversão!</footer>
+
 <script>
 /* === CONFIG FIREBASE === */
 const firebaseConfig={apiKey:"AIzaSyCYJCgfil5HKrCWtB14zwdicDaEcldHU6A",
@@ -134,7 +135,7 @@ hideChatBtnMobile=document.getElementById("hideChatBtnMobile"),blockBtnMobile=do
 hideChatBtnDesktop=document.getElementById("hideChatBtnDesktop"),blockBtnDesktop=document.getElementById("blockBtnDesktop"),
 onlineCount=document.getElementById("onlineCount");
 
-let userData={},currentChat="chatGlobal",currentPartnerUID=null,blocked={},hidden={},localHidden={};
+let userData={},currentChat="chatGlobal",currentPartnerUID=null,blocked={},hidden={};
 
 /* === LOGIN === */
 loginBtn.onclick=()=>auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
@@ -146,6 +147,7 @@ auth.onAuthStateChanged(u=>{
   loginBtn.style.display="none";logoutBtn.style.display="inline-block";
   msgInput.disabled=false;sendBtn.disabled=false;
 
+  // Online e permanente
   db.ref("online/"+u.uid).set({name:u.displayName,photo:u.photoURL});
   db.ref("online/"+u.uid).onDisconnect().remove();
   db.ref("usuariosConectados/"+u.uid).set({name:u.displayName,photo:u.photoURL});
@@ -218,7 +220,7 @@ function startGlobal(){
  currentChat="chatGlobal"; currentPartnerUID=null;
  currentPartnerEl.textContent="🌍 Global"; chatWindow.innerHTML="";
  db.ref("chatGlobal").off();
- db.ref("chatGlobal").on("child_added",snap=>showMsg(snap.val(),"chatGlobal",snap.key));
+ db.ref("chatGlobal").on("child_added",snap=>showMsg(snap.val(),"chatGlobal"));
 }
 
 /* === CHAT PRIVADO === */
@@ -228,7 +230,7 @@ function startPrivate(uid,name){
  const btns=[blockBtnMobile,blockBtnDesktop];
  btns.forEach(b=>b.textContent=(blocked[uid] && blocked[uid][userData.uid])?"Desbloquear":"Bloquear");
  db.ref("private/"+currentChat).off();
- db.ref("private/"+currentChat).on("child_added",snap=>showMsg(snap.val(),currentChat,snap.key));
+ db.ref("private/"+currentChat).on("child_added",snap=>showMsg(snap.val(),currentChat));
 }
 
 /* === ENVIAR MENSAGEM === */
@@ -245,30 +247,13 @@ function sendMsg(){
  msgInput.value="";
 }
 
-/* === MOSTRAR MENSAGEM COM OPÇÃO DE APAGAR LOCAL === */
-function showMsg(m,room,key){
+/* === MOSTRAR MENSAGEM === */
+function showMsg(m,room){
  if(room!=="chatGlobal" && room!==currentChat) return;
- if(hidden[currentChat] || (localHidden[currentChat] && localHidden[currentChat][key])) return;
-
+ if(hidden[currentChat]) return;
  const d=document.createElement("div");
  d.className=m.uid===userData.uid?"msg userMsg":"msg otherMsg";
  d.textContent=m.text;
-
- // Botão apagar apenas para mensagens do usuário
- if(m.uid===userData.uid){
-   const btn = document.createElement("button");
-   btn.textContent="X";
-   btn.style.marginLeft="6px";
-   btn.style.fontSize="0.7em";
-   btn.style.cursor="pointer";
-   btn.onclick=()=>{
-     if(!localHidden[currentChat]) localHidden[currentChat]={};
-     localHidden[currentChat][key]=true;
-     d.remove();
-   };
-   d.appendChild(btn);
- }
-
  chatWindow.appendChild(d);
  chatWindow.scrollTop=chatWindow.scrollHeight;
 }
@@ -282,7 +267,5 @@ function hideChat(){
 hideChatBtnMobile.onclick=hideChat;
 hideChatBtnDesktop.onclick=hideChat;
 </script>
-
-
 </body>
 </html>
