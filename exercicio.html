@@ -8,8 +8,50 @@
   <link rel="icon" type="image/png" href="images/dimitri-favicon.png">
 
   <style>
+/* ===== HEADER FIXO ===== */
+header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: var(--header-bg, #fff);
+  color: #000;
+  padding: 15px 20px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
 
-/* ===== BOTÕES LATERAIS ===== */
+header h1 {
+  font-size: 1.3em;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+}
+
+.emoji-head {
+  width: 32px;
+  height: 32px;
+}
+
+/* Corrige o deslocamento do conteúdo */
+body {
+  margin: 0;
+  padding-top: 70px; /* altura do header */
+  font-family: Arial, sans-serif;
+}
+
+/* ===== MENU (ASIDE) ===== */
+aside {
+  position: relative;
+  width: 100%;
+  background: transparent;
+  margin: 0;
+  padding: 0;
+}
 
 aside nav {
   display: flex;
@@ -29,6 +71,7 @@ aside nav a {
   font-size: 1.1em;
   font-weight: 500;
   transition: all 0.3s ease;
+  text-align: center;
 }
 
 aside nav a:hover {
@@ -37,291 +80,9 @@ aside nav a:hover {
   transform: scale(1.03);
 }
 
-/* ===== Dark Mode para botões laterais ===== */
-body.dark-mode aside nav a {
-  background: #1e1e1e;
-  color: #ddd;
-  box-shadow: 0 3px 6px rgba(255,255,255,0.1);
-}
-
-body.dark-mode aside nav a:hover {
-  background: #45a049;
-  color: white;
-}
-
-
- /* ===== destacar o botão da página em que o usuário está ===== */
 aside nav a.active {
   background: #4CAF50;
   color: white;
-  transform: scale(1.03);
-}
-
-    /* ======== MODO ESCURO ======== */
-    body.dark-mode {
-      background-color: #121212;
-      color: #f5f5f5;
-    }
-    body.dark-mode header {
-      background-color: #222;
-      color: #fff;
-    }
-    body.dark-mode aside {
-      background-color: #1e1e1e;
-    }
-    body.dark-mode footer {
-      background-color: #222;
-      color: #f5f5f5;
-    }
-
-    /* ===== Botões modo escuro e idioma em verde ===== */
-    #darkModeToggle, #languageToggle {
-      background-color: #4CAF50;
-      color: white;
-    }
-    #darkModeToggle:hover, #languageToggle:hover {
-      background-color: #45A049;
-    }
-
-    /* ====== Layout e Rodapé ====== */
-    html, body {
-      height: 100%;
-      margin: 0;
-      display: flex;
-      flex-direction: column;
-    }
-
-    main {
-      flex: 1;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 20px;
-      box-sizing: border-box;
-    }
-
-    footer {
-      background: white;
-      color: #555;
-      text-align: center;
-      padding: 8px 0;
-      font-size: 0.85em;
-      box-shadow: 0 -2px 6px rgba(0,0,0,0.1);
-    }
-
-    /* ===== Correção mobile ===== */
-    @media (max-width: 768px) {
-      main, .content, #cruzadoContainer, #backButtonContainer {
-        position: relative;
-        z-index: 10;
-      }
-      #backButtonContainer {
-        text-align: center;
-        margin-top: 20px;
-      }
-      #backBtn {
-        display: inline-block;
-        padding: 12px 20px;
-        font-size: 1em;
-        background-color: #4CAF50;
-        color: white;
-        border: none;
-        border-radius: 8px;
-        cursor: pointer;
-      }
-      #backBtn:hover {
-        background-color: #45A049;
-      }
-      #dimitri { z-index: 1; }
-      aside { z-index: 2; }
-    }
-
-    /* ===== Botão do modo escuro ===== */
-    #darkModeToggle {
-      position: absolute;
-      right: 70px;
-      top: 15px;
-      border: none;
-      padding: 6px 10px;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
-
-    /* ===== Botão de idioma ===== */
-    #languageToggle {
-      position: absolute;
-      right: 15px;
-      top: 15px;
-      border: none;
-      padding: 6px 10px;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: background-color 0.3s;
-    }
-
-    /* ===== configuração do emoji dimitry ===== */
-    .emoji-head {
-      width: 32px;
-      height: 32px;
-      vertical-align: middle;
-      margin-right: 8px;
-    }
-
-    /* Clique e estado visual */
-    .clickable {
-      cursor: pointer;
-      transition: transform 0.12s ease, box-shadow 0.12s ease, background-color 0.2s;
-      user-select: none;
-      padding: 10px;
-      margin: 6px;
-      border-radius: 8px;
-      border: 1px solid #ddd;
-      background: #fff;
-      min-width: 140px;
-      text-align: center;
-    }
-
-    /* efeito breve ao clicar */
-    .clickable.clicked {
-      transform: scale(1.06);
-      box-shadow: 0 6px 18px rgba(0,0,0,0.12);
-    }
-
-    /* estado selecionado (esquerda) */
-    .word.selected {
-      outline: 3px solid rgba(76,175,80,0.35);
-      background: #f0fff4;
-    }
-
-    /* desativado (já usado nessa rodada) */
-    .clickable.disabled {
-      opacity: 0.6;
-      pointer-events: none;
-    }
-
-    /* cores só mostradas ao revelar */
-    .correct {
-      background: #4CAF50 !important;
-      color: #fff !important;
-      border-color: rgba(0,0,0,0.05) !important;
-    }
-
-    .wrong {
-      background: #e74c3c !important;
-      color: #fff !important;
-      border-color: rgba(0,0,0,0.05) !important;
-    }
-
-    /* resultados finais */
-    .results-list { margin-top: 12px; display: grid; gap:8px; }
-    .result-item { padding: 8px 10px; border-radius:8px; color:#fff; }
-    .result-item.correct { background:#4CAF50; }
-    .result-item.wrong { background:#e74c3c; }
-
-    /* botão retry */
-    .retry-btn {
-      margin-top: 14px;
-      padding: 10px 14px;
-      background: #4CAF50;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-
-    /* ===== Botão Iniciar exercícios ===== */
-    #startBtn {
-      display: inline-block;
-      padding: 12px 20px;
-      font-size: 1em;
-      background-color: #4CAF50;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: background-color 0.3s;
-    }
-
-    #startBtn:hover {
-      background-color: #45A049;
-    }
-
-    /* ===== Palavras cruzadas padrão ===== */
-    .column {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      margin: 0 10px;
-    }
-
-    .word, .placeholder {
-      padding: 10px 12px;
-      border-radius: 8px;
-      border: 1px solid #ddd;
-      background-color: #fff;
-      color: #000;
-      text-align: center;
-      cursor: pointer;
-      transition: background 0.2s, color 0.2s, transform 0.1s;
-    }
-
-    /* ===== Palavras cruzadas no modo escuro com destaque ===== */
-    body.dark-mode .word, 
-    body.dark-mode .placeholder {
-      background-color: #1e1e1e;
-      color: #f5f5f5;
-      border: 1.5px solid #444;
-      border-radius: 10px;
-      padding: 12px;
-      margin: 6px 4px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-      transition: background 0.2s, color 0.2s, transform 0.1s, box-shadow 0.2s;
-    }
-
-    body.dark-mode .word.selected {
-      background-color: #2a2a2a;
-      border-color: #4CAF50;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-    }
-
-    body.dark-mode .correct { 
-      background-color: #4CAF50 !important; 
-      color: #fff !important; 
-      border-color: rgba(0,0,0,0.05) !important; 
-    }
-
-    body.dark-mode .wrong { 
-      background-color: #e74c3c !important; 
-      color: #fff !important; 
-      border-color: rgba(0,0,0,0.05) !important; 
-    }
-/* ===== HEADER FIXO ===== */
-header {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 1000;
-  background: var(--header-bg, #fff);
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-}
-
-/* Corrige o deslocamento do conteúdo para não ficar escondido atrás do header */
-body {
-  margin: 0;
-  padding-top: 70px; /* altura do header */
-}
-
-/* ===== MENU (ASIDE) ===== */
-aside {
-  position: relative;
-  top: 0;
-  width: 100%;
-  background: transparent;
-  box-shadow: none;
-  margin: 0;
-  padding: 0;
 }
 
 /* ===== MENU HORIZONTAL NO CELULAR ===== */
@@ -342,8 +103,8 @@ aside {
     gap: 8px;
     padding: 8px 10px;
     background: #f9f9f9;
-    scrollbar-width: thin;
     border-bottom: 1px solid #ddd;
+    scrollbar-width: thin;
   }
 
   aside nav a {
@@ -370,66 +131,191 @@ aside {
     color: white;
   }
 
-  /* Ajusta o conteúdo para não ficar escondido atrás do menu fixo */
   main {
     padding-top: 110px; /* header (70px) + menu (40px) */
   }
 
-  /* Esconde o mascote no celular */
   .mascote {
     display: none;
   }
-
-  /* Dark mode */
-  body.dark-mode aside nav {
-    background: #121212;
-    border-bottom: 1px solid #333;
-  }
-
-  body.dark-mode aside nav a {
-    background: #1e1e1e;
-    color: #ddd;
-    box-shadow: 0 1px 3px rgba(255,255,255,0.05);
-  }
-
-  body.dark-mode aside nav a:hover,
-  body.dark-mode aside nav a.active {
-    background: #4CAF50;
-    color: white;
-  }
 }
 
+/* ===== DARK MODE ===== */
+body.dark-mode {
+  background-color: #121212;
+  color: #f5f5f5;
+}
 
-    
+body.dark-mode header {
+  background-color: #222;
+  color: #fff;
+}
+
+body.dark-mode aside nav a {
+  background: #1e1e1e;
+  color: #ddd;
+  box-shadow: 0 3px 6px rgba(255,255,255,0.1);
+}
+
+body.dark-mode aside nav a:hover,
+body.dark-mode aside nav a.active {
+  background: #4CAF50;
+  color: white;
+}
+
+body.dark-mode footer {
+  background-color: #222;
+  color: #f5f5f5;
+}
+
+/* ===== BOTÕES DARK E IDIOMA ===== */
+#darkModeToggle, #languageToggle {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+#darkModeToggle:hover, #languageToggle:hover {
+  background-color: #45A049;
+}
+
+/* ===== RODAPÉ ===== */
+footer {
+  background: white;
+  color: #555;
+  text-align: center;
+  padding: 8px 0;
+  font-size: 0.85em;
+  box-shadow: 0 -2px 6px rgba(0,0,0,0.1);
+}
+
+/* ===== CONTEÚDO PRINCIPAL ===== */
+main {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 60px 20px;
+}
+
+.content {
+  max-width: 900px;
+  width: 100%;
+  text-align: center;
+}
+
+/* ===== EXERCÍCIO CENTRALIZADO ===== */
+#cruzadoContainer {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-top: 25px;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  padding: 30px;
+}
+
+body.dark-mode #cruzadoContainer {
+  background: #1e1e1e;
+  box-shadow: 0 4px 12px rgba(255,255,255,0.05);
+}
+
+/* ===== BOTÕES (CLICKABLES) ===== */
+.clickable {
+  font-size: 1.1em;
+  min-width: 160px;
+  padding: 14px 18px;
+  border-radius: 12px;
+  background: #f0f0f0;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.12);
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.clickable:hover:not(.disabled) {
+  background: #4CAF50;
+  color: white;
+  transform: scale(1.05);
+}
+
+/* Dark Mode botões */
+body.dark-mode .clickable {
+  background: #2a2a2a;
+  color: #f0f0f0;
+  box-shadow: 0 2px 6px rgba(255,255,255,0.08);
+}
+
+body.dark-mode .clickable:hover:not(.disabled) {
+  background: #4CAF50;
+  color: white;
+}
+
+/* ===== BOTÕES DE CONTROLE ===== */
+#startBtn,
+#backBtn,
+.retry-btn {
+  display: inline-block;
+  padding: 14px 22px;
+  font-size: 1.1em;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+}
+
+#startBtn:hover,
+#backBtn:hover,
+.retry-btn:hover {
+  background-color: #45A049;
+  transform: scale(1.05);
+}
+
+/* ===== PROGRESSO ===== */
+#progressContainer {
+  margin: 0 auto 25px auto;
+  max-width: 600px;
+  text-align: center;
+}
+
+/* ===== BOTÕES NO TOPO ===== */
+#darkModeToggle {
+  margin-right: 10px;
+}
   </style>
 </head>
 
 <body>
-  <!-- Header -->
   <header>
     <h1>Славянский клуб <img src="emoji_dimitry.png" alt="Dimitry" class="emoji-head"></h1>	 
-    <button id="languageToggle">PT</button>
-    <button id="darkModeToggle">🌙</button>
+    <div>
+      <button id="darkModeToggle">🌙</button>
+      <button id="languageToggle">PT</button>
+    </div>
   </header>
 
-  <!-- Sidebar -->
   <aside>
     <nav>
       <a href="index.html">📈 Selecionar</a>
-      <a href="exercicio.html" class="active">📝 Exercícios</a>
-      <a href="jogo.html">🎮 Jogos</a>
-      <a href="complete-a-frase.html">🧩 Complete a Frase</a>
+      <a href="exercicios.html" class="active">📝 Exercícios</a>
+      <a href="jogos.html">🎮 Jogos</a>
+      <a href="complete.html">🧩 Complete a Frase</a>
       <a href="chat.html">💬 Chat</a>
     </nav>
-    <div class="mascote">🐻 Dimitry</div>
   </aside>
 
-  <!-- Main -->
   <main>
     <div class="content">
       <h2>📝 Exercício Interativo</h2>
 
-      <!-- Barra de progresso -->
       <div id="progressContainer">
         <div id="progressText"></div>
         <div id="progressBarContainer">
@@ -437,41 +323,18 @@ aside {
         </div>
       </div>
 
-      <!-- Exercício -->
       <div id="cruzadoContainer" class="container"></div>
 
-      <!-- Botão voltar -->
       <div id="backButtonContainer">
         <button id="backBtn" onclick="window.location.href='index.html'">🔙 Voltar</button>
       </div>
     </div>
   </main>
 
-  <!-- Rodapé fixo -->
   <footer>
     © 2025 Славянский клуб — Aprenda Russo e Português com diversão!
   </footer>
 
-  <!-- Mascote Dimitri -->
-  <div id="dimitri">
-    <div class="head">
-      <div class="ushanka">
-        <div class="ear left"></div>
-        <div class="ear right"></div>
-      </div>
-      <div class="eye left"></div>
-      <div class="eye right"></div>
-      <div class="eyebrow left"></div>
-      <div class="eyebrow right"></div>
-      <div class="mouth"></div>
-    </div>
-    <div class="body">
-      <div class="arm left"></div>
-      <div class="arm right"></div>
-    </div>
-  </div>
-
-  <!-- Scripts -->
   <script src="exercicio.js"></script>
 
   <script>
@@ -483,11 +346,8 @@ aside {
     if (savedTheme === 'dark') {
       document.body.classList.add('dark-mode');
       darkModeToggle.textContent = '☀️';
-    } else {
-      darkModeToggle.textContent = '🌙';
     }
 
-    // Alternar modo escuro
     darkModeToggle.addEventListener('click', () => {
       document.body.classList.toggle('dark-mode');
       const isDark = document.body.classList.contains('dark-mode');
@@ -501,15 +361,13 @@ aside {
         title: "📝 Exercício Interativo",
         footer: "© 2025 Славянский клуб — Aprenda Russo e Português com diversão!",
         backBtn: "🔙 Voltar",
-        nav: ["📈 Selecionar", "📝 Exercícios", "🎮 Jogos", "🧩 Complete a Frase", "💬 Chat"],
-        mascot: "🐻 Dimitry"
+        nav: ["📈 Selecionar", "📝 Exercícios", "🎮 Jogos", "🧩 Complete a Frase", "💬 Chat"]
       },
       ru: {
         title: "📝 Интерактивное упражнение",
         footer: "© 2025 Славянский клуб — Учите русский и португальский с удовольствием!",
         backBtn: "🔙 Назад",
-        nav: ["📈 Выбор", "📝 Упражнения", "🎮 Игры", "🧩 Закончить фразу", "💬 Чат"],
-        mascot: "🐻 Димитрий"
+        nav: ["📈 Выбор", "📝 Упражнения", "🎮 Игры", "🧩 Закончить фразу", "💬 Чат"]
       }
     };
 
@@ -531,14 +389,7 @@ aside {
 
       const navLinks = document.querySelectorAll("aside nav a");
       navLinks.forEach((link, i) => { link.textContent = t.nav[i]; });
-      document.querySelector(".mascote").textContent = t.mascot;
     }
   </script>
 </body>
 </html>
-
-
-
-
-
-
