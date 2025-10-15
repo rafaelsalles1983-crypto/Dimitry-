@@ -29,7 +29,7 @@ const exercises = [
   { russian: ['Стул','Окно','Дверь'], portuguese: ['Cadeira','Janela','Porta'] }
 ];
 
-// estado
+// ===================== VARIÁVEIS GLOBAIS =====================
 let currentExercise = 0;
 let selectedLeft = null;
 let matchesThisRound = 0;
@@ -38,7 +38,7 @@ let allResults = [];
 let correctAnswers = 0;
 let totalAnswers = 0;
 
-// ===================== SOM (WebAudio) =====================
+// ===================== SOM =====================
 function playClickSound() {
   try {
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -112,7 +112,7 @@ function loadExercise() {
   updateProgress();
 }
 
-// ===================== SELEÇÃO E FEEDBACK =====================
+// ===================== SELEÇÃO =====================
 function selectLeft(div, word) {
   playClickSound();
   div.classList.add('clicked');
@@ -202,7 +202,6 @@ function showFinalResults() {
   header.innerHTML = `<h2>${title}</h2><p>${score}</p>`;
   container.appendChild(header);
 
-  // Mostrar apenas erros
   const list = document.createElement('div');
   list.className = 'results-list';
   allResults.filter(r => !r.correct).forEach(r => {
@@ -218,6 +217,13 @@ function showFinalResults() {
   retryBtn.textContent = isPortuguese ? '🔁 Refazer apenas erros' : '🔁 Повторить только ошибки';
   retryBtn.addEventListener('click', restartMistakesOnly);
   container.appendChild(retryBtn);
+
+  // 🔀 Novo conjunto aleatório
+  const newRandomBtn = document.createElement('button');
+  newRandomBtn.className = 'retry-btn';
+  newRandomBtn.textContent = isPortuguese ? '🔀 Novo conjunto aleatório' : '🔀 Новый случайный набор';
+  newRandomBtn.addEventListener('click', restartRandom);
+  container.appendChild(newRandomBtn);
 }
 
 // ===================== REFAZER ERROS =====================
@@ -236,10 +242,20 @@ function restartMistakesOnly() {
   }
 
   const newExercises = errorRoundIndexes.map(i => exercises[i]);
-  window._backupExercises = exercises.slice();
-  while(exercises.length) exercises.pop();
+  currentExercise = 0;
+  correctAnswers = 0;
+  totalAnswers = 0;
+  matchesThisRound = 0;
+  resultsThisRound = [];
+  allResults = [];
+  exercises.length = 0;
   newExercises.forEach(e => exercises.push(e));
+  loadExercise();
+}
 
+// ===================== NOVO CONJUNTO ALEATÓRIO =====================
+function restartRandom() {
+  exercises.sort(() => Math.random() - 0.5);
   currentExercise = 0;
   correctAnswers = 0;
   totalAnswers = 0;
@@ -262,6 +278,9 @@ window.addEventListener('load', () => {
   `;
 
   document.getElementById("startBtn").addEventListener("click", () => {
+    // 🔀 Embaralhar perguntas no início
+    exercises.sort(() => Math.random() - 0.5);
+
     currentExercise = 0;
     correctAnswers = 0;
     totalAnswers = 0;
