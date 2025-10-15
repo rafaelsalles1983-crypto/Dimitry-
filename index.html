@@ -292,6 +292,100 @@ body.dark-mode footer {
     font-size: 0.9em;
     padding: 6px 12px;
   }
+
+
+
+
+
+/* ===== RESPONSIVIDADE: CELULAR ===== */
+@media (max-width: 768px) {
+  /* Coloca o menu logo abaixo do header */
+  aside {
+    position: relative;
+    top: 0;
+    width: 100%;
+    background: transparent;
+    box-shadow: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Menu horizontal com rolagem */
+  aside nav {
+    display: flex !important;
+    flex-direction: row !important;
+    overflow-x: auto;
+    white-space: nowrap;
+    gap: 8px;
+    padding: 8px 10px;
+    background: #f9f9f9;
+    scrollbar-width: thin;
+    border-bottom: 1px solid #ddd;
+  }
+
+  /* Botões menores */
+  aside nav a {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 90px;
+    padding: 8px 10px;
+    font-size: 0.9em;
+    border-radius: 8px;
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    color: #333;
+  }
+
+  aside nav a:hover {
+    background: #4CAF50;
+    color: white;
+    transform: none;
+  }
+
+  aside nav a.active {
+    background: #4CAF50;
+    color: white;
+  }
+
+  /* Esconde o mascote no celular (ou reduz se quiser mostrar pequeno) */
+  .mascote {
+    display: none;
+  }
+
+  /* Ajuste para dark mode */
+  body.dark-mode aside nav {
+    background: #121212;
+    border-bottom: 1px solid #333;
+  }
+
+  body.dark-mode aside nav a {
+    background: #1e1e1e;
+    color: #ddd;
+    box-shadow: 0 1px 3px rgba(255,255,255,0.05);
+  }
+
+  body.dark-mode aside nav a:hover,
+  body.dark-mode aside nav a.active {
+    background: #4CAF50;
+    color: white;
+  }
+
+  /* Rolagem lateral suave */
+  aside nav::-webkit-scrollbar {
+    height: 6px;
+  }
+
+  aside nav::-webkit-scrollbar-thumb {
+    background: rgba(0,0,0,0.2);
+    border-radius: 3px;
+  }
+
+
+
+
+
 }
 
 
@@ -962,6 +1056,7 @@ modoBtn.addEventListener("click", () => {
 
 </body>
 </html>
+
 
 
 
