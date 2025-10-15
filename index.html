@@ -6,6 +6,56 @@
 <title>Славянский клуб</title>
 <link rel="stylesheet" href="style.css">
 <style>
+
+/* ===== BOTÕES LATERAIS ===== */
+
+aside nav {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 15px;
+}
+
+aside nav a {
+  display: block;
+  background: #f0f0f0;
+  color: #333;
+  text-decoration: none;
+  padding: 12px 15px;
+  border-radius: 10px;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+  font-size: 1.1em;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+aside nav a:hover {
+  background: #4CAF50;
+  color: white;
+  transform: scale(1.03);
+}
+
+/* ===== Dark Mode para botões laterais ===== */
+body.dark-mode aside nav a {
+  background: #1e1e1e;
+  color: #ddd;
+  box-shadow: 0 3px 6px rgba(255,255,255,0.1);
+}
+
+body.dark-mode aside nav a:hover {
+  background: #45a049;
+  color: white;
+}
+
+
+ /* ===== destacar o botão da página em que o usuário está ===== */
+aside nav a.active {
+  background: #4CAF50;
+  color: white;
+  transform: scale(1.03);
+}
+
+ 
  /* ===== Overlay com animação ===== */
 .overlay {
   display: none;
@@ -262,7 +312,7 @@ body.dark-mode footer {
 </header>
 <aside>
   <nav>
-    <a href="index.html">📈 Selecionar</a>
+    <a href="index.html" class="active">📈 Selecionar</a>
     <a href="exercicio.html">📝 Exercícios</a>
     <a href="jogo.html">🎮 Jogos</a>
     <a href="complete-a-frase.html">🧩 Complete a Frase</a>
@@ -917,6 +967,7 @@ modoBtn.addEventListener("click", () => {
 
 </body>
 </html>
+
 
 
 
