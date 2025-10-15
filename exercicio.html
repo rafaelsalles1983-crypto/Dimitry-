@@ -213,6 +213,71 @@ body.dark-mode footer {
   background-color: #222;
   color: #f5f5f5;
 }
+
+    /* ===== MODO ESCURO GLOBAL ===== */
+body.dark-mode {
+  background: #121212;
+  color: #f0f0f0;
+}
+
+/* Header e Footer já existentes */
+body.dark-mode header,
+body.dark-mode footer {
+  background: #1e1e1e;
+}
+
+/* Main e cards */
+body.dark-mode main {
+  background: #121212;
+}
+
+body.dark-mode .cards {
+  background: transparent; /* mantem transparência se houver */
+}
+
+body.dark-mode .card {
+  background: #1e1e1e;
+  color: #ddd;
+  border: 1px solid #333;
+  box-shadow: 0 3px 6px rgba(255,255,255,0.05);
+}
+
+/* Overlay */
+body.dark-mode .overlay-content {
+  background: #1e1e1e;
+  color: #ddd;
+}
+
+/* Palavras clicáveis no overlay */
+body.dark-mode .overlay-content .word {
+  background: #2c2c2c;
+  color: #ddd;
+}
+
+body.dark-mode .overlay-content .word.selected {
+  background: #4CAF50;
+  color: white;
+}
+
+/* Barra de progresso */
+body.dark-mode .overlay-content .progress-container {
+  background: #2c2c2c;
+}
+
+body.dark-mode .overlay-content .progress-bar {
+  background: #4CAF50;
+}
+
+/* Botões dentro do overlay */
+body.dark-mode .overlay-content button {
+  background: #4CAF50;
+  color: white;
+}
+
+body.dark-mode .overlay-content button:hover {
+  background: #45a049;
+}
+
   </style>
 </head>
 
@@ -306,4 +371,5 @@ function applyLanguage(lang) {
   </script>
 </body>
 </html>
+
 
