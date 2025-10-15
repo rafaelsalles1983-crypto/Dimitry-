@@ -6,7 +6,6 @@
 <title>Славянский клуб</title>
 <link rel="stylesheet" href="style.css">
 <style>
-
 /* ===== BOTÕES LATERAIS ===== */
 
 aside nav {
@@ -46,53 +45,12 @@ body.dark-mode aside nav a:hover {
   background: #45a049;
   color: white;
 }
-
-
-/* ===== RESPONSIVIDADE: CELULAR ===== */
-@media (max-width: 768px) {
-  aside nav {
-    flex-direction: row;
-    overflow-x: auto;
-    white-space: nowrap;
-    gap: 8px;
-    padding: 10px;
-    background: #f9f9f9;
-    scrollbar-width: thin;
-  }
-
-  aside nav a {
-    flex: 0 0 auto;
-    min-width: 90px;
-    padding: 8px 10px;
-    font-size: 0.9em;
-    border-radius: 8px;
-  }
-
-  /* Modo escuro */
-  body.dark-mode aside nav {
-    background: #121212;
-  }
-
-  aside nav::-webkit-scrollbar {
-    height: 6px;
-  }
-
-  aside nav::-webkit-scrollbar-thumb {
-    background: rgba(0,0,0,0.2);
-    border-radius: 3px;
-  }
-
-
-
-  
  /* ===== destacar o botão da página em que o usuário está ===== */
 aside nav a.active {
   background: #4CAF50;
   color: white;
   transform: scale(1.03);
 }
-
- 
  /* ===== Overlay com animação ===== */
 .overlay {
   display: none;
@@ -1004,6 +962,7 @@ modoBtn.addEventListener("click", () => {
 
 </body>
 </html>
+
 
 
 
