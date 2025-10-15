@@ -6,8 +6,31 @@
   <title>Славянский клуб - Exercícios</title>
   <link rel="stylesheet" href="style.css">
   <link rel="icon" type="image/png" href="images/dimitri-favicon.png">
-
   <style>
+/* ===== LAYOUT GERAL ===== */
+html, body {
+  height: 100%;
+  margin: 0;
+  padding-top: 70px; /* header fixo */
+  display: flex;
+  flex-direction: column;
+  font-family: Arial, sans-serif;
+}
+
+main {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.content {
+  max-width: 900px;
+  width: 100%;
+  text-align: center;
+}
+
 /* ===== HEADER FIXO ===== */
 header {
   position: fixed;
@@ -15,13 +38,13 @@ header {
   left: 0;
   right: 0;
   z-index: 1000;
-  background: var(--header-bg, #fff);
+  background: #fff;
   color: #000;
   padding: 15px 20px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.1);
   display: flex;
-  align-items: center;
   justify-content: space-between;
+  align-items: center;
 }
 
 header h1 {
@@ -37,14 +60,7 @@ header h1 {
   height: 32px;
 }
 
-/* Corrige o deslocamento do conteúdo */
-body {
-  margin: 0;
-  padding-top: 70px; /* altura do header */
-  font-family: Arial, sans-serif;
-}
-
-/* ===== MENU (ASIDE) ===== */
+/* ===== MENU ===== */
 aside {
   position: relative;
   width: 100%;
@@ -70,33 +86,26 @@ aside nav a {
   box-shadow: 0 3px 6px rgba(0,0,0,0.1);
   font-size: 1.1em;
   font-weight: 500;
-  transition: all 0.3s ease;
   text-align: center;
+  transition: all 0.3s ease;
 }
 
-aside nav a:hover {
+aside nav a:hover, aside nav a.active {
   background: #4CAF50;
-  color: white;
+  color: #fff;
   transform: scale(1.03);
 }
 
-aside nav a.active {
-  background: #4CAF50;
-  color: white;
-}
-
-/* ===== MENU HORIZONTAL NO CELULAR ===== */
+/* MENU HORIZONTAL NO CELULAR */
 @media (max-width: 768px) {
   aside {
     position: fixed;
-    top: 70px; /* logo abaixo do header fixo */
+    top: 70px;
     left: 0;
     right: 0;
     z-index: 999;
   }
-
   aside nav {
-    display: flex !important;
     flex-direction: row !important;
     overflow-x: auto;
     white-space: nowrap;
@@ -104,71 +113,77 @@ aside nav a.active {
     padding: 8px 10px;
     background: #f9f9f9;
     border-bottom: 1px solid #ddd;
-    scrollbar-width: thin;
   }
-
   aside nav a {
     flex: 0 0 auto;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
     min-width: 90px;
-    padding: 8px 10px;
     font-size: 0.9em;
+    padding: 8px 10px;
     border-radius: 8px;
-    background: #fff;
     box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-    color: #333;
   }
-
-  aside nav a:hover {
-    background: #4CAF50;
-    color: white;
-  }
-
-  aside nav a.active {
-    background: #4CAF50;
-    color: white;
-  }
-
-  main {
-    padding-top: 110px; /* header (70px) + menu (40px) */
-  }
-
-  .mascote {
-    display: none;
-  }
+  main { padding-top: 110px; } /* header + menu */
 }
 
-/* ===== DARK MODE ===== */
-body.dark-mode {
-  background-color: #121212;
-  color: #f5f5f5;
+/* ===== EXERCÍCIO ===== */
+#cruzadoContainer {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-top: 25px;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  padding: 30px;
 }
 
-body.dark-mode header {
-  background-color: #222;
-  color: #fff;
-}
-
-body.dark-mode aside nav a {
+body.dark-mode #cruzadoContainer {
   background: #1e1e1e;
-  color: #ddd;
-  box-shadow: 0 3px 6px rgba(255,255,255,0.1);
+  box-shadow: 0 4px 12px rgba(255,255,255,0.05);
 }
 
-body.dark-mode aside nav a:hover,
-body.dark-mode aside nav a.active {
+/* ===== BOTÕES ===== */
+.clickable, #startBtn, #backBtn, .retry-btn {
+  font-size: 1.1em;
+  min-width: 160px;
+  padding: 14px 22px;
+  border-radius: 12px;
+  background: #f0f0f0;
+  color: #000;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.12);
+  transition: all 0.25s ease;
+}
+
+.clickable:hover:not(.disabled),
+#startBtn:hover, #backBtn:hover, .retry-btn:hover {
+  background: #4CAF50;
+  color: white;
+  transform: scale(1.05);
+}
+
+body.dark-mode .clickable, body.dark-mode #startBtn, body.dark-mode #backBtn, body.dark-mode .retry-btn {
+  background: #2a2a2a;
+  color: #f0f0f0;
+  box-shadow: 0 2px 6px rgba(255,255,255,0.08);
+}
+
+body.dark-mode .clickable:hover:not(.disabled),
+body.dark-mode #startBtn:hover, body.dark-mode #backBtn:hover, body.dark-mode .retry-btn:hover {
   background: #4CAF50;
   color: white;
 }
 
-body.dark-mode footer {
-  background-color: #222;
-  color: #f5f5f5;
+/* ===== PROGRESSO ===== */
+#progressContainer {
+  margin: 0 auto 25px auto;
+  max-width: 600px;
+  text-align: center;
 }
 
-/* ===== BOTÕES DARK E IDIOMA ===== */
+/* ===== BOTÕES DARK/IDIOMA ===== */
 #darkModeToggle, #languageToggle {
   background-color: #4CAF50;
   color: white;
@@ -183,124 +198,43 @@ body.dark-mode footer {
   background-color: #45A049;
 }
 
-/* ===== RODAPÉ ===== */
+/* ===== FOOTER FIXO NO FINAL ===== */
 footer {
-  background: white;
+  background: #fff;
   color: #555;
   text-align: center;
   padding: 8px 0;
   font-size: 0.85em;
   box-shadow: 0 -2px 6px rgba(0,0,0,0.1);
+  flex-shrink: 0;
 }
 
-/* ===== CONTEÚDO PRINCIPAL ===== */
-main {
-  flex: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 60px 20px;
-}
-
-.content {
-  max-width: 900px;
-  width: 100%;
-  text-align: center;
-}
-
-/* ===== EXERCÍCIO CENTRALIZADO ===== */
-#cruzadoContainer {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 15px;
-  margin-top: 25px;
-  background: #ffffff;
-  border-radius: 16px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-  padding: 30px;
-}
-
-body.dark-mode #cruzadoContainer {
-  background: #1e1e1e;
-  box-shadow: 0 4px 12px rgba(255,255,255,0.05);
-}
-
-/* ===== BOTÕES (CLICKABLES) ===== */
-.clickable {
-  font-size: 1.1em;
-  min-width: 160px;
-  padding: 14px 18px;
-  border-radius: 12px;
-  background: #f0f0f0;
-  box-shadow: 0 3px 6px rgba(0,0,0,0.12);
-  cursor: pointer;
-  transition: all 0.25s ease;
-}
-
-.clickable:hover:not(.disabled) {
-  background: #4CAF50;
-  color: white;
-  transform: scale(1.05);
-}
-
-/* Dark Mode botões */
-body.dark-mode .clickable {
-  background: #2a2a2a;
-  color: #f0f0f0;
-  box-shadow: 0 2px 6px rgba(255,255,255,0.08);
-}
-
-body.dark-mode .clickable:hover:not(.disabled) {
-  background: #4CAF50;
-  color: white;
-}
-
-/* ===== BOTÕES DE CONTROLE ===== */
-#startBtn,
-#backBtn,
-.retry-btn {
-  display: inline-block;
-  padding: 14px 22px;
-  font-size: 1.1em;
-  background-color: #4CAF50;
-  color: white;
-  border: none;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: background-color 0.3s, transform 0.2s;
-  box-shadow: 0 3px 6px rgba(0,0,0,0.15);
-}
-
-#startBtn:hover,
-#backBtn:hover,
-.retry-btn:hover {
-  background-color: #45A049;
-  transform: scale(1.05);
-}
-
-/* ===== PROGRESSO ===== */
-#progressContainer {
-  margin: 0 auto 25px auto;
-  max-width: 600px;
-  text-align: center;
-}
-
-/* ===== BOTÕES NO TOPO ===== */
-#darkModeToggle {
-  margin-right: 10px;
+body.dark-mode footer {
+  background-color: #222;
+  color: #f5f5f5;
 }
   </style>
 </head>
 
 <body>
   <header>
-    <h1>Славянский клуб <img src="emoji_dimitry.png" alt="Dimitry" class="emoji-head"></h1>	 
+    <h1>Славянский клуб <img src="emoji_dimitry.png" alt="Dimitry" class="emoji-head"></h1>
     <div>
       <button id="darkModeToggle">🌙</button>
       <button id="languageToggle">PT</button>
     </div>
   </header>
+
+  <aside>
+    <nav>
+      <a href="#">📈 Selecionar</a>
+      <a href="#" class="active">📝 Exercícios</a>
+      <a href="#">🎮 Jogos</a>
+      <a href="#">🧩 Complete a Frase</a>
+      <a href="#">💬 Chat</a>
+    </nav>
+  </aside>
+
   <main>
     <div class="content">
       <h2>📝 Exercício Interativo</h2>
@@ -327,59 +261,58 @@ body.dark-mode .clickable:hover:not(.disabled) {
   <script src="exercicio.js"></script>
 
   <script>
-    const darkModeToggle = document.getElementById('darkModeToggle');
-    const languageToggle = document.getElementById('languageToggle');
+const darkModeToggle = document.getElementById('darkModeToggle');
+const languageToggle = document.getElementById('languageToggle');
 
-    // Tema salvo
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme === 'dark') {
-      document.body.classList.add('dark-mode');
-      darkModeToggle.textContent = '☀️';
-    }
+// Tema salvo
+const savedTheme = localStorage.getItem('theme');
+if (savedTheme === 'dark') {
+  document.body.classList.add('dark-mode');
+  darkModeToggle.textContent = '☀️';
+}
 
-    darkModeToggle.addEventListener('click', () => {
-      document.body.classList.toggle('dark-mode');
-      const isDark = document.body.classList.contains('dark-mode');
-      darkModeToggle.textContent = isDark ? '☀️' : '🌙';
-      localStorage.setItem('theme', isDark ? 'dark' : 'light');
-    });
+darkModeToggle.addEventListener('click', () => {
+  document.body.classList.toggle('dark-mode');
+  const isDark = document.body.classList.contains('dark-mode');
+  darkModeToggle.textContent = isDark ? '☀️' : '🌙';
+  localStorage.setItem('theme', isDark ? 'dark' : 'light');
+});
 
-    // Sistema de idiomas
-    const texts = {
-      pt: {
-        title: "📝 Exercício Interativo",
-        footer: "© 2025 Славянский клуб — Aprenda Russo e Português com diversão!",
-        backBtn: "🔙 Voltar",
-        nav: ["📈 Selecionar", "📝 Exercícios", "🎮 Jogos", "🧩 Complete a Frase", "💬 Chat"]
-      },
-      ru: {
-        title: "📝 Интерактивное упражнение",
-        footer: "© 2025 Славянский клуб — Учите русский и португальский с удовольствием!",
-        backBtn: "🔙 Назад",
-        nav: ["📈 Выбор", "📝 Упражнения", "🎮 Игры", "🧩 Закончить фразу", "💬 Чат"]
-      }
-    };
+// Sistema de idiomas
+const texts = {
+  pt: {
+    title: "📝 Exercício Interativo",
+    footer: "© 2025 Славянский клуб — Aprenda Russo e Português com diversão!",
+    backBtn: "🔙 Voltar",
+    nav: ["📈 Selecionar", "📝 Exercícios", "🎮 Jogos", "🧩 Complete a Frase", "💬 Chat"]
+  },
+  ru: {
+    title: "📝 Интерактивное упражнение",
+    footer: "© 2025 Славянский клуб — Учите русский и португальский с удовольствием!",
+    backBtn: "🔙 Назад",
+    nav: ["📈 Выбор", "📝 Упражнения", "🎮 Игры", "🧩 Закончить фразу", "💬 Чат"]
+  }
+};
 
-    let currentLang = localStorage.getItem('lang') || 'pt';
-    applyLanguage(currentLang);
+let currentLang = localStorage.getItem('lang') || 'pt';
+applyLanguage(currentLang);
 
-    languageToggle.addEventListener('click', () => {
-      currentLang = currentLang === 'pt' ? 'ru' : 'pt';
-      localStorage.setItem('lang', currentLang);
-      applyLanguage(currentLang);
-    });
+languageToggle.addEventListener('click', () => {
+  currentLang = currentLang === 'pt' ? 'ru' : 'pt';
+  localStorage.setItem('lang', currentLang);
+  applyLanguage(currentLang);
+});
 
-    function applyLanguage(lang) {
-      const t = texts[lang];
-      document.querySelector("main h2").textContent = t.title;
-      document.querySelector("footer").textContent = t.footer;
-      document.getElementById("backBtn").textContent = t.backBtn;
-      languageToggle.textContent = lang === 'pt' ? 'РУ' : 'PT';
+function applyLanguage(lang) {
+  const t = texts[lang];
+  document.querySelector("main h2").textContent = t.title;
+  document.querySelector("footer").textContent = t.footer;
+  document.getElementById("backBtn").textContent = t.backBtn;
+  languageToggle.textContent = lang === 'pt' ? 'РУ' : 'PT';
 
-      const navLinks = document.querySelectorAll("aside nav a");
-      navLinks.forEach((link, i) => { link.textContent = t.nav[i]; });
-    }
+  const navLinks = document.querySelectorAll("aside nav a");
+  navLinks.forEach((link, i) => { link.textContent = t.nav[i]; });
+}
   </script>
 </body>
 </html>
-
