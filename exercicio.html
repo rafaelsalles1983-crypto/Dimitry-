@@ -8,6 +8,55 @@
   <link rel="icon" type="image/png" href="images/dimitri-favicon.png">
 
   <style>
+
+/* ===== BOTÕES LATERAIS ===== */
+
+aside nav {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 15px;
+}
+
+aside nav a {
+  display: block;
+  background: #f0f0f0;
+  color: #333;
+  text-decoration: none;
+  padding: 12px 15px;
+  border-radius: 10px;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+  font-size: 1.1em;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+aside nav a:hover {
+  background: #4CAF50;
+  color: white;
+  transform: scale(1.03);
+}
+
+/* ===== Dark Mode para botões laterais ===== */
+body.dark-mode aside nav a {
+  background: #1e1e1e;
+  color: #ddd;
+  box-shadow: 0 3px 6px rgba(255,255,255,0.1);
+}
+
+body.dark-mode aside nav a:hover {
+  background: #45a049;
+  color: white;
+}
+
+
+ /* ===== destacar o botão da página em que o usuário está ===== */
+aside nav a.active {
+  background: #4CAF50;
+  color: white;
+  transform: scale(1.03);
+}
+
     /* ======== MODO ESCURO ======== */
     body.dark-mode {
       background-color: #121212;
@@ -262,7 +311,7 @@
   <aside>
     <nav>
       <a href="index.html">📈 Selecionar</a>
-      <a href="exercicio.html">📝 Exercícios</a>
+      <a href="exercicio.html" class="active">📝 Exercícios</a>
       <a href="jogo.html">🎮 Jogos</a>
       <a href="complete-a-frase.html">🧩 Complete a Frase</a>
       <a href="chat.html">💬 Chat</a>
@@ -382,6 +431,7 @@
   </script>
 </body>
 </html>
+
 
 
 
