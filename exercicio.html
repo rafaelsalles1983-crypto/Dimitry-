@@ -296,6 +296,111 @@ aside nav a.active {
       color: #fff !important; 
       border-color: rgba(0,0,0,0.05) !important; 
     }
+/* ===== HEADER FIXO ===== */
+header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: var(--header-bg, #fff);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+/* Corrige o deslocamento do conteúdo para não ficar escondido atrás do header */
+body {
+  margin: 0;
+  padding-top: 70px; /* altura do header */
+}
+
+/* ===== MENU (ASIDE) ===== */
+aside {
+  position: relative;
+  top: 0;
+  width: 100%;
+  background: transparent;
+  box-shadow: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* ===== MENU HORIZONTAL NO CELULAR ===== */
+@media (max-width: 768px) {
+  aside {
+    position: fixed;
+    top: 70px; /* logo abaixo do header fixo */
+    left: 0;
+    right: 0;
+    z-index: 999;
+  }
+
+  aside nav {
+    display: flex !important;
+    flex-direction: row !important;
+    overflow-x: auto;
+    white-space: nowrap;
+    gap: 8px;
+    padding: 8px 10px;
+    background: #f9f9f9;
+    scrollbar-width: thin;
+    border-bottom: 1px solid #ddd;
+  }
+
+  aside nav a {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 90px;
+    padding: 8px 10px;
+    font-size: 0.9em;
+    border-radius: 8px;
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    color: #333;
+  }
+
+  aside nav a:hover {
+    background: #4CAF50;
+    color: white;
+  }
+
+  aside nav a.active {
+    background: #4CAF50;
+    color: white;
+  }
+
+  /* Ajusta o conteúdo para não ficar escondido atrás do menu fixo */
+  main {
+    padding-top: 110px; /* header (70px) + menu (40px) */
+  }
+
+  /* Esconde o mascote no celular */
+  .mascote {
+    display: none;
+  }
+
+  /* Dark mode */
+  body.dark-mode aside nav {
+    background: #121212;
+    border-bottom: 1px solid #333;
+  }
+
+  body.dark-mode aside nav a {
+    background: #1e1e1e;
+    color: #ddd;
+    box-shadow: 0 1px 3px rgba(255,255,255,0.05);
+  }
+
+  body.dark-mode aside nav a:hover,
+  body.dark-mode aside nav a.active {
+    background: #4CAF50;
+    color: white;
+  }
+}
+
+
+    
   </style>
 </head>
 
@@ -431,6 +536,7 @@ aside nav a.active {
   </script>
 </body>
 </html>
+
 
 
 
