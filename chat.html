@@ -16,7 +16,6 @@
   --color-primary: #4CAF50;
   --color-primary-hover: #45a049;
 }
-
 /* RESET */
 * { box-sizing: border-box; margin:0; padding:0; }
 html, body { height:100%; font-family:Arial,sans-serif; background: var(--color-bg-light); }
@@ -92,6 +91,7 @@ footer { background:white; color:#555; text-align:center; padding:6px; font-size
   <button id="backBtn" onclick="window.location.href='index.html'">⬅ Voltar</button>
   <button id="loginBtn">Login com Google</button>
   <button id="logoutBtn" style="display:none;">Logout</button>
+  <button id="generalBtn" style="display:none;">💬 Bate-papo Geral</button>
   <span id="alertaLogin">⚠️ Faça login para enviar mensagens.</span>
   <span id="onlineCount">👥 Usuários online: 0</span>
 </div>
@@ -132,6 +132,7 @@ firebase.initializeApp(firebaseConfig);
 
 const auth = firebase.auth();
 const db = firebase.database();
+
 const loginBtn = document.getElementById("loginBtn");
 const logoutBtn = document.getElementById("logoutBtn");
 const msgInput = document.getElementById("msgInput");
@@ -144,10 +145,12 @@ const mobileUserLine = document.getElementById("mobileUserLine");
 const msgSound = document.getElementById("msgSound");
 const clearBtn = document.getElementById("clearBtn");
 const blockBtn = document.getElementById("blockBtn");
+const generalBtn = document.getElementById("generalBtn");
 
 let blocked = false;
-let knownUsers = {};
 let currentUser = null;
+let currentChat = "global";
+let knownUsers = {};
 
 // LOGIN/LOGOUT
 loginBtn.onclick = () => auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
@@ -162,18 +165,20 @@ auth.onAuthStateChanged(user=>{
     alertaLogin.style.display = "none";
     msgInput.disabled = false;
     sendBtn.disabled = false;
+    generalBtn.style.display = "inline-block";
 
     db.ref("online/"+user.uid).set({name:user.displayName, photo:user.photoURL});
     db.ref("online/"+user.uid).onDisconnect().remove();
 
     renderUserList();
-    loadMessages();
+    openGlobalChat();
   } else {
     loginBtn.style.display = "inline-block";
     logoutBtn.style.display = "none";
     alertaLogin.style.display = "inline-block";
     msgInput.disabled = true;
     sendBtn.disabled = true;
+    generalBtn.style.display = "none";
     chatWindow.innerHTML = "";
     renderUserList();
   }
@@ -186,7 +191,6 @@ function renderUserList(){
     onlineCount.textContent=`👥 ${Object.keys(onlineUsers).length} usuários online`;
 
     const allUsers = {...knownUsers, ...onlineUsers};
-
     userList.innerHTML = "";
     mobileUserLine.innerHTML = "";
 
@@ -194,11 +198,13 @@ function renderUserList(){
       const div = document.createElement("div");
       div.className="userItem";
       div.innerHTML=`<img src="${u.photo||'https://cdn-icons-png.flaticon.com/512/847/847969.png'}"><span>${u.name}</span>`;
+      div.onclick=()=>alert("Em breve mensagens privadas!");
       userList.appendChild(div);
 
       const mob = document.createElement("div");
       mob.className="userItemMobile";
       mob.innerHTML=`<img src="${u.photo||'https://cdn-icons-png.flaticon.com/512/847/847969.png'}" title="${u.name}">`;
+      mob.onclick=()=>alert("Em breve mensagens privadas!");
       mobileUserLine.appendChild(mob);
     }
   });
@@ -209,16 +215,19 @@ sendBtn.onclick = sendMessage;
 msgInput.addEventListener("keypress", e=>{ if(e.key==="Enter") sendMessage(); });
 
 function sendMessage(){
-  if(blocked) return;
+  if(blocked || !currentUser) return;
   const text = msgInput.value.trim();
-  if(!text || !currentUser) return;
-  const msgData = {user:currentUser.displayName, photo:currentUser.photoURL, text, timestamp:Date.now()};
-  db.ref("chatGlobal").push(msgData);
+  if(!text) return;
+  const path = currentChat==="global" ? "chatGlobal" : "private/"+currentChat;
+  db.ref(path).push({user:currentUser.displayName, photo:currentUser.photoURL, text, timestamp:Date.now()});
   msgInput.value="";
 }
 
-// CARREGAR MENSAGENS
-function loadMessages(){
+// ABRIR CHAT GERAL
+generalBtn.onclick = openGlobalChat;
+function openGlobalChat(){
+  currentChat="global";
+  chatWindow.innerHTML="";
   db.ref("chatGlobal").off();
   db.ref("chatGlobal").on("child_added", snap=>{
     const msg = snap.val();
@@ -234,7 +243,7 @@ function loadMessages(){
 // APAGAR CHAT
 clearBtn.onclick = ()=>{
   if(!confirm("Tem certeza que deseja apagar todas as mensagens?")) return;
-  db.ref("chatGlobal").remove();
+  if(currentChat==="global") db.ref("chatGlobal").remove();
   chatWindow.innerHTML="";
 };
 
@@ -244,10 +253,12 @@ blockBtn.onclick = ()=>{
   blockBtn.textContent = blocked ? "Desbloquear" : "Bloquear";
 };
 
-// CENTRALIZAR NO DESKTOP
-window.addEventListener("resize", ()=>{
-  document.getElementById("mainContent").style.justifyContent = window.innerWidth>768?"center":"flex-start";
-});
+// SCROLL MOBILE
+setInterval(()=>{
+  const container=mobileUserLine;
+  if(container) { container.scrollLeft +=1; if(container.scrollLeft>=container.scrollWidth-container.clientWidth) container.scrollLeft=0;}
+},20);
+
 </script>
 
 </body>
