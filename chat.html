@@ -130,50 +130,124 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 
-const auth=firebase.auth();
-const db=firebase.database();
-const loginBtn=document.getElementById("loginBtn");
-const logoutBtn=document.getElementById("logoutBtn");
-const msgInput=document.getElementById("msgInput");
-const sendBtn=document.getElementById("sendBtn");
-const chatWindow=document.getElementById("chatWindow");
-const clearBtn=document.getElementById("clearBtn");
-const blockBtn=document.getElementById("blockBtn");
-const onlineCount=document.getElementById("onlineCount");
-const msgSound=document.getElementById("msgSound");
+const auth = firebase.auth();
+const db = firebase.database();
+const loginBtn = document.getElementById("loginBtn");
+const logoutBtn = document.getElementById("logoutBtn");
+const msgInput = document.getElementById("msgInput");
+const sendBtn = document.getElementById("sendBtn");
+const chatWindow = document.getElementById("chatWindow");
+const userList = document.getElementById("userList");
+const alertaLogin = document.getElementById("alertaLogin");
+const onlineCount = document.getElementById("onlineCount");
+const mobileUserLine = document.getElementById("mobileUserLine");
+const msgSound = document.getElementById("msgSound");
+const clearBtn = document.getElementById("clearBtn");
+const blockBtn = document.getElementById("blockBtn");
 
-let blocked=false;
+let blocked = false;
+let knownUsers = {};
+let currentUser = null;
 
-// Limpar mensagens
-clearBtn.onclick=()=>{ chatWindow.innerHTML=""; alert("Mensagens apagadas"); };
+// LOGIN/LOGOUT
+loginBtn.onclick = () => auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
+logoutBtn.onclick = () => auth.signOut();
 
-// Bloquear chat
-blockBtn.onclick=()=>{
-  blocked=!blocked;
-  msgInput.disabled=blocked;
-  sendBtn.disabled=blocked;
-  blockBtn.textContent=blocked?"Desbloquear":"Bloquear";
-};
+auth.onAuthStateChanged(user=>{
+  currentUser = user;
+  if(user){
+    knownUsers[user.uid] = {name:user.displayName, photo:user.photoURL};
+    loginBtn.style.display = "none";
+    logoutBtn.style.display = "inline-block";
+    alertaLogin.style.display = "none";
+    msgInput.disabled = false;
+    sendBtn.disabled = false;
 
-// Enviar mensagem
-sendBtn.onclick=sendMessage;
-msgInput.addEventListener("keypress",e=>{if(e.key==="Enter") sendMessage();});
-function sendMessage(){
-  if(blocked) return;
-  const text=msgInput.value.trim();
-  if(!text) return;
-  const user=auth.currentUser || {displayName:"Visitante"};
-  const div=document.createElement("div");
-  div.className="msg "+(user.displayName==="Visitante"?"otherMsg":"userMsg");
-  div.textContent=`${user.displayName}: ${text}`;
-  chatWindow.appendChild(div);
-  chatWindow.scrollTop=chatWindow.scrollHeight;
-  msgInput.value="";
-  msgSound.currentTime=0; msgSound.play();
+    db.ref("online/"+user.uid).set({name:user.displayName, photo:user.photoURL});
+    db.ref("online/"+user.uid).onDisconnect().remove();
+
+    renderUserList();
+    loadMessages();
+  } else {
+    loginBtn.style.display = "inline-block";
+    logoutBtn.style.display = "none";
+    alertaLogin.style.display = "inline-block";
+    msgInput.disabled = true;
+    sendBtn.disabled = true;
+    chatWindow.innerHTML = "";
+    renderUserList();
+  }
+});
+
+// RENDER USUÁRIOS ONLINE
+function renderUserList(){
+  db.ref("online").once("value").then(snap=>{
+    const onlineUsers = snap.val()||{};
+    onlineCount.textContent=`👥 ${Object.keys(onlineUsers).length} usuários online`;
+
+    const allUsers = {...knownUsers, ...onlineUsers};
+
+    userList.innerHTML = "";
+    mobileUserLine.innerHTML = "";
+
+    for(const [uid,u] of Object.entries(allUsers)){
+      const div = document.createElement("div");
+      div.className="userItem";
+      div.innerHTML=`<img src="${u.photo||'https://cdn-icons-png.flaticon.com/512/847/847969.png'}"><span>${u.name}</span>`;
+      userList.appendChild(div);
+
+      const mob = document.createElement("div");
+      mob.className="userItemMobile";
+      mob.innerHTML=`<img src="${u.photo||'https://cdn-icons-png.flaticon.com/512/847/847969.png'}" title="${u.name}">`;
+      mobileUserLine.appendChild(mob);
+    }
+  });
 }
 
-// Centralizar o chat no desktop
-window.addEventListener("resize",()=>{ document.getElementById("mainContent").style.justifyContent=window.innerWidth>768?"center":"flex-start"; });
+// ENVIAR MENSAGEM
+sendBtn.onclick = sendMessage;
+msgInput.addEventListener("keypress", e=>{ if(e.key==="Enter") sendMessage(); });
+
+function sendMessage(){
+  if(blocked) return;
+  const text = msgInput.value.trim();
+  if(!text || !currentUser) return;
+  const msgData = {user:currentUser.displayName, photo:currentUser.photoURL, text, timestamp:Date.now()};
+  db.ref("chatGlobal").push(msgData);
+  msgInput.value="";
+}
+
+// CARREGAR MENSAGENS
+function loadMessages(){
+  db.ref("chatGlobal").off();
+  db.ref("chatGlobal").on("child_added", snap=>{
+    const msg = snap.val();
+    const div = document.createElement("div");
+    div.className = msg.user===currentUser?.displayName?"msg userMsg":"msg otherMsg";
+    div.textContent = `${msg.user}: ${msg.text}`;
+    chatWindow.appendChild(div);
+    chatWindow.scrollTop = chatWindow.scrollHeight;
+    msgSound.currentTime=0; msgSound.play();
+  });
+}
+
+// APAGAR CHAT
+clearBtn.onclick = ()=>{
+  if(!confirm("Tem certeza que deseja apagar todas as mensagens?")) return;
+  db.ref("chatGlobal").remove();
+  chatWindow.innerHTML="";
+};
+
+// BLOQUEAR/DESBLOQUEAR
+blockBtn.onclick = ()=>{
+  blocked = !blocked;
+  blockBtn.textContent = blocked ? "Desbloquear" : "Bloquear";
+};
+
+// CENTRALIZAR NO DESKTOP
+window.addEventListener("resize", ()=>{
+  document.getElementById("mainContent").style.justifyContent = window.innerWidth>768?"center":"flex-start";
+});
 </script>
 
 </body>
