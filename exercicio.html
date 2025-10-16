@@ -12,23 +12,33 @@ html, body {
   height: 100%;
   margin: 0;
   padding-top: 70px; /* header fixo */
-  display: flex;
-  flex-direction: column;
   font-family: Arial, sans-serif;
+  overflow-x: hidden;
+  background: #fff;
+}
+
+body.dark-mode {
+  background: #121212;
+  color: #f0f0f0;
 }
 
 main {
-  flex: 1;
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: stretch;
   padding: 20px;
+  gap: 20px;
+  box-sizing: border-box;
+  min-height: calc(100vh - 70px);
 }
 
+/* ===== CONTENT ===== */
 .content {
   max-width: 900px;
   width: 100%;
   text-align: center;
+  overflow-y: auto;
+  background: transparent;
 }
 
 /* ===== HEADER FIXO ===== */
@@ -60,69 +70,38 @@ header h1 {
   height: 32px;
 }
 
-/* ===== MENU ===== */
-aside {
-  position: relative;
-  width: 100%;
-  background: transparent;
-  margin: 0;
-  padding: 0;
-}
-
-aside nav {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding: 15px;
-}
-
-aside nav a {
-  display: block;
-  background: #f0f0f0;
-  color: #333;
-  text-decoration: none;
-  padding: 12px 15px;
+/* ===== PUBLICIDADE FIXA LATERAL ===== */
+.ads-sidebar {
+  width: 280px;
+  position: fixed;
+  top: 100px; /* abaixo do header */
+  left: 10px;
+  background: #fafafa;
   border-radius: 10px;
-  box-shadow: 0 3px 6px rgba(0,0,0,0.1);
-  font-size: 1.1em;
-  font-weight: 500;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+  padding: 10px;
   text-align: center;
-  transition: all 0.3s ease;
+  box-sizing: border-box;
+  z-index: 900;
 }
 
-aside nav a:hover, aside nav a.active {
-  background: #4CAF50;
-  color: #fff;
-  transform: scale(1.03);
+.ads-sidebar h3 {
+  font-size: 1em;
+  color: #555;
+  margin-bottom: 8px;
 }
 
-/* MENU HORIZONTAL NO CELULAR */
-@media (max-width: 768px) {
-  aside {
-    position: fixed;
-    top: 70px;
-    left: 0;
-    right: 0;
-    z-index: 999;
-  }
-  aside nav {
-    flex-direction: row !important;
-    overflow-x: auto;
-    white-space: nowrap;
-    gap: 8px;
-    padding: 8px 10px;
-    background: #f9f9f9;
-    border-bottom: 1px solid #ddd;
-  }
-  aside nav a {
-    flex: 0 0 auto;
-    min-width: 90px;
-    font-size: 0.9em;
-    padding: 8px 10px;
-    border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-  }
-  main { padding-top: 110px; } /* header + menu */
+.ads-container {
+  width: 100%;
+  min-height: 250px;
+  background: #f5f5f5;
+  border: 1px dashed #ccc;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #666;
+  font-size: 0.9em;
 }
 
 /* ===== EXERCÍCIO ===== */
@@ -164,23 +143,19 @@ body.dark-mode #cruzadoContainer {
   transform: scale(1.05);
 }
 
-body.dark-mode .clickable, body.dark-mode #startBtn, body.dark-mode #backBtn, body.dark-mode .retry-btn {
-  background: #2a2a2a;
-  color: #f0f0f0;
-  box-shadow: 0 2px 6px rgba(255,255,255,0.08);
+#backBtn {
+  margin-top: 20px;
 }
 
-body.dark-mode .clickable:hover:not(.disabled),
-body.dark-mode #startBtn:hover, body.dark-mode #backBtn:hover, body.dark-mode .retry-btn:hover {
-  background: #4CAF50;
-  color: white;
-}
-
-/* ===== PROGRESSO ===== */
-#progressContainer {
-  margin: 0 auto 25px auto;
-  max-width: 600px;
+/* ===== FOOTER ===== */
+footer {
+  background: #fff;
+  color: #555;
   text-align: center;
+  padding: 8px 0;
+  font-size: 0.85em;
+  box-shadow: 0 -2px 6px rgba(0,0,0,0.1);
+  flex-shrink: 0;
 }
 
 /* ===== BOTÕES DARK/IDIOMA ===== */
@@ -198,86 +173,36 @@ body.dark-mode #startBtn:hover, body.dark-mode #backBtn:hover, body.dark-mode .r
   background-color: #45A049;
 }
 
-/* ===== FOOTER FIXO NO FINAL ===== */
-footer {
-  background: #fff;
-  color: #555;
-  text-align: center;
-  padding: 8px 0;
-  font-size: 0.85em;
-  box-shadow: 0 -2px 6px rgba(0,0,0,0.1);
-  flex-shrink: 0;
-}
-
-body.dark-mode footer {
-  background-color: #222;
-  color: #f5f5f5;
-}
-
-    /* ===== MODO ESCURO GLOBAL ===== */
-body.dark-mode {
-  background: #121212;
-  color: #f0f0f0;
-}
-
-/* Header e Footer já existentes */
+/* ===== DARK MODE ===== */
 body.dark-mode header,
-body.dark-mode footer {
+body.dark-mode footer,
+body.dark-mode .ads-sidebar {
   background: #1e1e1e;
+  color: #ccc;
 }
 
-/* Main e cards */
-body.dark-mode main {
-  background: #121212;
+body.dark-mode .ads-container {
+  background: #2a2a2a;
+  border-color: #444;
+  color: #aaa;
 }
 
-body.dark-mode .cards {
-  background: transparent; /* mantem transparência se houver */
-}
+/* ===== RESPONSIVO ===== */
+@media (max-width: 1024px) {
+  main {
+    flex-direction: column;
+    align-items: center;
+  }
 
-body.dark-mode .card {
-  background: #1e1e1e;
-  color: #ddd;
-  border: 1px solid #333;
-  box-shadow: 0 3px 6px rgba(255,255,255,0.05);
-}
+  .ads-sidebar {
+    display: none;
+  }
 
-/* Overlay */
-body.dark-mode .overlay-content {
-  background: #1e1e1e;
-  color: #ddd;
+  .content {
+    width: 100%;
+    padding: 10px;
+  }
 }
-
-/* Palavras clicáveis no overlay */
-body.dark-mode .overlay-content .word {
-  background: #2c2c2c;
-  color: #ddd;
-}
-
-body.dark-mode .overlay-content .word.selected {
-  background: #4CAF50;
-  color: white;
-}
-
-/* Barra de progresso */
-body.dark-mode .overlay-content .progress-container {
-  background: #2c2c2c;
-}
-
-body.dark-mode .overlay-content .progress-bar {
-  background: #4CAF50;
-}
-
-/* Botões dentro do overlay */
-body.dark-mode .overlay-content button {
-  background: #4CAF50;
-  color: white;
-}
-
-body.dark-mode .overlay-content button:hover {
-  background: #45a049;
-}
-
   </style>
 </head>
 
@@ -290,10 +215,16 @@ body.dark-mode .overlay-content button:hover {
     </div>
   </header>
 
+  <aside class="ads-sidebar">
+    <h3>Publicidade</h3>
+    <div class="ads-container">
+      Área de anúncio lateral (300x600)
+    </div>
+  </aside>
+
   <main>
     <div class="content">
       <h2>📝 Exercício Interativo</h2>
-
       <div id="progressContainer">
         <div id="progressText"></div>
         <div id="progressBarContainer">
@@ -314,12 +245,10 @@ body.dark-mode .overlay-content button:hover {
   </footer>
 
   <script src="exercicio.js"></script>
-
   <script>
 const darkModeToggle = document.getElementById('darkModeToggle');
 const languageToggle = document.getElementById('languageToggle');
 
-// Tema salvo
 const savedTheme = localStorage.getItem('theme');
 if (savedTheme === 'dark') {
   document.body.classList.add('dark-mode');
@@ -333,19 +262,16 @@ darkModeToggle.addEventListener('click', () => {
   localStorage.setItem('theme', isDark ? 'dark' : 'light');
 });
 
-// Sistema de idiomas
 const texts = {
   pt: {
     title: "📝 Exercício Interativo",
     footer: "© 2025 Славянский клуб — Aprenda Russo e Português com diversão!",
-    backBtn: "🔙 Voltar",
-    nav: ["📈 Selecionar", "📝 Exercícios", "🎮 Jogos", "🧩 Complete a Frase", "💬 Chat"]
+    backBtn: "🔙 Voltar"
   },
   ru: {
     title: "📝 Интерактивное упражнение",
     footer: "© 2025 Славянский клуб — Учите русский и португальский с удовольствием!",
-    backBtn: "🔙 Назад",
-    nav: ["📈 Выбор", "📝 Упражнения", "🎮 Игры", "🧩 Закончить фразу", "💬 Чат"]
+    backBtn: "🔙 Назад"
   }
 };
 
@@ -364,12 +290,7 @@ function applyLanguage(lang) {
   document.querySelector("footer").textContent = t.footer;
   document.getElementById("backBtn").textContent = t.backBtn;
   languageToggle.textContent = lang === 'pt' ? 'РУ' : 'PT';
-
-  const navLinks = document.querySelectorAll("aside nav a");
-  navLinks.forEach((link, i) => { link.textContent = t.nav[i]; });
 }
   </script>
 </body>
 </html>
-
-
