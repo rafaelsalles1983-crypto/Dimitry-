@@ -3,129 +3,62 @@ const exercisesData = {
   pt: [
     {sentence: "Eu ___ ao mercado todos os dias.", options: ["vou", "ir", "foi", "vão"], answer: "vou", translate: "Я хожу в магазин каждый день."},
     {sentence: "Ele ___ feliz hoje.", options: ["está", "são", "sou", "era"], answer: "está", translate: "Он счастлив сегодня."},
-    {sentence: "Nós ___ felizes com a notícia.", options: ["estamos", "são", "eram", "é"], answer: "estamos", translate: "Мы счастливы с новостью."},
+    {sentence: "Nós ___ felizes com a notícia.", options: ["estamos", "são", "eram", "é"], answer: "estamos", translate: "Мы счастливы с этой новостью."},
     {sentence: "Você ___ pronto para a prova?", options: ["está", "são", "é", "estávamos"], answer: "está", translate: "Ты готов к экзамену?"},
     {sentence: "Eles ___ na Rússia agora.", options: ["estão", "são", "é", "estamos"], answer: "estão", translate: "Они сейчас в России."},
-    {sentence: "Eu ___ com fome.", options: ["estou", "sou", "são", "é"], answer: "estou", translate: "Я голоден."},
-    {sentence: "Ela ___ professora de russo.", options: ["é", "está", "são", "estamos"], answer: "é", translate: "Она учитель русского языка."},
-    {sentence: "Nós ___ estudando russo agora.", options: ["estamos", "é", "são", "estávamos"], answer: "estamos", translate: "Мы изучаем русский сейчас."},
-    {sentence: "Ele ___ médico de profissão.", options: ["é", "está", "são", "estamos"], answer: "é", translate: "Он врач по профессии."},
-    {sentence: "Você ___ satisfeito com a resposta?", options: ["está", "é", "são", "estamos"], answer: "está", translate: "Ты доволен ответом?"},
-    {sentence: "Eu ___ estudante de russo.", options: ["sou", "estou", "são", "é"], answer: "sou", translate: "Я студент русского языка."},
-    {sentence: "Nós ___ na escola ontem.", options: ["estávamos", "são", "é", "estamos"], answer: "estávamos", translate: "Мы были в школе вчера."},
-    {sentence: "Ele ___ com fome agora.", options: ["está", "é", "são", "estamos"], answer: "está", translate: "Он сейчас голоден."},
-    {sentence: "Eu ___ português fluentemente.", options: ["falo", "fala", "falamos", "falam"], answer: "falo", translate: "Я говорю по-португальски свободно."},
-    {sentence: "Nós ___ cansados depois da viagem.", options: ["estamos", "é", "são", "estávamos"], answer: "estamos", translate: "Мы устали после поездки."},
-    {sentence: "Você ___ com frio?", options: ["está", "é", "são", "estamos"], answer: "está", translate: "Тебе холодно?"},
-    {sentence: "Eles ___ amigos desde a infância.", options: ["são", "estão", "é", "estávamos"], answer: "são", translate: "Они друзья с детства."},
-    {sentence: "Ele ___ comprar pão amanhã.", options: ["vai", "vou", "vamos", "vão"], answer: "vai", translate: "Он купит хлеб завтра."},
-    {sentence: "Eu ___ no parque ontem.", options: ["estava", "sou", "são", "é"], answer: "estava", translate: "Я был в парке вчера."},
-    {sentence: "Você ___ português muito bem.", options: ["fala", "falamos", "falam", "falo"], answer: "fala", translate: "Ты говоришь по-португальски очень хорошо."},
-    {sentence: "Nós ___ amigos desde crianças.", options: ["somos", "estamos", "são", "é"], answer: "somos", translate: "Мы друзья с детства."},
-    {sentence: "Ela ___ professora de russo.", options: ["é", "está", "são", "estamos"], answer: "é", translate: "Она учитель русского."},
-    {sentence: "Eu ___ feliz por estar aqui.", options: ["estou", "sou", "são", "é"], answer: "estou", translate: "Я рад быть здесь."},
-    {sentence: "Ele ___ muito inteligente.", options: ["é", "está", "são", "estamos"], answer: "é", translate: "Он очень умный."},
-    {sentence: "Nós ___ no Brasil agora.", options: ["estamos", "são", "é", "estávamos"], answer: "estamos", translate: "Мы сейчас в Бразилии."},
-    {sentence: "Você ___ cansado?", options: ["está", "é", "são", "estamos"], answer: "está", translate: "Ты устал?"},
-    {sentence: "Ela ___ na biblioteca.", options: ["está", "é", "são", "estamos"], answer: "está", translate: "Она в библиотеке."},
-    {sentence: "Eu ___ lendo um livro.", options: ["estou", "sou", "são", "é"], answer: "estou", translate: "Я читаю книгу."},
-    {sentence: "Nós ___ aprendendo russo juntos.", options: ["estamos", "é", "são", "estávamos"], answer: "estamos", translate: "Мы учим русский вместе."},
-    {sentence: "Ele ___ no trabalho agora.", options: ["está", "é", "são", "estamos"], answer: "está", translate: "Он сейчас на работе."},
-    {sentence: "Você ___ pronto para sair?", options: ["está", "é", "são", "estamos"], answer: "está", translate: "Ты готов выйти?"},
-    {sentence: "Eu ___ estudando para a prova.", options: ["estou", "sou", "são", "é"], answer: "estou", translate: "Я учусь к экзамену."},
-    {sentence: "Eles ___ viajando para Portugal.", options: ["estão", "são", "é", "estamos"], answer: "estão", translate: "Они путешествуют в Португалию."},
-    {sentence: "Nós ___ no cinema ontem.", options: ["estávamos", "são", "é", "estamos"], answer: "estávamos", translate: "Мы были в кино вчера."},
-    {sentence: "Ela ___ cansada depois do treino.", options: ["está", "é", "são", "estamos"], answer: "está", translate: "Она устала после тренировки."},
-    {sentence: "Eu ___ feliz com o resultado.", options: ["estou", "sou", "são", "é"], answer: "estou", translate: "Я доволен результатом."},
-    {sentence: "Ele ___ no parque todos os dias.", options: ["está", "é", "são", "estamos"], answer: "está", translate: "Он каждый день в парке."},
-    {sentence: "Nós ___ felizes com a decisão.", options: ["estamos", "é", "são", "estávamos"], answer: "estamos", translate: "Мы довольны решением."},
-    {sentence: "Você ___ pronto para viajar?", options: ["está", "é", "são", "estamos"], answer: "está", translate: "Ты готов ехать в путешествие?"},
-    {sentence: "Eu ___ com sono agora.", options: ["estou", "sou", "são", "é"], answer: "estou", translate: "Я сейчас сонный."},
-    {sentence: "Ela ___ minha amiga há anos.", options: ["é", "está", "são", "estamos"], answer: "é", translate: "Она моя подруга уже много лет."},
-    {sentence: "Ele ___ com fome agora.", options: ["está", "é", "são", "estamos"], answer: "está", translate: "Он сейчас голоден."},
-    {sentence: "Nós ___ estudando português.", options: ["estamos", "é", "são", "estávamos"], answer: "estamos", translate: "Мы учим португальский."},
-    {sentence: "Eu ___ no trabalho todos os dias.", options: ["estou", "sou", "são", "é"], answer: "estou", translate: "Я на работе каждый день."},
-    {sentence: "Você ___ satisfeito com o resultado?", options: ["está", "é", "são", "estamos"], answer: "está", translate: "Ты доволен результатом?"},
-    {sentence: "Eles ___ amigos desde crianças.", options: ["são", "estão", "é", "estávamos"], answer: "são", translate: "Они друзья с детства."},
-    {sentence: "Eu ___ aprendendo russo.", options: ["estou", "sou", "são", "é"], answer: "estou", translate: "Я учу русский язык."},
-    {sentence: "Ela ___ feliz com a notícia.", options: ["está", "é", "são", "estamos"], answer: "está", translate: "Она довольна новостью."},
-    {sentence: "Nós ___ cansados da viagem.", options: ["estamos", "é", "são", "estávamos"], answer: "estamos", translate: "Мы устали после поездки."},
-    {sentence: "Ele ___ no Brasil agora.", options: ["está", "é", "são", "estamos"], answer: "está", translate: "Он сейчас в Бразилии."},
-    {sentence: "Você ___ pronto para a aula?", options: ["está", "é", "são", "estamos"], answer: "está", translate: "Ты готов к уроку?"},
-    {sentence: "Eu ___ estudando para o teste.", options: ["estou", "sou", "são", "é"], answer: "estou", translate: "Я учусь к тесту."},
-    {sentence: "Eles ___ viajando para Moscou.", options: ["estão", "são", "é", "estamos"], answer: "estão", translate: "Они едут в Москву."},
-    {sentence: "Nós ___ no parque ontem.", options: ["estávamos", "são", "é", "estamos"], answer: "estávamos", translate: "Мы были в парке вчера."},
-    {sentence: "Ela ___ cansada depois da aula.", options: ["está", "é", "são", "estamos"], answer: "está", translate: "Она устала после урока."},
-    {sentence: "Eu ___ feliz por estudar russo.", options: ["estou", "sou", "são", "é"], answer: "estou", translate: "Я рад изучать русский."},
-    {sentence: "Ele ___ no trabalho agora.", options: ["está", "é", "são", "estamos"], answer: "está", translate: "Он сейчас на работе."},
-    {sentence: "Nós ___ felizes com a decisão.", options: ["estamos", "é", "são", "estávamos"], answer: "estamos", translate: "Мы довольны решением."},
-    {sentence: "Você ___ pronto para sair?", options: ["está", "é", "são", "estamos"], answer: "está", translate: "Ты готов выйти?"},
-    {sentence: "Eu ___ com frio agora.", options: ["estou", "sou", "são", "é"], answer: "estou", translate: "Мне сейчас холодно."}
+    {sentence: "Eu ___ estudar hoje à noite.", options: ["vou", "vou indo", "ir", "fui"], answer: "vou", translate: "Я буду учиться сегодня вечером."},
+    {sentence: "Nós ___ amigos há muitos anos.", options: ["somos", "estamos", "são", "era"], answer: "somos", translate: "Мы друзья уже много лет."},
+    {sentence: "Ela ___ muito bonita.", options: ["é", "está", "foi", "será"], answer: "é", translate: "Она очень красивая."},
+    {sentence: "Vocês ___ no parque agora?", options: ["estão", "são", "estavam", "foi"], answer: "estão", translate: "Вы сейчас в парке?"},
+    {sentence: "Ele ___ o carro ontem.", options: ["comprou", "compra", "comprava", "comprem"], answer: "comprou", translate: "Он купил машину вчера."},
+    {sentence: "Nós ___ felizes com o resultado.", options: ["estamos", "somos", "eramos", "fomos"], answer: "estamos", translate: "Мы довольны результатом."},
+    {sentence: "Eu ___ português e inglês.", options: ["falo", "fala", "falamos", "falam"], answer: "falo", translate: "Я говорю по-португальски и по-английски."},
+    {sentence: "Eles ___ estudar mais.", options: ["precisam", "preciso", "precisa", "precisamos"], answer: "precisam", translate: "Им нужно больше учиться."},
+    {sentence: "Você ___ meu amigo.", options: ["é", "está", "foi", "será"], answer: "é", translate: "Ты мой друг."},
+    {sentence: "Eu ___ muito cansado ontem.", options: ["estava", "estou", "era", "sou"], answer: "estava", translate: "Вчера я был очень уставший."},
+    {sentence: "Nós ___ viajando para a Rússia.", options: ["estamos", "somos", "estávamos", "éramos"], answer: "estamos", translate: "Мы едем в Россию."},
+    {sentence: "Eles ___ livros na biblioteca.", options: ["estão", "são", "estavam", "serão"], answer: "estão", translate: "Они находятся с книгами в библиотеке."},
+    {sentence: "Eu ___ um café todas as manhãs.", options: ["bebo", "bebem", "bebe", "bebemos"], answer: "bebo", translate: "Я пью кофе каждое утро."},
+    {sentence: "Você ___ meu telefone?", options: ["tem", "temos", "têm", "tenho"], answer: "tem", translate: "У тебя есть мой телефон?"},
+    {sentence: "Nós ___ no trabalho agora.", options: ["estamos", "somos", "estavam", "seremos"], answer: "estamos", translate: "Мы сейчас на работе."},
+    {sentence: "Ele ___ muito rápido.", options: ["corre", "corremos", "corre", "correm"], answer: "corre", translate: "Он бегает очень быстро."},
+    {sentence: "Eu ___ uma carta para minha amiga.", options: ["escrevi", "escrevo", "escrevia", "escreverei"], answer: "escrevi", translate: "Я написал письмо своей подруге."},
+    {sentence: "Eles ___ na escola todos os dias.", options: ["estão", "são", "estavam", "eram"], answer: "estão", translate: "Они ходят в школу каждый день."},
+    {sentence: "Nós ___ comida deliciosa ontem.", options: ["comemos", "come", "comeu", "comiam"], answer: "comemos", translate: "Мы ели вкусную еду вчера."},
+    {sentence: "Você ___ em casa agora?", options: ["está", "é", "era", "estava"], answer: "está", translate: "Ты сейчас дома?"},
+    {sentence: "Eu ___ muito feliz com a notícia.", options: ["estou", "sou", "era", "estava"], answer: "estou", translate: "Я очень рад этой новости."}
   ],
 
-ru: [
+  ru: [
     {sentence: "Я ___ в магазин каждый день.", options: ["хожу", "иду", "пойду", "ходим"], answer: "хожу", translate: "Eu vou ao mercado todos os dias."},
-    {sentence: "Он ___ счастлив сегодня.", options: ["счастлив", "были", "будет", "находится"], answer: "счастлив", translate: "Ele está feliz hoje."},
-    {sentence: "Мы ___ счастливы с новостью.", options: ["счастливы", "были", "есть", "будем"], answer: "счастливы", translate: "Nós estamos felizes com a notícia."},
-    {sentence: "Ты ___ готов к экзамену?", options: ["готов", "находишься", "были", "будешь"], answer: "готов", translate: "Você está pronto para a prova?"},
+    {sentence: "Он ___ сегодня.", options: ["счастлив", "были", "будет", "находится"], answer: "счастлив", translate: "Ele está feliz hoje."},
+    {sentence: "Мы ___ с новостью.", options: ["счастливы", "были", "есть", "будем"], answer: "счастливы", translate: "Nós estamos felizes com a notícia."},
+    {sentence: "Ты ___ к экзамену?", options: ["готов", "находишься", "были", "будешь"], answer: "готов", translate: "Você está pronto para a prova?"},
     {sentence: "Они ___ в России сейчас.", options: ["находятся", "были", "есть", "будут"], answer: "находятся", translate: "Eles estão na Rússia agora."},
-    {sentence: "Я ___ голоден.", options: ["есть", "находится", "были", "буду"], answer: "есть", translate: "Eu estou com fome."},
-    {sentence: "Она ___ учитель русского.", options: ["есть", "находится", "были", "будет"], answer: "есть", translate: "Ela é professora de russo."},
-    {sentence: "Мы ___ изучаем русский сейчас.", options: ["изучаем", "есть", "были", "будем"], answer: "изучаем", translate: "Nós estamos estudando russo agora."},
-    {sentence: "Он ___ врач по профессии.", options: ["есть", "находится", "были", "будет"], answer: "есть", translate: "Ele é médico de profissão."},
-    {sentence: "Ты ___ доволен ответом?", options: ["доволен", "есть", "находишься", "будешь"], answer: "доволен", translate: "Você está satisfeito com a resposta?"},
-    {sentence: "Я ___ студент.", options: ["есть", "были", "буду", "находится"], answer: "есть", translate: "Eu sou estudante de russo."},
-    {sentence: "Мы ___ в школе вчера.", options: ["были", "есть", "находимся", "будем"], answer: "были", translate: "Nós estávamos na escola ontem."},
-    {sentence: "Он ___ голоден сейчас.", options: ["есть", "были", "будет", "находится"], answer: "есть", translate: "Ele está com fome agora."},
-    {sentence: "Я ___ говорю по-португальски свободно.", options: ["говорю", "есть", "были", "буду"], answer: "говорю", translate: "Eu falo português fluentemente."},
-    {sentence: "Мы ___ устали после поездки.", options: ["устали", "есть", "были", "будем"], answer: "устали", translate: "Nós estamos cansados depois da viagem."},
-    {sentence: "Тебе ___ холодно?", options: ["замерз", "есть", "находишься", "будешь"], answer: "замерз", translate: "Você está com frio?"},
-    {sentence: "Они ___ друзья с детства.", options: ["являются", "были", "есть", "будут"], answer: "являются", translate: "Eles são amigos desde a infância."},
-    {sentence: "Он ___ купит хлеб завтра.", options: ["купит", "будет", "есть", "пойдет"], answer: "купит", translate: "Ele vai comprar pão amanhã."},
-    {sentence: "Я ___ в парке вчера.", options: ["был", "есть", "буду", "находился"], answer: "был", translate: "Eu estava no parque ontem."},
-    {sentence: "Ты ___ говоришь по-португальски очень хорошо.", options: ["говоришь", "есть", "будешь", "был"], answer: "говоришь", translate: "Você fala português muito bem."},
-    {sentence: "Мы ___ друзья с детства.", options: ["являемся", "были", "есть", "будем"], answer: "являемся", translate: "Nós somos amigos desde crianças."},
-    {sentence: "Она ___ учитель русского.", options: ["есть", "находится", "будет", "были"], answer: "есть", translate: "Ela é professora de russo."},
-    {sentence: "Я ___ рад быть здесь.", options: ["рад", "есть", "буду", "был"], answer: "рад", translate: "Eu estou feliz por estar aqui."},
-    {sentence: "Он ___ очень умный.", options: ["умный", "есть", "будет", "был"], answer: "умный", translate: "Ele é muito inteligente."},
-    {sentence: "Мы ___ в Бразилии сейчас.", options: ["находимся", "были", "есть", "будем"], answer: "находимся", translate: "Nós estamos no Brasil agora."},
-    {sentence: "Ты ___ устал?", options: ["устал", "есть", "будешь", "был"], answer: "устал", translate: "Você está cansado?"},
-    {sentence: "Она ___ в библиотеке.", options: ["находится", "есть", "будет", "была"], answer: "находится", translate: "Ela está na biblioteca."},
-    {sentence: "Я ___ читаю книгу.", options: ["читаю", "есть", "буду", "был"], answer: "читаю", translate: "Eu estou lendo um livro."},
-    {sentence: "Мы ___ учим русский вместе.", options: ["учим", "есть", "были", "будем"], answer: "учим", translate: "Nós estamos aprendendo russo juntos."},
-    {sentence: "Он ___ на работе сейчас.", options: ["находится", "есть", "будет", "был"], answer: "находится", translate: "Ele está no trabalho agora."},
-    {sentence: "Ты ___ готов выйти?", options: ["готов", "есть", "будешь", "был"], answer: "готов", translate: "Você está pronto para sair?"},
-    {sentence: "Я ___ учусь к экзамену.", options: ["учу", "есть", "буду", "был"], answer: "учу", translate: "Eu estou estudando para a prova."},
-    {sentence: "Они ___ путешествуют в Португалию.", options: ["путешествуют", "были", "будут", "есть"], answer: "путешествуют", translate: "Eles estão viajando para Portugal."},
-    {sentence: "Мы ___ были в кино вчера.", options: ["были", "есть", "будем", "находимся"], answer: "были", translate: "Nós estávamos no cinema ontem."},
-    {sentence: "Она ___ устала после тренировки.", options: ["устала", "есть", "будет", "была"], answer: "устала", translate: "Ela está cansada depois do treino."},
-    {sentence: "Я ___ доволен результатом.", options: ["доволен", "есть", "буду", "был"], answer: "доволен", translate: "Eu estou feliz com o resultado."},
-    {sentence: "Он ___ в парке каждый день.", options: ["находится", "есть", "будет", "был"], answer: "находится", translate: "Ele está no parque todos os dias."},
-    {sentence: "Мы ___ довольны решением.", options: ["довольны", "есть", "будем", "были"], answer: "довольны", translate: "Nós estamos felizes com a decisão."},
-    {sentence: "Ты ___ готов ехать в путешествие?", options: ["готов", "есть", "будешь", "был"], answer: "готов", translate: "Você está pronto para viajar?"},
-    {sentence: "Я ___ сонный сейчас.", options: ["сонный", "есть", "буду", "был"], answer: "сонный", translate: "Eu estou com sono agora."},
-    {sentence: "Она ___ моя подруга уже много лет.", options: ["является", "есть", "будет", "была"], answer: "является", translate: "Ela é minha amiga há anos."},
-    {sentence: "Он ___ голоден сейчас.", options: ["голоден", "есть", "будет", "был"], answer: "голоден", translate: "Ele está com fome agora."},
-    {sentence: "Мы ___ учим португальский.", options: ["учим", "есть", "будем", "были"], answer: "учим", translate: "Nós estamos estudando português."},
-    {sentence: "Я ___ на работе каждый день.", options: ["на работе", "есть", "буду", "был"], answer: "на работе", translate: "Eu estou no trabalho todos os dias."},
-    {sentence: "Ты ___ доволен результатом?", options: ["доволен", "есть", "будешь", "был"], answer: "доволен", translate: "Você está satisfeito com o resultado?"},
-    {sentence: "Они ___ друзья с детства.", options: ["являются", "были", "есть", "будут"], answer: "являются", translate: "Eles são amigos desde crianças."},
-    {sentence: "Я ___ учу русский язык.", options: ["учу", "есть", "буду", "был"], answer: "учу", translate: "Eu estou aprendendo russo."},
-    {sentence: "Она ___ довольна новостью.", options: ["довольна", "есть", "будет", "была"], answer: "довольна", translate: "Ela está feliz com a notícia."},
-    {sentence: "Мы ___ устали после поездки.", options: ["устали", "есть", "будем", "были"], answer: "устали", translate: "Nós estamos cansados da viagem."},
-    {sentence: "Он ___ сейчас в Бразилии.", options: ["находится", "есть", "будет", "был"], answer: "находится", translate: "Ele está no Brasil agora."},
-    {sentence: "Ты ___ готов к уроку?", options: ["готов", "есть", "будешь", "был"], answer: "готов", translate: "Você está pronto para a aula?"},
-    {sentence: "Я ___ учусь к тесту.", options: ["учу", "есть", "буду", "был"], answer: "учу", translate: "Eu estou estudando para o teste."},
-    {sentence: "Они ___ едут в Москву.", options: ["едут", "были", "будут", "есть"], answer: "едут", translate: "Eles estão viajando para Moscou."},
-    {sentence: "Мы ___ были в парке вчера.", options: ["были", "есть", "будем", "находимся"], answer: "были", translate: "Nós estávamos no parque ontem."},
-    {sentence: "Она ___ устала после урока.", options: ["устала", "есть", "будет", "была"], answer: "устала", translate: "Ela está cansada depois da aula."},
-    {sentence: "Я ___ рад изучать русский.", options: ["рад", "есть", "буду", "был"], answer: "рад", translate: "Eu estou feliz por estudar russo."},
-    {sentence: "Он ___ сейчас на работе.", options: ["находится", "есть", "будет", "был"], answer: "находится", translate: "Ele está no trabalho agora."},
-    {sentence: "Мы ___ довольны решением.", options: ["довольны", "есть", "будем", "были"], answer: "довольны", translate: "Nós estamos felizes com a decisão."},
-    {sentence: "Ты ___ готов выйти?", options: ["готов", "есть", "будешь", "был"], answer: "готов", translate: "Você está pronto para sair?"},
-    {sentence: "Мне ___ холодно.", options: ["холодно", "есть", "буду", "был"], answer: "холодно", translate: "Eu estou com frio agora."}
+    {sentence: "Я ___ учиться сегодня вечером.", options: ["буду", "иду", "пошёл", "ходим"], answer: "буду", translate: "Eu vou estudar hoje à noite."},
+    {sentence: "Мы ___ друзья уже много лет.", options: ["являемся", "находимся", "были", "будем"], answer: "являемся", translate: "Nós somos amigos há muitos anos."},
+    {sentence: "Она ___ очень красивая.", options: ["есть", "находится", "была", "будет"], answer: "есть", translate: "Ela é muito bonita."},
+    {sentence: "Вы ___ в парке сейчас?", options: ["находитесь", "являетесь", "были", "будете"], answer: "находитесь", translate: "Vocês estão no parque agora?"},
+    {sentence: "Он ___ машину вчера.", options: ["купил", "покупает", "покупал", "купят"], answer: "купил", translate: "Ele comprou o carro ontem."},
+    {sentence: "Мы ___ довольны результатом.", options: ["есть", "находимся", "были", "будем"], answer: "есть", translate: "Nós estamos felizes com o resultado."},
+    {sentence: "Я ___ по-португальски и по-английски.", options: ["говорю", "говорит", "говорим", "говорят"], answer: "говорю", translate: "Eu falo português e inglês."},
+    {sentence: "Им ___ больше учиться.", options: ["нужно", "нужен", "нужны", "нужна"], answer: "нужно", translate: "Eles precisam estudar mais."},
+    {sentence: "Ты ___ мой друг.", options: ["мой", "есть", "находишься", "будешь"], answer: "мой", translate: "Você é meu amigo."},
+    {sentence: "Вчера я ___ очень уставший.", options: ["был", "есть", "буду", "бываю"], answer: "был", translate: "Eu estava muito cansado ontem."},
+    {sentence: "Мы ___ в Россию.", options: ["едем", "поедем", "ехали", "ходим"], answer: "едем", translate: "Nós estamos viajando para a Rússia."},
+    {sentence: "Они ___ с книгами в библиотеке.", options: ["находятся", "были", "будут", "есть"], answer: "находятся", translate: "Eles estão com livros na biblioteca."},
+    {sentence: "Я ___ кофе каждое утро.", options: ["пью", "пьет", "пьем", "пьют"], answer: "пью", translate: "Eu bebo café todas as manhãs."},
+    {sentence: "У тебя ___ мой телефон?", options: ["есть", "имеешь", "имеют", "имеем"], answer: "есть", translate: "Você tem meu telefone?"},
+    {sentence: "Мы ___ на работе сейчас.", options: ["находимся", "есть", "были", "будем"], answer: "находимся", translate: "Nós estamos no trabalho agora."},
+    {sentence: "Он ___ очень быстро.", options: ["бегает", "бегу", "бегаем", "бегают"], answer: "бегает", translate: "Ele corre muito rápido."},
+    {sentence: "Я ___ письмо своей подруге.", options: ["написал", "пишу", "писал", "напишу"], answer: "написал", translate: "Eu escrevi uma carta para minha amiga."},
+    {sentence: "Они ___ в школу каждый день.", options: ["ходят", "ходит", "ходим", "ходят"], answer: "ходят", translate: "Eles vão à escola todos os dias."},
+    {sentence: "Мы ___ вкусную еду вчера.", options: ["съели", "едим", "ел", "ем"], answer: "съели", translate: "Nós comemos comida deliciosa ontem."},
+    {sentence: "Ты ___ дома сейчас?", options: ["дома", "есть", "был", "будешь"], answer: "дома", translate: "Você está em casa agora?"},
+    {sentence: "Я ___ очень рад этой новости.", options: ["очень рад", "доволен", "счастлив", "в восторге"], answer: "очень рад", translate: "Eu estou muito feliz com a notícia."}
   ]
 };
+
 
 // ===== VARIÁVEIS =====
 let currentLang = localStorage.getItem('currentLang') || 'pt';
@@ -219,7 +152,6 @@ function loadExercise() {
   feedbackEl.textContent = '';
   nextBtn.style.display = 'none';
   optionsEl.innerHTML = '';
-  hideRestartButtons();
 
   const shuffledOptions = shuffleArray(exercise.options);
 
@@ -280,12 +212,6 @@ function showFinalResults(){
   toggleTranslateBtn.style.display = 'block';
 }
 
-function hideRestartButtons(){
-  restartAllBtn.style.display = 'none';
-  restartWrongBtn.style.display = 'none';
-  toggleTranslateBtn.style.display = 'none';
-}
-
 // ===== EVENTOS =====
 nextBtn.addEventListener('click', () => {
   currentIndex++;
@@ -304,7 +230,6 @@ restartWrongBtn.addEventListener('click', () => {
   correctCount = 0;
   wrongCount = 0;
   wrongExercises = [];
-  hideRestartButtons();
   loadExercise();
 });
 
