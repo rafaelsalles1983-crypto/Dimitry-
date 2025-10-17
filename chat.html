@@ -14,12 +14,20 @@
 :root {
   --color-bg-light: #f5f5f5;
   --color-primary: #4CAF50;
+  --color-primary-hover: #45a049;
 }
 * { margin:0; padding:0; box-sizing:border-box; }
 body { font-family:Arial, sans-serif; background:var(--color-bg-light); transition:background 0.3s, color 0.3s; }
 
-body.dark { background:#121212; color:#eee; }
-body.dark header, body.dark footer, body.dark #chatContainer, body.dark #userList, body.dark #adSidebar, body.dark #chatInput { background:#1e1e1e; color:#eee; border-color:#333; }
+body.dark {
+  background:#121212;
+  color:#eee;
+}
+body.dark header, body.dark footer, body.dark #chatContainer, body.dark #userList, body.dark #adSidebar, body.dark #chatInput {
+  background:#1e1e1e;
+  color:#eee;
+  border-color:#333;
+}
 body.dark #topBar { background:#1a1a1a; border-color:#333; }
 body.dark #chatInput input { background:#333; color:#eee; border:1px solid #555; }
 body.dark #chatInput button { background:#388e3c; }
@@ -27,26 +35,61 @@ body.dark .userMsg { background:#2e7d32; color:white; }
 body.dark .otherMsg { background:#3e3e3e; color:white; }
 
 /* HEADER */
-header { background:#fff; padding:10px; border-bottom:1px solid #ddd; display:flex; align-items:center; gap:8px; position:fixed; top:0; left:0; right:0; z-index:10; justify-content:space-between; }
+header {
+  background:#fff;
+  padding:10px;
+  border-bottom:1px solid #ddd;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  position:fixed;
+  top:0; left:0; right:0;
+  z-index:10;
+  justify-content:space-between;
+}
 header h1 { color:var(--color-primary); font-size:1.3em; display:flex; align-items:center; gap:6px; }
 .emoji-head { width:28px; }
 
 /* LANGUAGE + THEME BTNS */
 #langThemeBtns { display:flex; gap:8px; align-items:center; }
-#langThemeBtns button { background:white; color:var(--color-primary); border:1px solid var(--color-primary); border-radius:5px; padding:4px 10px; cursor:pointer; font-size:0.9em; }
+#langThemeBtns button {
+  background:white; color:var(--color-primary);
+  border:1px solid var(--color-primary);
+  border-radius:5px; padding:4px 10px; cursor:pointer;
+  font-size:0.9em;
+}
 #langThemeBtns button:hover { background:var(--color-primary); color:white; }
 body.dark #langThemeBtns button { background:#333; color:#a5d6a7; border-color:#4CAF50; }
 
 /* TOPBAR */
-#topBar { display:flex; gap:8px; padding:8px; background:#fafafa; border-bottom:1px solid #ddd; margin-top:50px; flex-wrap:wrap; justify-content:space-between; align-items:center; }
+#topBar {
+  display:flex;
+  gap:8px;
+  padding:8px;
+  background:#fafafa;
+  border-bottom:1px solid #ddd;
+  margin-top:50px;
+  flex-wrap:wrap;
+  justify-content:space-between;
+  align-items:center;
+}
 #topBar .left { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
-#topBar button { background:white; color:var(--color-primary); border:1px solid var(--color-primary); border-radius:5px; padding:6px 10px; cursor:pointer; }
+#topBar button {
+  background:white; color:var(--color-primary);
+  border:1px solid var(--color-primary);
+  border-radius:5px; padding:6px 10px; cursor:pointer;
+}
 #topBar button:hover { background:var(--color-primary); color:white; }
 #topBar span { font-size:0.9em; }
 
 /* MAIN */
 #mainContent { display:flex; height:calc(100vh - 130px); }
-#userList { width:200px; background:white; border-right:1px solid #ddd; overflow-y:auto; padding-bottom:10px; }
+
+/* USERLIST */
+#userList {
+  width:200px; background:white; border-right:1px solid #ddd;
+  overflow-y:auto; padding-bottom:10px;
+}
 .userItem { display:flex; align-items:center; gap:6px; padding:6px; cursor:pointer; border-radius:5px; margin:4px; }
 .userItem:hover { background:#e8f8ee; }
 .userItem img { width:28px; height:28px; border-radius:50%; }
@@ -74,7 +117,11 @@ body.dark #langThemeBtns button { background:#333; color:#a5d6a7; border-color:#
 #adSidebar { width:250px; background:#f7f7f7; border-left:1px dashed #ccc; text-align:center; padding:8px; }
 
 /* FOOTER */
-footer { background:white; text-align:center; padding:6px; border-top:1px solid #ddd; font-size:0.85em; position:fixed; bottom:0; left:0; right:0; z-index:20; }
+footer {
+  background:white; text-align:center; padding:6px;
+  border-top:1px solid #ddd; font-size:0.85em;
+  position:fixed; bottom:0; left:0; right:0; z-index:20;
+}
 
 /* NOTIF */
 #notificationContainer { position:fixed; top:70px; right:10px; display:flex; flex-direction:column; gap:10px; z-index:200; width:260px; }
@@ -90,7 +137,11 @@ footer { background:white; text-align:center; padding:6px; border-top:1px solid 
   .userItem { flex:0 0 auto; margin:0; padding:4px; background:#fff; border-radius:6px; }
   footer { display:none; }
   #chatContainer { height:calc(100vh - 200px); }
-  #chatInput { position:fixed; bottom:0; left:0; right:0; padding:8px; z-index:30; background:rgba(255,255,255,0.98); }
+  #chatInput {
+    position:fixed; bottom:0; left:0; right:0;
+    padding:8px; z-index:30;
+    background:rgba(255,255,255,0.98);
+  }
   #chatWindow { padding-bottom:80px; }
 }
 </style>
@@ -107,7 +158,8 @@ footer { background:white; text-align:center; padding:6px; border-top:1px solid 
 
 <div id="topBar">
   <div class="left">
-    <button id="homeBtn" onclick="location.href='index.html'">🏠 Início</button>
+    <button id="homeBtn">🏠 Início</button>
+    <button id="backBtn"⬅️ Voltar</button>
     <button id="loginBtn">Login com Google</button>
     <button id="logoutBtn" style="display:none;">Logout</button>
     <button id="generalBtn" style="display:none;">💬 Bate-papo Geral</button>
@@ -143,12 +195,37 @@ themeBtn.onclick=()=>{document.body.classList.toggle('dark'); themeBtn.textConte
 const langBtn=document.getElementById('langBtn');
 let currentLang='ru';
 const texts={
-  ru:{siteName:"Славянский клуб",homeBtn:"🏠 Главная",loginBtn:"Войти через Google",logoutBtn:"Выйти",chatBtn:"💬 Общий чат",usersOnline:"👥 Пользователи онлайн: ",msgPlaceholder:"Введите сообщение...",sendBtn:"Отправить",footer:"© 2025 Славянский клуб — Учите русский и португальский",chatTitle:"💬 Общий чат"},
-  pt:{siteName:"Славянский клуб",homeBtn:"🏠 Início",loginBtn:"Login com Google",logoutBtn:"Logout",chatBtn:"💬 Bate-papo Geral",usersOnline:"👥 Usuários online: ",msgPlaceholder:"Digite sua mensagem...",sendBtn:"Enviar",footer:"© 2025 Славянский клуб — Aprenda Russo e Português",chatTitle:"💬 Bate-papo Geral"}
+  ru:{
+    siteName:"Славянский клуб",
+    homeBtn:"🏠 Главная",
+    backBtn:"⬅️ Назад",
+    loginBtn:"Войти через Google",
+    logoutBtn:"Выйти",
+    chatBtn:"💬 Общий чат",
+    usersOnline:"👥 Пользователи онлайн: ",
+    msgPlaceholder:"Введите сообщение...",
+    sendBtn:"Отправить",
+    footer:"© 2025 Славянский клуб — Учите русский и португальский",
+    chatTitle:"💬 Общий чат"
+  },
+  pt:{
+    siteName:"Славянский клуб",
+    homeBtn:"🏠 Início",
+    backBtn:"⬅️ Voltar",
+    loginBtn:"Login com Google",
+    logoutBtn:"Logout",
+    chatBtn:"💬 Bate-papo Geral",
+    usersOnline:"👥 Usuários online: ",
+    msgPlaceholder:"Digite sua mensagem...",
+    sendBtn:"Enviar",
+    footer:"© 2025 Славянский клуб — Aprenda Russo e Português",
+    chatTitle:"💬 Bate-papo Geral"
+  }
 };
 function updateTexts(lang){
-  document.querySelector('header h1').childNodes[0].nodeValue = texts[lang].siteName+" ";
+  document.querySelector('header h1').childNodes[0].nodeValue = texts[lang].siteName + " ";
   document.getElementById('homeBtn').textContent = texts[lang].homeBtn;
+  document.getElementById('backBtn').textContent = texts[lang].backBtn;
   document.getElementById('loginBtn').textContent = texts[lang].loginBtn;
   document.getElementById('logoutBtn').textContent = texts[lang].logoutBtn;
   document.getElementById('generalBtn').textContent = texts[lang].chatBtn;
@@ -159,23 +236,14 @@ function updateTexts(lang){
   document.getElementById('chatTitle').textContent = texts[lang].chatTitle;
 }
 langBtn.onclick = ()=>{
-  currentLang = currentLang==='ru'?'pt':'ru';
-  langBtn.textContent = currentLang==='ru'?'🇷🇺 Рус':'🇧🇷 PT';
-  document.documentElement.lang = currentLang==='ru'?'ru':'pt-BR';
+  if(currentLang==='ru'){currentLang='pt'; langBtn.textContent='🇧🇷 PT'; document.documentElement.lang='pt-BR';}
+  else{currentLang='ru'; langBtn.textContent='🇷🇺 Рус'; document.documentElement.lang='ru';}
   updateTexts(currentLang);
 };
 updateTexts(currentLang);
 
 /* ===== FIREBASE E CHAT ===== */
-const firebaseConfig={
-  apiKey:"AIzaSyCYJCgfil5HKrCWtB14zwdicDaEcldHU6A",
-  authDomain:"dimitry-rusian.firebaseapp.com",
-  databaseURL:"https://dimitry-rusian-default-rtdb.firebaseio.com",
-  projectId:"dimitry-rusian",
-  storageBucket:"dimitry-rusian.appspot.com",
-  messagingSenderId:"449029666805",
-  appId:"1:449029666805:web:feaf575a7b7e6f234a52bc"
-};
+const firebaseConfig={apiKey:"AIzaSyCYJCgfil5HKrCWtB14zwdicDaEcldHU6A", authDomain:"dimitry-rusian.firebaseapp.com", databaseURL:"https://dimitry-rusian-default-rtdb.firebaseio.com", projectId:"dimitry-rusian", storageBucket:"dimitry-rusian.appspot.com", messagingSenderId:"449029666805", appId:"1:449029666805:web:feaf575a7b7e6f234a52bc"};
 firebase.initializeApp(firebaseConfig);
 const auth=firebase.auth(), db=firebase.database();
 
@@ -185,6 +253,94 @@ const chatWindow=document.getElementById('chatWindow'), chatTitle=document.getEl
 const notificationContainer=document.getElementById('notificationContainer'), msgSound=document.getElementById('msgSound');
 let currentUser=null, currentChat='chatGlobal', activeListener=null;
 
-// LOGIN GOOGLE COM TRATAMENTO DE ERROS
-loginBtnEl.onclick = () => {
-  const provider = new firebase.auth.GoogleAuth
+loginBtnEl.onclick=()=>auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
+logoutBtnEl.onclick=()=>auth.signOut();
+generalBtnEl.onclick=openGlobal;
+
+auth.onAuthStateChanged(user=>{
+  if(user){
+    currentUser=user;
+    loginBtnEl.style.display='none'; logoutBtnEl.style.display='inline-block'; generalBtnEl.style.display='inline-block';
+    msgInput.disabled=false; sendBtn.disabled=false;
+    db.ref('users/'+user.uid).set({name:user.displayName,photo:user.photoURL});
+    db.ref('online/'+user.uid).set({name:user.displayName});
+    db.ref('online/'+user.uid).onDisconnect().remove();
+    renderUsers(); openGlobal(); watchPrivateMessages();
+  } else { currentUser=null; msgInput.disabled=true; sendBtn.disabled=true; chatWindow.innerHTML=''; }
+});
+
+function renderUsers(){
+  db.ref('users').on('value',snap=>{
+    const all=snap.val()||{};
+    db.ref('online').once('value').then(oSnap=>{
+      const online=oSnap.val()||{};
+      userList.innerHTML=''; let count=0;
+      for(const uid in all){
+        if(uid===currentUser?.uid) continue;
+        const u=all[uid]; const onlineNow=!!online[uid]; if(onlineNow) count++;
+        const d=document.createElement('div');
+        d.className='userItem';
+        d.innerHTML=`<img src="${u.photo}"><span>${onlineNow?'🟢':'⚪'} ${u.name}</span>`;
+        d.onclick=()=>openPrivate(uid,u.name);
+        userList.appendChild(d);
+      }
+      onlineCount.textContent = texts[currentLang].usersOnline + count;
+    });
+  });
+}
+
+function openGlobal(){
+  detach(); currentChat='chatGlobal'; chatTitle.textContent = texts[currentLang].chatTitle; chatWindow.innerHTML='';
+  const ref=db.ref('chatGlobal').limitToLast(200); activeListener=ref;
+  ref.on('child_added',s=>renderMessage(s.key,s.val()));
+}
+
+function openPrivate(uid,name){
+  detach();
+  const path=['private',[currentUser.uid,uid].sort().join('_')].join('/');
+  currentChat=path; chatTitle.textContent='👤 '+name; chatWindow.innerHTML='';
+  const ref=db.ref(path).limitToLast(200); activeListener=ref;
+  ref.on('child_added',s=>renderMessage(s.key,s.val()));
+  removeNotification(uid);
+}
+
+function detach(){if(activeListener) activeListener.off();}
+sendBtn.onclick=sendMsg; msgInput.addEventListener('keypress',e=>{if(e.key==='Enter')sendMsg();});
+function sendMsg(){const txt=msgInput.value.trim(); if(!txt||!currentUser)return; db.ref(currentChat).push({uid:currentUser.uid,user:currentUser.displayName,text:txt,timestamp:Date.now()}); msgInput.value='';}
+function renderMessage(key,m){
+  const div=document.createElement('div');
+  div.className=m.uid===currentUser?.uid?'msg userMsg':'msg otherMsg';
+  div.innerHTML=`<strong>${m.user}</strong>: ${m.text}<small>${new Date(m.timestamp).toLocaleTimeString()}</small>`;
+  if(m.uid===currentUser?.uid){ const del=document.createElement('button'); del.className='deleteBtn'; del.textContent='🗑'; del.onclick=()=>db.ref(currentChat+'/'+key).remove(); div.appendChild(del);}
+  chatWindow.appendChild(div); chatWindow.scrollTop=chatWindow.scrollHeight;
+}
+
+function watchPrivateMessages(){
+  db.ref('private').on('child_added',chat=>{
+    const chatId=chat.key;
+    if(!chatId.includes(currentUser.uid)) return;
+    db.ref('private/'+chatId).limitToLast(1).on('child_added',snap=>{
+      const m=snap.val();
+      if(m.uid!==currentUser.uid && currentChat!=='private/'+chatId){
+        const other=chatId.replace(currentUser.uid,'').replace('_','');
+        showNotification(m.user,m.text,other); msgSound.currentTime=0; msgSound.play();
+      }
+    });
+  });
+}
+
+function showNotification(user,text,uid){
+  removeNotification(uid);
+  const n=document.createElement('div');
+  n.className='notification';
+  n.dataset.uid=uid;
+  n.innerHTML=`<b>${user}</b>: ${text}<button onclick="removeNotification('${uid}')">✖</button>`;
+  notificationContainer.appendChild(n);
+}
+function removeNotification(uid){
+  const n=notificationContainer.querySelector(`[data-uid='${uid}']`);
+  if(n) n.remove();
+}
+</script>
+</body>
+</html>
