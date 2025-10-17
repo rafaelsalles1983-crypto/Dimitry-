@@ -45,10 +45,12 @@ aside h3 {
 .userItem {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   padding: 6px;
   border-radius: 6px;
   cursor: pointer;
   transition: background 0.2s;
+  position: relative;
 }
 .userItem:hover {
   background: #333;
@@ -58,6 +60,19 @@ aside h3 {
   height: 28px;
   border-radius: 50%;
   margin-right: 8px;
+}
+.userItem span {
+  flex: 1;
+}
+
+/* Badge de mensagens não lidas */
+.unreadBadge {
+  background: #e11d48;
+  color: #fff;
+  font-size: 0.75em;
+  padding: 2px 6px;
+  border-radius: 10px;
+  margin-left: 6px;
 }
 
 /* ===== CHAT ===== */
@@ -213,7 +228,7 @@ currentPartnerEl=document.getElementById("currentPartner"),
 tabGlobal=document.getElementById("tabGlobal"),
 tabPrivate=document.getElementById("tabPrivate");
 
-let userData={},currentChat="chatGlobal",currentPartnerUID=null,blocked={},hidden={},localHidden={};
+let userData={},currentChat="chatGlobal",currentPartnerUID=null,unreadCount={};
 
 /* === LOGIN === */
 loginBtn.onclick=()=>auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
@@ -235,7 +250,7 @@ auth.onAuthStateChanged(u=>{
  }
 });
 
-/* === LISTA DE USUÁRIOS (conectados e desconectados) === */
+/* === LISTA DE USUÁRIOS === */
 function updateUsers(){
  db.ref("usuariosConectados").on("value",snap=>{
    const allUsers = snap.val()||{};
@@ -247,8 +262,12 @@ function updateUsers(){
        const isOnline = !!onlineUsers[uid];
        const d=document.createElement("div");
        d.className="userItem";
-       d.innerHTML=`<img src="${u.photo||'https://cdn-icons-png.flaticon.com/512/847/847969.png'}"><span>${u.name}${isOnline?' 🟢':' ⚪'}</span>`;
-       d.onclick=()=>startPrivate(uid,u.name);
+       d.innerHTML=`<div style="display:flex;align-items:center;">
+         <img src="${u.photo||'https://cdn-icons-png.flaticon.com/512/847/847969.png'}">
+         <span>${u.name}${isOnline?' 🟢':' ⚪'}</span>
+       </div>
+       <span id="unread_${uid}" class="unreadBadge" style="display:none;"></span>`;
+       d.onclick=()=>{markAsRead(uid);startPrivate(uid,u.name)};
        userList.appendChild(d);
      }
    });
@@ -272,7 +291,13 @@ function startPrivate(uid,name){
  currentPartnerEl.textContent="💬 "+name;
  chatWindow.innerHTML="";
  db.ref("private/"+currentChat).off();
- db.ref("private/"+currentChat).on("child_added",snap=>showMsg(snap.val(),currentChat,snap.key));
+ db.ref("private/"+currentChat).on("child_added",snap=>{
+   showMsg(snap.val(),currentChat,snap.key);
+   if(snap.val().uid!==userData.uid && currentPartnerUID!==uid){
+     unreadCount[uid]=(unreadCount[uid]||0)+1;
+     updateBadge(uid);
+   }
+ });
  tabGlobal.classList.remove("active");
  tabPrivate.classList.add("active");
 }
@@ -293,8 +318,6 @@ function showMsg(m,room,key){
  const d=document.createElement("div");
  d.className=m.uid===userData.uid?"msg userMsg":"msg otherMsg";
  d.textContent=m.text;
-
- // Botão apagar individual
  if(m.uid===userData.uid){
    const btn=document.createElement("button");
    btn.textContent="×";
@@ -302,9 +325,25 @@ function showMsg(m,room,key){
    btn.onclick=()=>{d.remove();};
    d.appendChild(btn);
  }
-
  chatWindow.appendChild(d);
  chatWindow.scrollTop=chatWindow.scrollHeight;
+}
+
+/* === GERENCIAR NÃO LIDAS === */
+function updateBadge(uid){
+ const el=document.getElementById("unread_"+uid);
+ if(!el) return;
+ const count=unreadCount[uid]||0;
+ if(count>0){
+   el.textContent=count>9?"9+":count;
+   el.style.display="inline-block";
+ }else{
+   el.style.display="none";
+ }
+}
+function markAsRead(uid){
+ unreadCount[uid]=0;
+ updateBadge(uid);
 }
 
 /* === ABAS === */
