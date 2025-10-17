@@ -3,430 +3,320 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>чат 🌍</title>
+<title>Чат — Clube Eslavo</title>
 
 <!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
+<!-- CSS -->
+<link rel="stylesheet" href="chat.css">
+
 <style>
-:root {
-  --color-bg-light: #f5f5f5;
-  --color-primary: #4CAF50;
-  --color-primary-hover: #45a049;
+body {
+  font-family: Arial, sans-serif;
+  background-color: var(--bg-color, #101010);
+  color: var(--text-color, #fff);
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
 }
-* { margin:0; padding:0; box-sizing:border-box; }
-body { font-family:Arial, sans-serif; background:var(--color-bg-light); }
 
-/* HEADER */
+/* ===== TOPO ===== */
 header {
-  background:#fff;
-  padding:10px;
-  border-bottom:1px solid #ddd;
-  display:flex;
-  align-items:center;
-  gap:8px;
-  position:fixed;
-  top:0; left:0; right:0;
-  z-index:10;
+  background: #1c1c1c;
+  color: #fff;
+  text-align: center;
+  padding: 10px;
+  position: relative;
 }
-header h1 { color:var(--color-primary); font-size:1.3em; display:flex; align-items:center; gap:6px; }
-.emoji-head { width:28px; }
-
-/* TOPBAR */
-#topBar {
-  display:flex;
-  gap:8px;
-  padding:8px;
-  background:#fafafa;
-  border-bottom:1px solid #ddd;
-  margin-top:50px;
-  flex-wrap:wrap;
+header h1 { margin: 0; font-size: 20px; }
+header button.voltar {
+  position: absolute;
+  left: 10px;
+  top: 10px;
+  background: #252525;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 6px 10px;
+  cursor: pointer;
+  transition: 0.3s;
 }
-#topBar button {
-  background:white;
-  color:var(--color-primary);
-  border:1px solid var(--color-primary);
-  border-radius:5px;
-  padding:6px 10px;
-  cursor:pointer;
+header button.voltar:hover {
+  background: #444;
 }
-#topBar button:hover { background:var(--color-primary-hover); color:#fff; }
 
-/* MAIN */
-#mainContent { display:flex; height:calc(100vh - 130px); }
+/* ===== LAYOUT PRINCIPAL ===== */
+main {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  background: #181818;
+}
 
-/* USERLIST */
+/* ===== LISTA DE USUÁRIOS ONLINE ===== */
 #userList {
-  width:200px;
-  background:white;
-  border-right:1px solid #ddd;
-  overflow-y:auto;
-  transition:all 0.3s ease;
+  width: 220px;
+  background: #202020;
+  border-right: 2px solid #333;
+  padding: 10px;
+  overflow-y: auto;
+  color: #ccc;
 }
-.userItem {
-  display:flex;
-  align-items:center;
-  gap:6px;
-  padding:6px;
-  cursor:pointer;
-  border-radius:5px;
-  margin:4px;
-}
-.userItem:hover { background:#e8f8ee; }
-.userItem img { width:28px; height:28px; border-radius:50%; }
+#userList h3 { text-align: center; margin-top: 0; }
+.user-item { margin: 5px 0; padding: 5px; border-bottom: 1px solid #333; }
 
-/* CHAT */
+/* ===== JANELA DE CHAT ===== */
 #chatContainer {
-  flex:1;
-  display:flex;
-  flex-direction:column;
-  background:white;
-  border-left:1px solid #ddd;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
-#chatHeader {
-  padding:6px;
-  background:#fafafa;
-  border-bottom:1px solid #ddd;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
+#chatWindow {
+  flex: 1;
+  padding: 10px;
+  overflow-y: auto;
 }
-#chatHeader h2 { font-size:1em; color:#333; }
-#chatWindow { flex:1; overflow-y:auto; padding:10px; display:flex; flex-direction:column; }
 .msg {
-  margin:5px 0;
-  padding:8px;
-  border-radius:8px;
-  max-width:80%;
-  word-wrap:break-word;
-  position:relative;
+  margin: 5px 0;
+  padding: 8px;
+  border-radius: 10px;
+  max-width: 75%;
+  word-wrap: break-word;
 }
-.userMsg { background:#e0f7e9; align-self:flex-end; text-align:right; }
-.otherMsg { background:#fff8dc; align-self:flex-start; text-align:left; }
-.msg .deleteBtn {
-  position:absolute;
-  top:2px;
-  right:5px;
-  font-size:0.8em;
-  color:red;
-  cursor:pointer;
-  display:none;
+.userMsg {
+  background: #2a7bde;
+  align-self: flex-end;
+  color: #fff;
 }
-.userMsg:hover .deleteBtn { display:inline; }
-
-/* INPUT */
-#chatInput { display:flex; border-top:1px solid #ddd; }
-#chatInput input {
-  flex:1;
-  padding:10px;
-  border:none;
-  outline:none;
-}
-#chatInput button {
-  background:var(--color-primary);
-  color:white;
-  border:none;
-  padding:10px 15px;
-  cursor:pointer;
+.otherMsg {
+  background: #333;
+  align-self: flex-start;
+  color: #ddd;
 }
 
-/* ADS */
-#adSidebar {
-  width:250px;
-  background:#f7f7f7;
-  border-left:1px dashed #ccc;
-  text-align:center;
-  padding:8px;
+/* ===== NOTIFICAÇÃO ===== */
+#notification {
+  background: #2a7bde;
+  text-align: center;
+  padding: 5px;
+  font-size: 14px;
+  display: none;
 }
 
-/* FOOTER */
+/* ===== CONTROLES ===== */
+#controls {
+  display: flex;
+  align-items: center;
+  background: #111;
+  padding: 10px;
+  gap: 10px;
+}
+#msgInput {
+  flex: 1;
+  padding: 10px;
+  border-radius: 10px;
+  border: none;
+}
+button {
+  background: #2a7bde;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+button:hover { background: #155fa0; }
+button.apagar { background: #d63b3b; }
+button.apagar:hover { background: #a82626; }
+button.bloquear { background: #f1b41c; color: #111; }
+button.bloquear:hover { background: #e29c00; }
+
+/* ===== RODAPÉ ===== */
 footer {
-  background:white;
-  text-align:center;
-  padding:6px;
-  border-top:1px solid #ddd;
-  font-size:0.85em;
-  position:relative;
-  z-index:5;
+  text-align: center;
+  background: #1c1c1c;
+  padding: 10px;
+  font-size: 14px;
+  color: #888;
 }
 
-/* NOTIFICAÇÕES */
-#notificationContainer {
-  position:fixed;
-  top:70px;
-  right:10px;
-  display:flex;
-  flex-direction:column;
-  gap:10px;
-  z-index:200;
-}
-.notification {
-  background:#4CAF50;
-  color:white;
-  padding:10px;
-  border-radius:8px;
-  box-shadow:0 2px 6px rgba(0,0,0,0.2);
-  animation:slideIn 0.3s ease;
-}
-@keyframes slideIn {
-  from { opacity:0; transform:translateX(50px); }
-  to { opacity:1; transform:translateX(0); }
-}
-
-/* MOBILE */
-@media(max-width:768px){
-  #mainContent { flex-direction:column; height:auto; }
-  #adSidebar { display:none; }
-
-  /* Lista de usuários retrátil */
+/* ===== MOBILE ===== */
+@media (max-width: 768px) {
+  main { flex-direction: column; }
   #userList {
-    position:fixed;
-    top:100px;
-    left:0;
-    right:0;
-    height:200px;
-    border:1px solid #ccc;
-    background:white;
-    display:none;
-    z-index:20;
-  }
-  #toggleUsers {
-    background:var(--color-primary);
-    color:white;
-    border:none;
-    padding:6px 10px;
-    border-radius:5px;
+    order: 2;
+    width: 100%;
+    border: none;
+    border-top: 2px solid #333;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
   }
   footer {
-    position:fixed;
-    bottom:0;
-    left:0;
-    right:0;
-    z-index:100;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
   }
-  #chatContainer { height:calc(100vh - 220px); }
 }
 </style>
 </head>
-<body>
 
+<body>
 <header>
-  <h1>Славянский клуб <img src="emoji_dimitry.png" alt="Dimitry" class="emoji-head"></h1>
+  <button class="voltar" onclick="window.location.href='index.html'">⬅ Voltar</button>
+  <h1>💬 Bate-papo em Grupo</h1>
 </header>
 
-<div id="topBar">
-  <button id="loginBtn">Login com Google</button>
-  <button id="logoutBtn" style="display:none;">Logout</button>
-  <button id="generalBtn" style="display:none;">💬 Bate-papo Geral</button>
-  <button id="toggleUsers" style="display:none;">👥 Usuários</button>
-  <span id="onlineCount">👥 Usuários online: 0</span>
-</div>
+<div id="notification"></div>
 
-<div id="mainContent">
-  <div id="userList"></div>
+<main>
+  <aside id="userList">
+    <h3>Usuários Online</h3>
+    <div id="onlineUsers"></div>
+  </aside>
 
-  <div id="chatContainer">
-    <div id="chatHeader">
-      <h2 id="chatTitle">💬 Bate-papo Geral</h2>
-      <div>
-        <button id="clearBtn">Apagar</button>
-        <button id="blockBtn">Bloquear</button>
-      </div>
-    </div>
+  <section id="chatContainer">
     <div id="chatWindow"></div>
-    <div id="chatInput">
-      <input id="msgInput" type="text" placeholder="Digite sua mensagem..." disabled>
-      <button id="sendBtn" disabled>Enviar</button>
+    <div id="controls">
+      <input id="msgInput" type="text" placeholder="Digite sua mensagem...">
+      <button id="sendBtn">Enviar</button>
+      <button class="apagar" id="apagarBtn">Apagar</button>
+      <button class="bloquear" id="bloquearBtn">Bloquear</button>
     </div>
-  </div>
+  </section>
+</main>
 
-  <div id="adSidebar">Publicidade (Adsense)</div>
-</div>
+<footer>© Clube Eslavo — Chat em grupo</footer>
 
-<footer>© 2025 Славянский клуб — Aprenda Russo e Português</footer>
-
-<!-- Container de notificações -->
-<div id="notificationContainer"></div>
-
-<!-- Áudio de notificação -->
-<audio id="msgSound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_2a8c4e8d5a.mp3?filename=message-pop-alert-23584.mp3" preload="auto"></audio>
+<audio id="msgSound" src="https://assets.mixkit.co/sfx/download/mixkit-positive-notification-951.wav"></audio>
 
 <script>
+/* ===== FIREBASE CONFIG ===== */
 const firebaseConfig = {
-  apiKey: "AIzaSyCYJCgfil5HKrCWtB14zwdicDaEcldHU6A",
-  authDomain: "dimitry-rusian.firebaseapp.com",
-  databaseURL: "https://dimitry-rusian-default-rtdb.firebaseio.com",
-  projectId: "dimitry-rusian",
-  storageBucket: "dimitry-rusian.appspot.com",
-  messagingSenderId: "449029666805",
-  appId: "1:449029666805:web:feaf575a7b7e6f234a52bc"
+  apiKey: "SUA_API_KEY",
+  authDomain: "seu-projeto.firebaseapp.com",
+  databaseURL: "https://seu-projeto-default-rtdb.firebaseio.com",
+  projectId: "seu-projeto",
+  storageBucket: "seu-projeto.appspot.com",
+  messagingSenderId: "000000000000",
+  appId: "1:000000000000:web:000000000000"
 };
 firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
 
-const auth=firebase.auth(), db=firebase.database();
+/* ===== LOGIN ANÔNIMO ===== */
+firebase.auth().signInAnonymously();
 
-const loginBtn=document.getElementById("loginBtn"),
-logoutBtn=document.getElementById("logoutBtn"),
-generalBtn=document.getElementById("generalBtn"),
-toggleUsers=document.getElementById("toggleUsers"),
-userList=document.getElementById("userList"),
-msgInput=document.getElementById("msgInput"),
-sendBtn=document.getElementById("sendBtn"),
-chatWindow=document.getElementById("chatWindow"),
-chatTitle=document.getElementById("chatTitle"),
-clearBtn=document.getElementById("clearBtn"),
-blockBtn=document.getElementById("blockBtn"),
-msgSound=document.getElementById("msgSound"),
-notificationContainer=document.getElementById("notificationContainer"),
-onlineCount=document.getElementById("onlineCount");
+/* ===== VARIÁVEIS ===== */
+const chatWindow = document.getElementById('chatWindow');
+const msgInput = document.getElementById('msgInput');
+const sendBtn = document.getElementById('sendBtn');
+const apagarBtn = document.getElementById('apagarBtn');
+const bloquearBtn = document.getElementById('bloquearBtn');
+const onlineUsersDiv = document.getElementById('onlineUsers');
+const notification = document.getElementById('notification');
+const msgSound = document.getElementById('msgSound');
+let blocked = false;
+let userId = null;
+let username = "Usuário";
 
-let currentUser=null,currentChat="chatGlobal",blocked={},currentPartner=null;
-
-loginBtn.onclick=()=>auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
-logoutBtn.onclick=()=>auth.signOut();
-
-auth.onAuthStateChanged(u=>{
-  if(u){
-    currentUser=u;
-    loginBtn.style.display="none";
-    logoutBtn.style.display="inline-block";
-    generalBtn.style.display="inline-block";
-    toggleUsers.style.display="inline-block";
-    msgInput.disabled=false;
-    sendBtn.disabled=false;
-
-    db.ref("online/"+u.uid).set({name:u.displayName,photo:u.photoURL});
-    db.ref("online/"+u.uid).onDisconnect().remove();
-
-    updateUsers();
-    openGlobal();
-  }else{
-    currentUser=null;
-    loginBtn.style.display="inline-block";
-    logoutBtn.style.display="none";
-    generalBtn.style.display="none";
-    toggleUsers.style.display="none";
-    msgInput.disabled=true;
-    sendBtn.disabled=true;
-    chatWindow.innerHTML="";
-    userList.innerHTML="";
-    onlineCount.textContent="👥 Usuários online: 0";
+/* ===== LOGIN USUÁRIO ===== */
+firebase.auth().onAuthStateChanged(user => {
+  if (user) {
+    userId = user.uid;
+    username = "Usuário_" + user.uid.substring(0, 5);
+    db.ref("onlineUsers/" + userId).set(username);
+    db.ref("onlineUsers/" + userId).onDisconnect().remove();
   }
 });
 
-toggleUsers.onclick=()=>{
-  userList.style.display=(userList.style.display==="block")?"none":"block";
-};
-
-function updateUsers(){
-  db.ref("online").on("value",snap=>{
-    const data=snap.val()||{};
-    userList.innerHTML="";
-    onlineCount.textContent="👥 Usuários online: "+Object.keys(data).length;
-    for(const [uid,u] of Object.entries(data)){
-      if(currentUser && uid===currentUser.uid) continue;
-      const div=document.createElement("div");
-      div.className="userItem";
-      div.innerHTML=`<img src="${u.photo}"><span>${u.name}</span>`;
-      div.onclick=()=>openPrivate(uid,u.name);
-      userList.appendChild(div);
-    }
+/* ===== USUÁRIOS ONLINE ===== */
+db.ref("onlineUsers").on("value", snap => {
+  onlineUsersDiv.innerHTML = "";
+  snap.forEach(u => {
+    const div = document.createElement("div");
+    div.className = "user-item";
+    div.textContent = u.val();
+    onlineUsersDiv.appendChild(div);
   });
-}
+});
 
-// === FUNÇÃO DE NOTIFICAÇÃO ===
-function showNotification(user,chatType){
-  const n=document.createElement("div");
-  n.className="notification";
-  n.textContent=`📩 Nova mensagem de ${user} (${chatType})`;
-  notificationContainer.appendChild(n);
-  setTimeout(()=>n.remove(),4000);
-  msgSound.currentTime=0;
-  msgSound.play();
-}
+/* ===== RECEBER MENSAGENS ===== */
+db.ref("messages").on("child_added", snap => {
+  const msg = snap.val();
+  const div = document.createElement("div");
+  div.className = "msg " + (msg.userId === userId ? "userMsg" : "otherMsg");
+  div.textContent = `${msg.username}: ${msg.text}`;
+  div.dataset.id = snap.key;
 
-function openGlobal(){
-  currentChat="chatGlobal";
-  currentPartner=null;
-  chatTitle.textContent="💬 Bate-papo Geral";
-  chatWindow.innerHTML="";
-  db.ref("chatGlobal").off();
-  db.ref("chatGlobal").limitToLast(100).on("child_added",snap=>{
-    const m=snap.val();
-    renderMsg(snap.key,m);
-    if(currentChat!=="chatGlobal" && m.uid!==currentUser?.uid) showNotification(m.user,"Geral");
-  });
-}
-
-function openPrivate(uid,name){
-  currentPartner=uid;
-  currentChat="private/"+[currentUser.uid,uid].sort().join("_");
-  chatTitle.textContent="👤 "+name;
-  chatWindow.innerHTML="";
-  db.ref(currentChat).off();
-  db.ref(currentChat).limitToLast(100).on("child_added",snap=>{
-    const m=snap.val();
-    renderMsg(snap.key,m);
-    if(currentChat!==("private/"+[currentUser.uid,uid].sort().join("_")) && m.uid!==currentUser?.uid) showNotification(m.user,"Privado");
-  });
-}
-
-function renderMsg(key,m){
-  const div=document.createElement("div");
-  div.className=m.uid===currentUser?.uid?"msg userMsg":"msg otherMsg";
-  div.innerHTML=`${m.user}: ${m.text}`;
-  if(m.uid===currentUser?.uid){
-    const del=document.createElement("span");
-    del.className="deleteBtn";
-    del.textContent="❌";
-    del.onclick=()=>deleteMsg(key);
-    div.appendChild(del);
+  // botão apagar individual (somente autor)
+  if (msg.userId === userId) {
+    const delBtn = document.createElement("button");
+    delBtn.textContent = "×";
+    delBtn.style.marginLeft = "10px";
+    delBtn.style.background = "transparent";
+    delBtn.style.border = "none";
+    delBtn.style.color = "#fff";
+    delBtn.style.cursor = "pointer";
+    delBtn.onclick = () => db.ref("messages/" + snap.key).remove();
+    div.appendChild(delBtn);
   }
+
   chatWindow.appendChild(div);
-  chatWindow.scrollTop=chatWindow.scrollHeight;
-  if(m.uid!==currentUser?.uid && currentChat==="chatGlobal"){
-    msgSound.currentTime=0;
+  chatWindow.scrollTop = chatWindow.scrollHeight;
+
+  if (msg.userId !== userId) {
     msgSound.play();
+    document.title = "💬 Nova mensagem!";
+    notification.style.display = "block";
+    notification.textContent = `${msg.username} enviou uma mensagem`;
+    setTimeout(() => {
+      document.title = "Чат — Clube Eslavo";
+      notification.style.display = "none";
+    }, 4000);
   }
-}
+});
 
-sendBtn.onclick=sendMsg;
-msgInput.addEventListener("keypress",e=>{if(e.key==="Enter")sendMsg();});
-function sendMsg(){
-  if(!currentUser)return;
-  const text=msgInput.value.trim();
-  if(!text)return;
-  db.ref(currentChat).push({
-    uid:currentUser.uid,
-    user:currentUser.displayName,
-    text,
-    timestamp:Date.now()
+/* ===== APAGAR TODAS AS MENSAGENS DO USUÁRIO ===== */
+apagarBtn.onclick = () => {
+  db.ref("messages").once("value", snap => {
+    snap.forEach(child => {
+      if (child.val().userId === userId) db.ref("messages/" + child.key).remove();
+    });
   });
-  msgInput.value="";
-}
-
-function deleteMsg(key){
-  db.ref(currentChat+"/"+key).once("value").then(snap=>{
-    const msg=snap.val();
-    if(msg && msg.uid===currentUser.uid){
-      db.ref(currentChat+"/"+key).remove();
-      alert("Mensagem apagada com sucesso.");
-    }else{
-      alert("Você só pode apagar suas próprias mensagens.");
-    }
-  });
-}
-
-clearBtn.onclick=()=>{ chatWindow.innerHTML=""; };
-blockBtn.onclick=()=>{
-  if(!currentPartner)return alert("Selecione um usuário para bloquear.");
-  blocked[currentPartner]=!blocked[currentPartner];
-  alert(blocked[currentPartner]?"Usuário bloqueado":"Usuário desbloqueado");
 };
-generalBtn.onclick=openGlobal;
-</script>
 
+/* ===== BLOQUEAR ===== */
+bloquearBtn.onclick = () => {
+  blocked = !blocked;
+  bloquearBtn.textContent = blocked ? "Desbloquear" : "Bloquear";
+};
+
+/* ===== ENVIAR MENSAGEM ===== */
+function sendMessage() {
+  if (blocked) return;
+  const text = msgInput.value.trim();
+  if (!text) return;
+  db.ref("messages").push({
+    userId,
+    username,
+    text,
+    time: Date.now()
+  });
+  msgInput.value = "";
+}
+sendBtn.onclick = sendMessage;
+msgInput.addEventListener("keypress", e => {
+  if (e.key === "Enter") sendMessage();
+});
+</script>
 </body>
 </html>
