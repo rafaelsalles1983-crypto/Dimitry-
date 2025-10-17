@@ -46,15 +46,23 @@ header h1 { color:var(--color-primary); font-size:1.3em; display:flex; align-ite
   justify-content:space-between;
   align-items:center;
 }
-#topBar .left { display:flex; gap:8px; align-items:center; }
-#topBar button { background:white; color:var(--color-primary); border:1px solid var(--color-primary); border-radius:5px; padding:6px 10px; cursor:pointer; }
+#topBar .left { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+#topBar button {
+  background:white; color:var(--color-primary);
+  border:1px solid var(--color-primary);
+  border-radius:5px; padding:6px 10px; cursor:pointer;
+}
+#topBar button:hover { background:var(--color-primary); color:white; }
 #topBar span { font-size:0.9em; }
 
 /* MAIN */
 #mainContent { display:flex; height:calc(100vh - 130px); }
 
 /* USERLIST */
-#userList { width:200px; background:white; border-right:1px solid #ddd; overflow-y:auto; }
+#userList {
+  width:200px; background:white; border-right:1px solid #ddd;
+  overflow-y:auto; padding-bottom:10px;
+}
 .userItem { display:flex; align-items:center; gap:6px; padding:6px; cursor:pointer; border-radius:5px; margin:4px; }
 .userItem:hover { background:#e8f8ee; }
 .userItem img { width:28px; height:28px; border-radius:50%; }
@@ -82,7 +90,11 @@ header h1 { color:var(--color-primary); font-size:1.3em; display:flex; align-ite
 #adSidebar { width:250px; background:#f7f7f7; border-left:1px dashed #ccc; text-align:center; padding:8px; }
 
 /* FOOTER */
-footer { background:white; text-align:center; padding:6px; border-top:1px solid #ddd; font-size:0.85em; position:fixed; bottom:0; left:0; right:0; z-index:20; }
+footer {
+  background:white; text-align:center; padding:6px;
+  border-top:1px solid #ddd; font-size:0.85em;
+  position:fixed; bottom:0; left:0; right:0; z-index:20;
+}
 
 /* NOTIF */
 #notificationContainer { position:fixed; top:70px; right:10px; display:flex; flex-direction:column; gap:10px; z-index:200; width:260px; }
@@ -96,9 +108,14 @@ footer { background:white; text-align:center; padding:6px; border-top:1px solid 
   #adSidebar { display:none; }
   #userList { width:100%; order:-1; display:flex; overflow-x:auto; border-bottom:1px solid #ddd; padding:6px; gap:6px; }
   .userItem { flex:0 0 auto; margin:0; padding:4px; background:#fff; border-radius:6px; }
-  footer { position:fixed; bottom:0; left:0; right:0; }
-  #chatContainer { height: calc(100vh - 260px); } /* reduz altura para deixar campo visível */
-  #chatInput { position:fixed; bottom:48px; left:0; right:0; padding:8px; z-index:30; background:rgba(255,255,255,0.98); }
+  footer { display:none; } /* Rodapé removido no mobile */
+  #chatContainer { height:calc(100vh - 200px); }
+  #chatInput {
+    position:fixed; bottom:0; left:0; right:0;
+    padding:8px; z-index:30;
+    background:rgba(255,255,255,0.98);
+  }
+  #chatWindow { padding-bottom:80px; } /* espaço para input */
 }
 </style>
 </head>
@@ -141,10 +158,7 @@ footer { background:white; text-align:center; padding:6px; border-top:1px solid 
 
 <footer>© 2025 Славянский клуб — Aprenda Russo e Português</footer>
 
-<!-- Notification toasts -->
 <div id="notificationContainer"></div>
-
-<!-- Sound -->
 <audio id="msgSound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_2a8c4e8d5a.mp3?filename=message-pop-alert-23584.mp3" preload="auto"></audio>
 
 <script>
@@ -162,7 +176,7 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.database();
 
-/* === ELEMENTS === */
+/* === ELEMENTOS === */
 const loginBtn = document.getElementById('loginBtn');
 const logoutBtn = document.getElementById('logoutBtn');
 const generalBtn = document.getElementById('generalBtn');
@@ -176,13 +190,11 @@ const notificationContainer = document.getElementById('notificationContainer');
 const msgSound = document.getElementById('msgSound');
 
 let currentUser = null;
-let currentChat = 'chatGlobal';          // path string used with db.ref(...)
-let currentPartner = null;              // partner uid for private chat
-let activeListenerRef = null;           // current db.ref listener
-let unread = {};                        // map chatId -> count / true to track unread
-let toastMap = {};                      // map chatId -> toast element(s)
+let currentChat = 'chatGlobal';
+let currentPartner = null;
+let activeListenerRef = null;
 
-/* === AUTH HANDLERS === */
+/* === AUTENTICAÇÃO === */
 loginBtn.onclick = () => auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
 logoutBtn.onclick = () => auth.signOut();
 
@@ -195,7 +207,6 @@ auth.onAuthStateChanged(user => {
     msgInput.disabled = false;
     sendBtn.disabled = false;
 
-    // record user presence
     db.ref('users/' + user.uid).set({ name: user.displayName, photo: user.photoURL });
     db.ref('online/' + user.uid).set({ name: user.displayName, photo: user.photoURL });
     db.ref('online/' + user.uid).onDisconnect().remove();
@@ -209,312 +220,99 @@ auth.onAuthStateChanged(user => {
     generalBtn.style.display = 'none';
     msgInput.disabled = true;
     sendBtn.disabled = true;
-
-    // clear UI
     chatWindow.innerHTML = '';
     userList.innerHTML = '';
     onlineCount.textContent = '👥 Usuários online: 0';
-    clearNotifications();
   }
 });
 
-/* === USERS RENDERING === */
+/* === LISTAR USUÁRIOS === */
 function renderUsers(){
-  // show all users (registered) and mark online
   db.ref('users').on('value', snap => {
     const all = snap.val() || {};
     db.ref('online').once('value').then(onlineSnap => {
       const online = onlineSnap.val() || {};
       userList.innerHTML = '';
-      let onlineCountNum = 0;
-      for (const uid of Object.keys(all)) {
-        const u = all[uid];
-        const isOnline = !!online[uid];
-        if (isOnline) onlineCountNum++;
-        // skip showing self
+      let count = 0;
+      for (const uid in all) {
         if (currentUser && uid === currentUser.uid) continue;
-
+        const u = all[uid];
+        const onlineNow = !!online[uid];
+        if (onlineNow) count++;
         const div = document.createElement('div');
         div.className = 'userItem';
-        div.innerHTML = `<img src="${u.photo || 'https://cdn-icons-png.flaticon.com/512/847/847969.png'}"><span>${isOnline ? '🟢' : '⚪'} ${u.name}</span>`;
+        div.dataset.uid = uid;
+        div.innerHTML = `<img src="${u.photo || 'https://cdn-icons-png.flaticon.com/512/847/847969.png'}"><span>${onlineNow ? '🟢' : '⚪'} ${u.name}</span>`;
         div.onclick = () => openPrivate(uid, u.name);
         userList.appendChild(div);
       }
-      onlineCount.textContent = `👥 Usuários online: ${onlineCountNum}`;
+      onlineCount.textContent = `👥 Usuários online: ${count}`;
     });
   });
 }
 
-/* === UTIL: build chatId for private pair === */
-function privateChatId(a, b){
-  return [a, b].sort().join('_');
-}
-
-/* === NOTIFICATIONS (toasts) === */
-function showToastForChat(chatId, senderName){
-  // create one toast per chat, increment counter text if exists
-  let toast = toastMap[chatId];
-  if (!toast) {
-    toast = document.createElement('div');
-    toast.className = 'notification';
-    toast.dataset.chat = chatId;
-    toast.innerHTML = `<div><b>${senderName}</b><div style="font-size:0.85em">Nova mensagem</div></div><div><button title="Fechar">✕</button></div>`;
-    const btn = toast.querySelector('button');
-    btn.onclick = () => {
-      toast.remove();
-      delete toastMap[chatId];
-      unread[chatId] = 0;
-    };
-    notificationContainer.appendChild(toast);
-    toastMap[chatId] = toast;
-  } else {
-    // pulse / small flash to indicate more messages
-    toast.animate([{ transform: 'translateX(0)' }, { transform: 'translateX(-6px)' }, { transform: 'translateX(0)' }], { duration: 300, iterations: 1 });
-  }
-}
-
-/* remove all notification toasts */
-function clearNotifications(){
-  for (const k in toastMap) {
-    const el = toastMap[k];
-    if (el && el.parentNode) el.remove();
-  }
-  Object.assign(toastMap, {});
-  unread = {};
-}
-
-/* remove toast for specific chat */
-function clearToastForChat(chatId){
-  const t = toastMap[chatId];
-  if (t && t.parentNode) t.remove();
-  delete toastMap[chatId];
-  unread[chatId] = 0;
-}
-
-/* === SWITCHING CHATS: remove previous listener cleanly === */
-function detachActiveListener(){
-  if (activeListenerRef) {
-    activeListenerRef.off();
-    activeListenerRef = null;
-  }
-}
-
-/* === OPEN GLOBAL === */
+/* === ABRIR GLOBAL === */
 function openGlobal(){
-  if(!currentUser) return;
-  detachActiveListener();
+  detachListener();
   currentChat = 'chatGlobal';
-  currentPartner = null;
   chatTitle.textContent = '💬 Bate-papo Geral';
   chatWindow.innerHTML = '';
-  clearToastForChat(currentChat); // mark global notifications read
   const ref = db.ref('chatGlobal').limitToLast(200);
   activeListenerRef = ref;
-  // child_added listener
-  ref.on('child_added', snap => {
-    const key = snap.key;
-    const m = snap.val();
-    renderMessage(key, m, 'chatGlobal');
-    // show notification only if not in this chat and message is from someone else
-    if ((currentChat !== 'chatGlobal' || document.hidden) && m.uid !== currentUser.uid) {
-      unread['chatGlobal'] = (unread['chatGlobal']||0) + 1;
-      showToastForChat('chatGlobal', m.user);
-      msgSound.currentTime = 0; msgSound.play();
-    }
-  });
+  ref.on('child_added', snap => renderMessage(snap.key, snap.val()));
 }
 
-/* === OPEN PRIVATE === */
+/* === ABRIR PRIVADO === */
 function openPrivate(uid, name){
-  if(!currentUser) return;
-  detachActiveListener();
+  if (!currentUser) return;
+  detachListener();
   currentPartner = uid;
-  const pair = privateChatId(currentUser.uid, uid);
+  const pair = [currentUser.uid, uid].sort().join('_');
   currentChat = 'private/' + pair;
   chatTitle.textContent = '👤 ' + name;
   chatWindow.innerHTML = '';
-  clearToastForChat(currentChat); // mark this private chat read
   const ref = db.ref('private/' + pair).limitToLast(200);
   activeListenerRef = ref;
-  ref.on('child_added', snap => {
-    const key = snap.key;
-    const m = snap.val();
-    renderMessage(key, m, currentChat);
-    // notify only when we're not viewing this chat, or tab hidden
-    if ((currentChat !== ('private/' + pair) || document.hidden) && m.uid !== currentUser.uid) {
-      unread['private/' + pair] = (unread['private/' + pair]||0) + 1;
-      showToastForChat('private/' + pair, m.user);
-      msgSound.currentTime = 0; msgSound.play();
-    }
-  });
+  ref.on('child_added', snap => renderMessage(snap.key, snap.val()));
 }
 
-/* === RENDER MESSAGE === */
-function renderMessage(key, m, chatPath){
-  // if message belongs to a chat different from the currently opened one, skip rendering here
-  if (chatPath !== currentChat) return;
+/* === DESCONECTA OUVINTE === */
+function detachListener(){
+  if (activeListenerRef) activeListenerRef.off();
+}
 
+/* === ENVIAR MENSAGEM === */
+sendBtn.onclick = sendMessage;
+msgInput.addEventListener('keypress', e => { if (e.key === 'Enter') sendMessage(); });
+function sendMessage(){
+  if (!currentUser) return;
+  const text = msgInput.value.trim();
+  if (!text) return;
+  db.ref(currentChat).push({
+    uid: currentUser.uid,
+    user: currentUser.displayName,
+    text,
+    timestamp: Date.now()
+  });
+  msgInput.value = '';
+}
+
+/* === RENDER === */
+function renderMessage(key, m){
   const div = document.createElement('div');
-  div.className = (m.uid === currentUser?.uid) ? 'msg userMsg' : 'msg otherMsg';
-  // show author, text and time
-  const time = m.timestamp ? new Date(m.timestamp).toLocaleTimeString() : '';
-  div.innerHTML = `<strong>${escapeHtml(m.user)}</strong>: ${escapeHtml(m.text)}<small>${time}</small>`;
-
+  div.className = m.uid === currentUser?.uid ? 'msg userMsg' : 'msg otherMsg';
+  const time = new Date(m.timestamp).toLocaleTimeString();
+  div.innerHTML = `<strong>${m.user}</strong>: ${m.text}<small>${time}</small>`;
   if (m.uid === currentUser?.uid) {
     const del = document.createElement('button');
     del.className = 'deleteBtn';
     del.textContent = '🗑';
-    del.title = 'Apagar (somente para você)';
-    del.onclick = () => deleteOwnMessage(chatPath, key);
+    del.onclick = () => db.ref(currentChat + '/' + key).remove();
     div.appendChild(del);
   }
-
   chatWindow.appendChild(div);
   chatWindow.scrollTop = chatWindow.scrollHeight;
 }
-
-/* simple escape to avoid injection from message text */
-function escapeHtml(s){
-  return (s+'').replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-}
-
-/* === SEND MESSAGE === */
-sendBtn.onclick = sendMessage;
-msgInput.addEventListener('keypress', e => { if (e.key === 'Enter') sendMessage(); });
-
-function sendMessage(){
-  if (!currentUser) return alert('Faça login primeiro.');
-  const text = msgInput.value.trim();
-  if (!text) return;
-  const payload = { uid: currentUser.uid, user: currentUser.displayName, text, timestamp: Date.now() };
-  db.ref(currentChat).push(payload);
-  msgInput.value = '';
-}
-
-/* === DELETE OWN MESSAGE (removes from DB so all see removal) ===
-   If you want "apagar só para você", instead of removing from DB you would
-   mark a local flag — but requirement said "apagar somente pelo autor",
-   so we remove DB node (only if author).
-*/
-function deleteOwnMessage(chatPath, key){
-  if (!currentUser) return;
-  db.ref(chatPath + '/' + key).once('value').then(snap => {
-    const m = snap.val();
-    if (m && m.uid === currentUser.uid) {
-      db.ref(chatPath + '/' + key).remove();
-      // also remove any local rendered element (listener will also update)
-      // optionally show confirmation
-    } else {
-      alert('Você só pode apagar suas próprias mensagens.');
-    }
-  });
-}
-
-/* === clear all toasts when user opens a chat (i.e. marks as read) === */
-function markChatRead(chatPath){
-  unread[chatPath] = 0;
-  clearToastForChat(chatPath);
-}
-
-/* Attach handlers for general button */
-generalBtn.onclick = () => {
-  openGlobal();
-  markChatRead('chatGlobal');
-};
-
-/* Clear active listener when leaving page */
-window.addEventListener('beforeunload', () => {
-  detachActiveListener();
-});
-
-/* When user manually clicks a toast, open that chat (if private, need to extract path) */
-notificationContainer.addEventListener('click', e => {
-  const n = e.target.closest('.notification');
-  if (!n) return;
-  const chatId = n.dataset.chat;
-  // if chatId is 'chatGlobal' -> open global
-  if (chatId === 'chatGlobal') {
-    openGlobal();
-    markChatRead(chatId);
-  } else if (chatId && chatId.startsWith('private/')) {
-    // chatId like 'private/uid1_uid2'
-    const pair = chatId.replace('private/', '');
-    // extract other uid to show title: pick the uid != currentUser.uid
-    const parts = pair.split('_');
-    let otherUid = parts[0] === currentUser.uid ? parts[1] : parts[0];
-    // fetch user name then open
-    db.ref('users/' + otherUid).once('value').then(snap => {
-      const u = snap.val();
-      openPrivate(otherUid, u ? u.name : 'Privado');
-      markChatRead(chatId);
-    });
-  }
-});
-
-/* Remove toast also when user opens chat via user list */
-function openPrivate(uid, name){
-  // reuse function defined earlier but ensure toast cleared
-  // We'll call the original openPrivate function (defined above) — to avoid duplicate definition,
-  // create a wrapper that clears toast then calls the real one.
-  // But we already defined openPrivate earlier; reassigning here to ensure toast clear.
-  // For simplicity, call internal openPrivateImpl:
-  openPrivateImpl(uid, name);
-}
-function openPrivateImpl(uid, name){
-  // detach and open as before
-  detachActiveListener();
-  currentPartner = uid;
-  const pair = privateChatId(currentUser.uid, uid);
-  currentChat = 'private/' + pair;
-  chatTitle.textContent = '👤 ' + name;
-  chatWindow.innerHTML = '';
-  clearToastForChat(currentChat);
-  const ref = db.ref('private/' + pair).limitToLast(200);
-  activeListenerRef = ref;
-  ref.on('child_added', snap => {
-    renderMessage(snap.key, snap.val(), currentChat);
-    const m = snap.val();
-    if ((currentChat !== ('private/' + pair) || document.hidden) && m.uid !== currentUser.uid) {
-      unread['private/' + pair] = (unread['private/' + pair]||0) + 1;
-      showToastForChat('private/' + pair, m.user);
-      msgSound.currentTime = 0; msgSound.play();
-    }
-  });
-}
-
-/* fix: ensure previous openPrivate (above) points here */
-window.openPrivate = openPrivateImpl;
-
-/* Also handle opening global via API above */
-window.openGlobal = openGlobal;
-
-/* Click on user items should call openPrivateImpl */
-userList.addEventListener('click', e => {
-  const target = e.target.closest('.userItem');
-  if (!target) return;
-  // extract name from span and photo ignored
-  const span = target.querySelector('span');
-  const text = span ? span.textContent : '';
-  // name may have status prefix; strip first two chars e.g. "🟢 Name"
-  const name = text.replace(/^.\s*/, '').trim();
-  // find uid by matching users list (we can lookup by name in users node)
-  // To be robust, find uid by name; if duplicate names, this could be ambiguous.
-  db.ref('users').orderByChild('name').equalTo(name).once('value').then(snap => {
-    const val = snap.val();
-    if (!val) return alert('Usuário não encontrado.');
-    const uid = Object.keys(val)[0];
-    openPrivateImpl(uid, name);
-  });
-});
-
-/* Utility: clear toasts on focus (user returned to tab) for current chat */
-document.addEventListener('visibilitychange', () => {
-  if (!document.hidden) {
-    // clear notification for currently open chat
-    clearToastForChat(currentChat);
-  }
-});
-
 </script>
 </body>
 </html>
