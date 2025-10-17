@@ -152,6 +152,29 @@ footer {
   z-index:5;
 }
 
+/* NOTIFICAÇÕES */
+#notificationContainer {
+  position:fixed;
+  top:70px;
+  right:10px;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  z-index:200;
+}
+.notification {
+  background:#4CAF50;
+  color:white;
+  padding:10px;
+  border-radius:8px;
+  box-shadow:0 2px 6px rgba(0,0,0,0.2);
+  animation:slideIn 0.3s ease;
+}
+@keyframes slideIn {
+  from { opacity:0; transform:translateX(50px); }
+  to { opacity:1; transform:translateX(0); }
+}
+
 /* MOBILE */
 @media(max-width:768px){
   #mainContent { flex-direction:column; height:auto; }
@@ -224,6 +247,10 @@ footer {
 
 <footer>© 2025 Славянский клуб — Aprenda Russo e Português</footer>
 
+<!-- Container de notificações -->
+<div id="notificationContainer"></div>
+
+<!-- Áudio de notificação -->
 <audio id="msgSound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_2a8c4e8d5a.mp3?filename=message-pop-alert-23584.mp3" preload="auto"></audio>
 
 <script>
@@ -238,26 +265,25 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 
-const auth = firebase.auth();
-const db = firebase.database();
+const auth=firebase.auth(), db=firebase.database();
 
-const loginBtn = document.getElementById("loginBtn");
-const logoutBtn = document.getElementById("logoutBtn");
-const generalBtn = document.getElementById("generalBtn");
-const toggleUsers = document.getElementById("toggleUsers");
-const userList = document.getElementById("userList");
-const msgInput = document.getElementById("msgInput");
-const sendBtn = document.getElementById("sendBtn");
-const chatWindow = document.getElementById("chatWindow");
-const chatTitle = document.getElementById("chatTitle");
-const clearBtn = document.getElementById("clearBtn");
-const blockBtn = document.getElementById("blockBtn");
-const msgSound = document.getElementById("msgSound");
-const onlineCount = document.getElementById("onlineCount");
+const loginBtn=document.getElementById("loginBtn"),
+logoutBtn=document.getElementById("logoutBtn"),
+generalBtn=document.getElementById("generalBtn"),
+toggleUsers=document.getElementById("toggleUsers"),
+userList=document.getElementById("userList"),
+msgInput=document.getElementById("msgInput"),
+sendBtn=document.getElementById("sendBtn"),
+chatWindow=document.getElementById("chatWindow"),
+chatTitle=document.getElementById("chatTitle"),
+clearBtn=document.getElementById("clearBtn"),
+blockBtn=document.getElementById("blockBtn"),
+msgSound=document.getElementById("msgSound"),
+notificationContainer=document.getElementById("notificationContainer"),
+onlineCount=document.getElementById("onlineCount");
 
-let currentUser=null, currentChat="chatGlobal", blocked={}, currentPartner=null;
+let currentUser=null,currentChat="chatGlobal",blocked={},currentPartner=null;
 
-// LOGIN
 loginBtn.onclick=()=>auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
 logoutBtn.onclick=()=>auth.signOut();
 
@@ -271,13 +297,12 @@ auth.onAuthStateChanged(u=>{
     msgInput.disabled=false;
     sendBtn.disabled=false;
 
-    // Usuário online
     db.ref("online/"+u.uid).set({name:u.displayName,photo:u.photoURL});
     db.ref("online/"+u.uid).onDisconnect().remove();
 
     updateUsers();
     openGlobal();
-  } else {
+  }else{
     currentUser=null;
     loginBtn.style.display="inline-block";
     logoutBtn.style.display="none";
@@ -291,12 +316,10 @@ auth.onAuthStateChanged(u=>{
   }
 });
 
-// TOGGLE LISTA MOBILE
 toggleUsers.onclick=()=>{
-  userList.style.display = (userList.style.display==="block") ? "none" : "block";
+  userList.style.display=(userList.style.display==="block")?"none":"block";
 };
 
-// LISTA DE USUÁRIOS ONLINE
 function updateUsers(){
   db.ref("online").on("value",snap=>{
     const data=snap.val()||{};
@@ -313,27 +336,43 @@ function updateUsers(){
   });
 }
 
-// CHAT GERAL (persistente)
+// === FUNÇÃO DE NOTIFICAÇÃO ===
+function showNotification(user,chatType){
+  const n=document.createElement("div");
+  n.className="notification";
+  n.textContent=`📩 Nova mensagem de ${user} (${chatType})`;
+  notificationContainer.appendChild(n);
+  setTimeout(()=>n.remove(),4000);
+  msgSound.currentTime=0;
+  msgSound.play();
+}
+
 function openGlobal(){
   currentChat="chatGlobal";
   currentPartner=null;
   chatTitle.textContent="💬 Bate-papo Geral";
   chatWindow.innerHTML="";
   db.ref("chatGlobal").off();
-  db.ref("chatGlobal").limitToLast(100).on("child_added",snap=>renderMsg(snap.key,snap.val()));
+  db.ref("chatGlobal").limitToLast(100).on("child_added",snap=>{
+    const m=snap.val();
+    renderMsg(snap.key,m);
+    if(currentChat!=="chatGlobal" && m.uid!==currentUser?.uid) showNotification(m.user,"Geral");
+  });
 }
 
-// CHAT PRIVADO
 function openPrivate(uid,name){
   currentPartner=uid;
   currentChat="private/"+[currentUser.uid,uid].sort().join("_");
   chatTitle.textContent="👤 "+name;
   chatWindow.innerHTML="";
   db.ref(currentChat).off();
-  db.ref(currentChat).limitToLast(100).on("child_added",snap=>renderMsg(snap.key,snap.val()));
+  db.ref(currentChat).limitToLast(100).on("child_added",snap=>{
+    const m=snap.val();
+    renderMsg(snap.key,m);
+    if(currentChat!==("private/"+[currentUser.uid,uid].sort().join("_")) && m.uid!==currentUser?.uid) showNotification(m.user,"Privado");
+  });
 }
 
-// RENDER MENSAGEM
 function renderMsg(key,m){
   const div=document.createElement("div");
   div.className=m.uid===currentUser?.uid?"msg userMsg":"msg otherMsg";
@@ -347,16 +386,18 @@ function renderMsg(key,m){
   }
   chatWindow.appendChild(div);
   chatWindow.scrollTop=chatWindow.scrollHeight;
-  if(m.uid!==currentUser?.uid){ msgSound.currentTime=0; msgSound.play(); }
+  if(m.uid!==currentUser?.uid && currentChat==="chatGlobal"){
+    msgSound.currentTime=0;
+    msgSound.play();
+  }
 }
 
-// ENVIAR
 sendBtn.onclick=sendMsg;
 msgInput.addEventListener("keypress",e=>{if(e.key==="Enter")sendMsg();});
 function sendMsg(){
-  if(!currentUser) return;
+  if(!currentUser)return;
   const text=msgInput.value.trim();
-  if(!text) return;
+  if(!text)return;
   db.ref(currentChat).push({
     uid:currentUser.uid,
     user:currentUser.displayName,
@@ -366,38 +407,24 @@ function sendMsg(){
   msgInput.value="";
 }
 
-// APAGAR MENSAGEM (somente autor)
 function deleteMsg(key){
   db.ref(currentChat+"/"+key).once("value").then(snap=>{
     const msg=snap.val();
     if(msg && msg.uid===currentUser.uid){
       db.ref(currentChat+"/"+key).remove();
       alert("Mensagem apagada com sucesso.");
-    } else {
+    }else{
       alert("Você só pode apagar suas próprias mensagens.");
     }
   });
 }
 
-// REMOVER MENSAGEM REMOVIDA NA TELA
-db.ref().on("child_removed",snap=>{
-  const msgs=document.querySelectorAll(".msg");
-  msgs.forEach(m=>{
-    if(m.textContent.includes(snap.val()?.text)) m.remove();
-  });
-});
-
-// LIMPAR CHAT LOCAL
 clearBtn.onclick=()=>{ chatWindow.innerHTML=""; };
-
-// BLOQUEAR
 blockBtn.onclick=()=>{
-  if(!currentPartner) return alert("Selecione um usuário para bloquear.");
+  if(!currentPartner)return alert("Selecione um usuário para bloquear.");
   blocked[currentPartner]=!blocked[currentPartner];
   alert(blocked[currentPartner]?"Usuário bloqueado":"Usuário desbloqueado");
 };
-
-// VOLTAR AO CHAT GERAL
 generalBtn.onclick=openGlobal;
 </script>
 
