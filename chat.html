@@ -108,14 +108,14 @@ footer {
   #adSidebar { display:none; }
   #userList { width:100%; order:-1; display:flex; overflow-x:auto; border-bottom:1px solid #ddd; padding:6px; gap:6px; }
   .userItem { flex:0 0 auto; margin:0; padding:4px; background:#fff; border-radius:6px; }
-  footer { display:none; } /* Rodapé removido no mobile */
+  footer { display:none; }
   #chatContainer { height:calc(100vh - 200px); }
   #chatInput {
     position:fixed; bottom:0; left:0; right:0;
     padding:8px; z-index:30;
     background:rgba(255,255,255,0.98);
   }
-  #chatWindow { padding-bottom:80px; } /* espaço para input */
+  #chatWindow { padding-bottom:80px; }
 }
 </style>
 </head>
@@ -138,26 +138,21 @@ footer {
 
 <div id="mainContent">
   <div id="userList"></div>
-
   <div id="chatContainer">
     <div id="chatHeader">
       <h2 id="chatTitle">💬 Bate-papo Geral</h2>
       <div id="headerControls"></div>
     </div>
-
     <div id="chatWindow"></div>
-
     <div id="chatInput">
       <input id="msgInput" type="text" placeholder="Digite sua mensagem..." disabled>
       <button id="sendBtn" disabled>Enviar</button>
     </div>
   </div>
-
   <div id="adSidebar">Publicidade (Adsense)</div>
 </div>
 
 <footer>© 2025 Славянский клуб — Aprenda Russo e Português</footer>
-
 <div id="notificationContainer"></div>
 <audio id="msgSound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_2a8c4e8d5a.mp3?filename=message-pop-alert-23584.mp3" preload="auto"></audio>
 
@@ -213,6 +208,7 @@ auth.onAuthStateChanged(user => {
 
     renderUsers();
     openGlobal();
+    watchPrivateMessages(); // 🔔 Ativa detecção de mensagens privadas
   } else {
     currentUser = null;
     loginBtn.style.display = 'inline-block';
@@ -274,6 +270,7 @@ function openPrivate(uid, name){
   const ref = db.ref('private/' + pair).limitToLast(200);
   activeListenerRef = ref;
   ref.on('child_added', snap => renderMessage(snap.key, snap.val()));
+  removeNotification(uid); // 🔕 apaga notificação ao abrir
 }
 
 /* === DESCONECTA OUVINTE === */
@@ -312,6 +309,40 @@ function renderMessage(key, m){
   }
   chatWindow.appendChild(div);
   chatWindow.scrollTop = chatWindow.scrollHeight;
+}
+
+/* === NOTIFICAÇÕES PRIVADAS === */
+function watchPrivateMessages(){
+  db.ref('private').on('child_added', chatSnap => {
+    const chatId = chatSnap.key;
+    if (!chatId.includes(currentUser.uid)) return;
+    db.ref('private/' + chatId).limitToLast(1).on('child_added', snap => {
+      const msg = snap.val();
+      if (msg.uid !== currentUser.uid) {
+        const otherUid = chatId.replace(currentUser.uid, '').replace('_', '');
+        if (currentChat !== 'private/' + chatId) {
+          showNotification(msg.user, msg.text, otherUid);
+          msgSound.currentTime = 0;
+          msgSound.play();
+        }
+      }
+    });
+  });
+}
+
+/* === EXIBIR / REMOVER NOTIF === */
+function showNotification(user, text, uid){
+  removeNotification(uid);
+  const div = document.createElement('div');
+  div.className = 'notification';
+  div.dataset.uid = uid;
+  div.innerHTML = `<b>${user}</b>: ${text}<button onclick="removeNotification('${uid}')">✖</button>`;
+  notificationContainer.appendChild(div);
+}
+
+function removeNotification(uid){
+  const n = notificationContainer.querySelector(`[data-uid='${uid}']`);
+  if (n) n.remove();
 }
 </script>
 </body>
