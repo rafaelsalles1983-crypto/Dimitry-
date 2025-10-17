@@ -158,8 +158,8 @@ footer {
 
 <div id="topBar">
   <div class="left">
-    <button onclick="window.location.href='index.html'">🏠 Início</button>
-    <button onclick="history.back()">⬅️ Voltar</button>
+    <button id="homeBtn">🏠 Início</button>
+    <button id="backBtn">⬅️ Voltar</button>
     <button id="loginBtn">Login com Google</button>
     <button id="logoutBtn" style="display:none;">Logout</button>
     <button id="generalBtn" style="display:none;">💬 Bate-papo Geral</button>
@@ -182,61 +182,91 @@ footer {
   <div id="adSidebar">Publicidade (Adsense)</div>
 </div>
 
-<footer>© 2025 Славянский клуб — Aprenda Russo e Português</footer>
+<footer id="footer">© 2025 Славянский клуб — Aprenda Russo e Português</footer>
 <div id="notificationContainer"></div>
 <audio id="msgSound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_2a8c4e8d5a.mp3?filename=message-pop-alert-23584.mp3" preload="auto"></audio>
 
 <script>
-/* === TEMA === */
+/* ===== TEMAS ===== */
 const themeBtn=document.getElementById('themeBtn');
-themeBtn.onclick=()=>{
-  document.body.classList.toggle('dark');
-  themeBtn.textContent=document.body.classList.contains('dark')?'☀️':'🌙';
-};
+themeBtn.onclick=()=>{document.body.classList.toggle('dark'); themeBtn.textContent=document.body.classList.contains('dark')?'☀️':'🌙';};
 
-/* === IDIOMA === */
+/* ===== IDIOMA ===== */
 const langBtn=document.getElementById('langBtn');
 let currentLang='ru';
-langBtn.onclick=()=>{
-  if(currentLang==='ru'){currentLang='pt';langBtn.textContent='🇧🇷 PT';document.documentElement.lang='pt-BR';}
-  else{currentLang='ru';langBtn.textContent='🇷🇺 Рус';document.documentElement.lang='ru';}
+const texts={
+  ru:{
+    siteName:"Славянский клуб",
+    homeBtn:"🏠 Главная",
+    backBtn:"⬅️ Назад",
+    loginBtn:"Войти через Google",
+    logoutBtn:"Выйти",
+    chatBtn:"💬 Общий чат",
+    usersOnline:"👥 Пользователи онлайн: ",
+    msgPlaceholder:"Введите сообщение...",
+    sendBtn:"Отправить",
+    footer:"© 2025 Славянский клуб — Учите русский и португальский",
+    chatTitle:"💬 Общий чат"
+  },
+  pt:{
+    siteName:"Славянский клуб",
+    homeBtn:"🏠 Início",
+    backBtn:"⬅️ Voltar",
+    loginBtn:"Login com Google",
+    logoutBtn:"Logout",
+    chatBtn:"💬 Bate-papo Geral",
+    usersOnline:"👥 Usuários online: ",
+    msgPlaceholder:"Digite sua mensagem...",
+    sendBtn:"Enviar",
+    footer:"© 2025 Славянский клуб — Aprenda Russo e Português",
+    chatTitle:"💬 Bate-papo Geral"
+  }
 };
+function updateTexts(lang){
+  document.querySelector('header h1').childNodes[0].nodeValue = texts[lang].siteName + " ";
+  document.getElementById('homeBtn').textContent = texts[lang].homeBtn;
+  document.getElementById('backBtn').textContent = texts[lang].backBtn;
+  document.getElementById('loginBtn').textContent = texts[lang].loginBtn;
+  document.getElementById('logoutBtn').textContent = texts[lang].logoutBtn;
+  document.getElementById('generalBtn').textContent = texts[lang].chatBtn;
+  document.getElementById('onlineCount').textContent = texts[lang].usersOnline + (parseInt(document.getElementById('onlineCount').textContent.replace(/\D/g,''))||0);
+  document.getElementById('msgInput').placeholder = texts[lang].msgPlaceholder;
+  document.getElementById('sendBtn').textContent = texts[lang].sendBtn;
+  document.getElementById('footer').textContent = texts[lang].footer;
+  document.getElementById('chatTitle').textContent = texts[lang].chatTitle;
+}
+langBtn.onclick = ()=>{
+  if(currentLang==='ru'){currentLang='pt'; langBtn.textContent='🇧🇷 PT'; document.documentElement.lang='pt-BR';}
+  else{currentLang='ru'; langBtn.textContent='🇷🇺 Рус'; document.documentElement.lang='ru';}
+  updateTexts(currentLang);
+};
+updateTexts(currentLang);
 
-/* === FIREBASE CONFIG E CHAT === */
-const firebaseConfig = {
-  apiKey: "AIzaSyCYJCgfil5HKrCWtB14zwdicDaEcldHU6A",
-  authDomain: "dimitry-rusian.firebaseapp.com",
-  databaseURL: "https://dimitry-rusian-default-rtdb.firebaseio.com",
-  projectId: "dimitry-rusian",
-  storageBucket: "dimitry-rusian.appspot.com",
-  messagingSenderId: "449029666805",
-  appId: "1:449029666805:web:feaf575a7b7e6f234a52bc"
-};
+/* ===== FIREBASE E CHAT ===== */
+const firebaseConfig={apiKey:"AIzaSyCYJCgfil5HKrCWtB14zwdicDaEcldHU6A", authDomain:"dimitry-rusian.firebaseapp.com", databaseURL:"https://dimitry-rusian-default-rtdb.firebaseio.com", projectId:"dimitry-rusian", storageBucket:"dimitry-rusian.appspot.com", messagingSenderId:"449029666805", appId:"1:449029666805:web:feaf575a7b7e6f234a52bc"};
 firebase.initializeApp(firebaseConfig);
 const auth=firebase.auth(), db=firebase.database();
 
-const loginBtn=document.getElementById('loginBtn'), logoutBtn=document.getElementById('logoutBtn'), generalBtn=document.getElementById('generalBtn');
+const loginBtnEl=document.getElementById('loginBtn'), logoutBtnEl=document.getElementById('logoutBtn'), generalBtnEl=document.getElementById('generalBtn');
 const userList=document.getElementById('userList'), msgInput=document.getElementById('msgInput'), sendBtn=document.getElementById('sendBtn');
 const chatWindow=document.getElementById('chatWindow'), chatTitle=document.getElementById('chatTitle'), onlineCount=document.getElementById('onlineCount');
 const notificationContainer=document.getElementById('notificationContainer'), msgSound=document.getElementById('msgSound');
 let currentUser=null, currentChat='chatGlobal', activeListener=null;
 
-loginBtn.onclick=()=>auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
-logoutBtn.onclick=()=>auth.signOut();
-generalBtn.onclick=openGlobal;
+loginBtnEl.onclick=()=>auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
+logoutBtnEl.onclick=()=>auth.signOut();
+generalBtnEl.onclick=openGlobal;
 
 auth.onAuthStateChanged(user=>{
   if(user){
     currentUser=user;
-    loginBtn.style.display='none';logoutBtn.style.display='inline-block';generalBtn.style.display='inline-block';
-    msgInput.disabled=false;sendBtn.disabled=false;
+    loginBtnEl.style.display='none'; logoutBtnEl.style.display='inline-block'; generalBtnEl.style.display='inline-block';
+    msgInput.disabled=false; sendBtn.disabled=false;
     db.ref('users/'+user.uid).set({name:user.displayName,photo:user.photoURL});
     db.ref('online/'+user.uid).set({name:user.displayName});
     db.ref('online/'+user.uid).onDisconnect().remove();
-    renderUsers();openGlobal();watchPrivateMessages();
-  } else {
-    currentUser=null;msgInput.disabled=true;sendBtn.disabled=true;chatWindow.innerHTML='';
-  }
+    renderUsers(); openGlobal(); watchPrivateMessages();
+  } else { currentUser=null; msgInput.disabled=true; sendBtn.disabled=true; chatWindow.innerHTML=''; }
 });
 
 function renderUsers(){
@@ -244,76 +274,61 @@ function renderUsers(){
     const all=snap.val()||{};
     db.ref('online').once('value').then(oSnap=>{
       const online=oSnap.val()||{};
-      userList.innerHTML='';let count=0;
+      userList.innerHTML=''; let count=0;
       for(const uid in all){
-        if(uid===currentUser?.uid)continue;
-        const u=all[uid];const onlineNow=!!online[uid];if(onlineNow)count++;
+        if(uid===currentUser?.uid) continue;
+        const u=all[uid]; const onlineNow=!!online[uid]; if(onlineNow) count++;
         const d=document.createElement('div');
         d.className='userItem';
         d.innerHTML=`<img src="${u.photo}"><span>${onlineNow?'🟢':'⚪'} ${u.name}</span>`;
         d.onclick=()=>openPrivate(uid,u.name);
         userList.appendChild(d);
       }
-      onlineCount.textContent=`👥 Usuários online: ${count}`;
+      onlineCount.textContent = texts[currentLang].usersOnline + count;
     });
   });
 }
 
 function openGlobal(){
-  detach();
-  currentChat='chatGlobal';
-  chatTitle.textContent='💬 Bate-papo Geral';
-  chatWindow.innerHTML='';
-  const ref=db.ref('chatGlobal').limitToLast(200);
-  activeListener=ref;
+  detach(); currentChat='chatGlobal'; chatTitle.textContent = texts[currentLang].chatTitle; chatWindow.innerHTML='';
+  const ref=db.ref('chatGlobal').limitToLast(200); activeListener=ref;
   ref.on('child_added',s=>renderMessage(s.key,s.val()));
 }
 
 function openPrivate(uid,name){
   detach();
   const path=['private',[currentUser.uid,uid].sort().join('_')].join('/');
-  currentChat=path;chatTitle.textContent='👤 '+name;chatWindow.innerHTML='';
-  const ref=db.ref(path).limitToLast(200);
-  activeListener=ref;
+  currentChat=path; chatTitle.textContent='👤 '+name; chatWindow.innerHTML='';
+  const ref=db.ref(path).limitToLast(200); activeListener=ref;
   ref.on('child_added',s=>renderMessage(s.key,s.val()));
   removeNotification(uid);
 }
 
-function detach(){if(activeListener)activeListener.off();}
-sendBtn.onclick=sendMsg;msgInput.addEventListener('keypress',e=>{if(e.key==='Enter')sendMsg();});
-function sendMsg(){
-  const txt=msgInput.value.trim();
-  if(!txt||!currentUser)return;
-  db.ref(currentChat).push({uid:currentUser.uid,user:currentUser.displayName,text:txt,timestamp:Date.now()});
-  msgInput.value='';
-}
+function detach(){if(activeListener) activeListener.off();}
+sendBtn.onclick=sendMsg; msgInput.addEventListener('keypress',e=>{if(e.key==='Enter')sendMsg();});
+function sendMsg(){const txt=msgInput.value.trim(); if(!txt||!currentUser)return; db.ref(currentChat).push({uid:currentUser.uid,user:currentUser.displayName,text:txt,timestamp:Date.now()}); msgInput.value='';}
 function renderMessage(key,m){
   const div=document.createElement('div');
   div.className=m.uid===currentUser?.uid?'msg userMsg':'msg otherMsg';
   div.innerHTML=`<strong>${m.user}</strong>: ${m.text}<small>${new Date(m.timestamp).toLocaleTimeString()}</small>`;
-  if(m.uid===currentUser?.uid){
-    const del=document.createElement('button');
-    del.className='deleteBtn';del.textContent='🗑';
-    del.onclick=()=>db.ref(currentChat+'/'+key).remove();
-    div.appendChild(del);
-  }
-  chatWindow.appendChild(div);chatWindow.scrollTop=chatWindow.scrollHeight;
+  if(m.uid===currentUser?.uid){ const del=document.createElement('button'); del.className='deleteBtn'; del.textContent='🗑'; del.onclick=()=>db.ref(currentChat+'/'+key).remove(); div.appendChild(del);}
+  chatWindow.appendChild(div); chatWindow.scrollTop=chatWindow.scrollHeight;
 }
 
 function watchPrivateMessages(){
   db.ref('private').on('child_added',chat=>{
     const chatId=chat.key;
-    if(!chatId.includes(currentUser.uid))return;
+    if(!chatId.includes(currentUser.uid)) return;
     db.ref('private/'+chatId).limitToLast(1).on('child_added',snap=>{
       const m=snap.val();
       if(m.uid!==currentUser.uid && currentChat!=='private/'+chatId){
         const other=chatId.replace(currentUser.uid,'').replace('_','');
-        showNotification(m.user,m.text,other);
-        msgSound.currentTime=0;msgSound.play();
+        showNotification(m.user,m.text,other); msgSound.currentTime=0; msgSound.play();
       }
     });
   });
 }
+
 function showNotification(user,text,uid){
   removeNotification(uid);
   const n=document.createElement('div');
@@ -324,7 +339,7 @@ function showNotification(user,text,uid){
 }
 function removeNotification(uid){
   const n=notificationContainer.querySelector(`[data-uid='${uid}']`);
-  if(n)n.remove();
+  if(n) n.remove();
 }
 </script>
 </body>
