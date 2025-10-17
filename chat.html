@@ -118,7 +118,7 @@ header h1 { color:var(--color-primary); font-size:1.3em; display:flex; align-ite
 .userMsg:hover .deleteBtn { display:inline; }
 
 /* INPUT */
-#chatInput { display:flex; border-top:1px solid #ddd; }
+#chatInput { display:flex; border-top:1px solid #ddd; background:#fff; }
 #chatInput input {
   flex:1;
   padding:10px;
@@ -180,7 +180,7 @@ footer {
 @media(max-width:768px){
   #mainContent { flex-direction:column; height:auto; }
   #adSidebar { display:none; }
-
+  #chatContainer { height:calc(100vh - 270px); } /* Reduzido para exibir input */
   #userList {
     position:fixed;
     top:100px;
@@ -206,7 +206,6 @@ footer {
     right:0;
     z-index:100;
   }
-  #chatContainer { height:calc(100vh - 220px); }
 }
 </style>
 </head>
@@ -249,22 +248,17 @@ footer {
 
 <footer>© 2025 Славянский клуб — Aprenda Russo e Português</footer>
 
-<!-- Container de notificações -->
 <div id="notificationContainer"></div>
-
-<!-- Som -->
 <audio id="msgSound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_2a8c4e8d5a.mp3?filename=message-pop-alert-23584.mp3" preload="auto"></audio>
 
 <script>
-const firebaseConfig={
-  apiKey:"AIzaSyCYJCgfil5HKrCWtB14zwdicDaEcldHU6A",
-  authDomain:"dimitry-rusian.firebaseapp.com",
-  databaseURL:"https://dimitry-rusian-default-rtdb.firebaseio.com",
-  projectId:"dimitry-rusian",
-  storageBucket:"dimitry-rusian.appspot.com",
-  messagingSenderId:"449029666805",
-  appId:"1:449029666805:web:feaf575a7b7e6f234a52bc"
-};
+const firebaseConfig={apiKey:"AIzaSyCYJCgfil5HKrCWtB14zwdicDaEcldHU6A",
+authDomain:"dimitry-rusian.firebaseapp.com",
+databaseURL:"https://dimitry-rusian-default-rtdb.firebaseio.com",
+projectId:"dimitry-rusian",
+storageBucket:"dimitry-rusian.appspot.com",
+messagingSenderId:"449029666805",
+appId:"1:449029666805:web:feaf575a7b7e6f234a52bc"};
 firebase.initializeApp(firebaseConfig);
 const auth=firebase.auth(),db=firebase.database();
 
@@ -286,19 +280,13 @@ onlineCount=document.getElementById("onlineCount");
 let currentUser=null,currentChat="chatGlobal",blocked={},currentPartner=null;
 let titleFlashing=false,flashInterval=null,originalTitle=document.title;
 
-function startFlashing(title){
-  if(titleFlashing) return;
-  titleFlashing=true;
-  let showing=false;
-  flashInterval=setInterval(()=>{
-    document.title=showing?originalTitle:`🔔 ${title}`;
-    showing=!showing;
-  },1000);
-}
-function stopFlashing(){
-  titleFlashing=false;
-  clearInterval(flashInterval);
-  document.title=originalTitle;
+function showNotification(user,chatType){
+  const n=document.createElement("div");
+  n.className="notification";
+  n.textContent=`📩 Nova mensagem de ${user} (${chatType})`;
+  notificationContainer.appendChild(n);
+  setTimeout(()=>n.remove(),4000);
+  msgSound.currentTime=0; msgSound.play();
 }
 
 loginBtn.onclick=()=>auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
@@ -359,18 +347,7 @@ function updateUsers(){
   });
 }
 
-function showNotification(user,chatType){
-  const n=document.createElement("div");
-  n.className="notification";
-  n.textContent=`📩 Nova mensagem de ${user} (${chatType})`;
-  notificationContainer.appendChild(n);
-  setTimeout(()=>n.remove(),4000);
-  msgSound.currentTime=0; msgSound.play();
-  startFlashing("Nova mensagem!");
-}
-
 function openGlobal(){
-  stopFlashing();
   currentChat="chatGlobal";
   currentPartner=null;
   chatTitle.textContent="💬 Bate-papo Geral";
@@ -379,28 +356,14 @@ function openGlobal(){
   db.ref("chatGlobal").limitToLast(100).on("child_added",snap=>{
     const m=snap.val();
     renderMsg(snap.key,m);
-    if(document.hidden && m.uid!==currentUser?.uid) showNotification(m.user,"Geral");
-  });
-}
-
-function openPrivate(uid,name){
-  stopFlashing();
-  currentPartner=uid;
-  currentChat="private/"+[currentUser.uid,uid].sort().join("_");
-  chatTitle.textContent="👤 "+name;
-  chatWindow.innerHTML="";
-  db.ref(currentChat).off();
-  db.ref(currentChat).limitToLast(100).on("child_added",snap=>{
-    const m=snap.val();
-    renderMsg(snap.key,m);
-    if(document.hidden && m.uid!==currentUser?.uid) showNotification(m.user,"Privado");
+    if(m.uid!==currentUser?.uid) showNotification(m.user,"Geral");
   });
 }
 
 function renderMsg(key,m){
   const div=document.createElement("div");
   div.className=m.uid===currentUser?.uid?"msg userMsg":"msg otherMsg";
-  div.innerHTML=`${m.user}: ${m.text}`;
+  div.innerHTML=`<b>${m.user}</b>: ${m.text}`;
   if(m.uid===currentUser?.uid){
     const del=document.createElement("span");
     del.className="deleteBtn";
@@ -440,11 +403,7 @@ function deleteMsg(key){
 }
 
 clearBtn.onclick=()=>chatWindow.innerHTML="";
-blockBtn.onclick=()=>{
-  if(!currentPartner)return alert("Selecione um usuário para bloquear.");
-  blocked[currentPartner]=!blocked[currentPartner];
-  alert(blocked[currentPartner]?"Usuário bloqueado":"Usuário desbloqueado");
-};
+blockBtn.onclick=()=>alert("Função de bloqueio apenas em chats privados.");
 generalBtn.onclick=openGlobal;
 </script>
 
