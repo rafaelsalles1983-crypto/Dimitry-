@@ -82,11 +82,6 @@ body.dark #langThemeBtns button { background:#333; color:#a5d6a7; border-color:#
 #topBar button:hover { background:var(--color-primary); color:white; }
 #topBar span { font-size:0.9em; }
 
-/* HAMBURGER MENU */
-#hamburger { display:none; flex-direction:column; cursor:pointer; gap:4px; }
-#hamburger div { width:25px; height:3px; background:var(--color-primary); transition:all 0.3s; }
-#topBar .mobileMenu { display:none; flex-direction:column; gap:4px; margin-top:6px; }
-
 /* MAIN */
 #mainContent { display:flex; height:calc(100vh - 130px); }
 
@@ -136,22 +131,18 @@ footer {
 
 /* MOBILE */
 @media(max-width:768px){
-  #topBar .left { flex-wrap:nowrap; overflow-x:auto; padding-bottom:4px; }
-  #topBar .left button { flex:0 0 auto; margin-right:4px; }
-  #hamburger { display:flex; }
-  #topBar .left { display:none; flex-direction:column; }
-  #topBar .mobileMenu { display:flex; }
-  
   #mainContent { flex-direction:column; height:auto; }
   #adSidebar { display:none; }
   #userList { width:100%; order:-1; display:flex; overflow-x:auto; border-bottom:1px solid #ddd; padding:6px; gap:6px; }
   .userItem { flex:0 0 auto; margin:0; padding:4px; background:#fff; border-radius:6px; }
-
-  #chatContainer { height:calc(100vh - 200px); }
-  #chatInput { position:fixed; bottom:0; left:0; right:0; padding:8px; z-index:30; background:rgba(255,255,255,0.98); }
-  #chatWindow { padding-bottom:80px; }
-
   footer { display:none; }
+  #chatContainer { height:calc(100vh - 200px); }
+  #chatInput {
+    position:fixed; bottom:0; left:0; right:0;
+    padding:8px; z-index:30;
+    background:rgba(255,255,255,0.98);
+  }
+  #chatWindow { padding-bottom:80px; }
 }
 </style>
 </head>
@@ -173,14 +164,9 @@ footer {
     <button id="logoutBtn" style="display:none;">Logout</button>
     <button id="generalBtn" style="display:none;">💬 Bate-papo Geral</button>
   </div>
-  <div id="hamburger">
-    <div></div>
-    <div></div>
-    <div></div>
-  </div>
-  <div class="mobileMenu"></div>
   <span id="onlineCount">👥 Usuários online: 0</span>
 </div>
+
 
 <div id="mainContent">
   <div id="userList"></div>
@@ -210,8 +196,32 @@ themeBtn.onclick=()=>{document.body.classList.toggle('dark'); themeBtn.textConte
 const langBtn=document.getElementById('langBtn');
 let currentLang='ru';
 const texts={
-  ru:{siteName:"Славянский клуб",homeBtn:"🏠 Главная",backBtn:"⬅️ Назад",loginBtn:"Войти через Google",logoutBtn:"Выйти",chatBtn:"💬 Общий чат",usersOnline:"👥 Пользователи онлайн: ",msgPlaceholder:"Введите сообщение...",sendBtn:"Отправить",footer:"© 2025 Славянский клуб — Учите русский и португальский",chatTitle:"💬 Общий чат"},
-  pt:{siteName:"Славянский клуб",homeBtn:"🏠 Início",backBtn:"⬅️ Voltar",loginBtn:"Login com Google",logoutBtn:"Logout",chatBtn:"💬 Bate-papo Geral",usersOnline:"👥 Usuários online: ",msgPlaceholder:"Digite sua mensagem...",sendBtn:"Enviar",footer:"© 2025 Славянский клуб — Aprenda Russo e Português",chatTitle:"💬 Bate-papo Geral"}
+  ru:{
+    siteName:"Славянский клуб",
+    homeBtn:"🏠 Главная",
+    backBtn:"⬅️ Назад",
+    loginBtn:"Войти через Google",
+    logoutBtn:"Выйти",
+    chatBtn:"💬 Общий чат",
+    usersOnline:"👥 Пользователи онлайн: ",
+    msgPlaceholder:"Введите сообщение...",
+    sendBtn:"Отправить",
+    footer:"© 2025 Славянский клуб — Учите русский и португальский",
+    chatTitle:"💬 Общий чат"
+  },
+  pt:{
+    siteName:"Славянский клуб",
+    homeBtn:"🏠 Início",
+    backBtn:"⬅️ Voltar",
+    loginBtn:"Login com Google",
+    logoutBtn:"Logout",
+    chatBtn:"💬 Bate-papo Geral",
+    usersOnline:"👥 Usuários online: ",
+    msgPlaceholder:"Digite sua mensagem...",
+    sendBtn:"Enviar",
+    footer:"© 2025 Славянский клуб — Aprenda Russo e Português",
+    chatTitle:"💬 Bate-papo Geral"
+  }
 };
 function updateTexts(lang){
   document.querySelector('header h1').childNodes[0].nodeValue = texts[lang].siteName + " ";
@@ -226,28 +236,18 @@ function updateTexts(lang){
   document.getElementById('footer').textContent = texts[lang].footer;
   document.getElementById('chatTitle').textContent = texts[lang].chatTitle;
 }
-langBtn.onclick = ()=>{if(currentLang==='ru'){currentLang='pt'; langBtn.textContent='🇧🇷 PT'; document.documentElement.lang='pt-BR';}else{currentLang='ru'; langBtn.textContent='🇷🇺 Рус'; document.documentElement.lang='ru';} updateTexts(currentLang);};
-updateTexts(currentLang);
-
-/* ===== HAMBURGER MENU ===== */
-const hamburger=document.getElementById('hamburger'), mobileMenu=document.querySelector('.mobileMenu');
-hamburger.onclick=()=>{
-  if(mobileMenu.style.display==='flex'){mobileMenu.style.display='none';}
-  else{
-    mobileMenu.innerHTML='';
-    document.querySelectorAll('#topBar .left button').forEach(btn=>{
-      const b=btn.cloneNode(true);
-      b.onclick=btn.onclick;
-      mobileMenu.appendChild(b);
-    });
-    mobileMenu.style.display='flex';
-  }
+langBtn.onclick = ()=>{
+  if(currentLang==='ru'){currentLang='pt'; langBtn.textContent='🇧🇷 PT'; document.documentElement.lang='pt-BR';}
+  else{currentLang='ru'; langBtn.textContent='🇷🇺 Рус'; document.documentElement.lang='ru';}
+  updateTexts(currentLang);
 };
+updateTexts(currentLang);
 
 /* ===== FIREBASE E CHAT ===== */
 const firebaseConfig={apiKey:"AIzaSyCYJCgfil5HKrCWtB14zwdicDaEcldHU6A", authDomain:"dimitry-rusian.firebaseapp.com", databaseURL:"https://dimitry-rusian-default-rtdb.firebaseio.com", projectId:"dimitry-rusian", storageBucket:"dimitry-rusian.appspot.com", messagingSenderId:"449029666805", appId:"1:449029666805:web:feaf575a7b7e6f234a52bc"};
 firebase.initializeApp(firebaseConfig);
 const auth=firebase.auth(), db=firebase.database();
+
 const loginBtnEl=document.getElementById('loginBtn'), logoutBtnEl=document.getElementById('logoutBtn'), generalBtnEl=document.getElementById('generalBtn');
 const userList=document.getElementById('userList'), msgInput=document.getElementById('msgInput'), sendBtn=document.getElementById('sendBtn');
 const chatWindow=document.getElementById('chatWindow'), chatTitle=document.getElementById('chatTitle'), onlineCount=document.getElementById('onlineCount');
@@ -313,6 +313,7 @@ function renderMessage(key, m) {
   div.className = m.uid === currentUser?.uid ? 'msg userMsg' : 'msg otherMsg';
   div.innerHTML = `<strong>${m.user}</strong>: ${m.text}<small>${new Date(m.timestamp).toLocaleTimeString()}</small>`;
 
+  // 🔹 Botão Traduzir
   const translateBtn = document.createElement('button');
   translateBtn.textContent = '🌍 Traduzir';
   translateBtn.style.border = 'none';
@@ -325,6 +326,7 @@ function renderMessage(key, m) {
 
   div.appendChild(translateBtn);
 
+  // 🔹 Botão Deletar (somente para o autor)
   if (m.uid === currentUser?.uid) {
     const del = document.createElement('button');
     del.className = 'deleteBtn';
@@ -336,36 +338,55 @@ function renderMessage(key, m) {
   chatWindow.appendChild(div);
   chatWindow.scrollTop = chatWindow.scrollHeight;
 }
-
 async function translateMessage(text, parentDiv) {
   try {
+    // Detecta o idioma do texto
     const detectRes = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=ru&dt=t&q=${encodeURIComponent(text)}`);
     const detectData = await detectRes.json();
-    const detectedLang = detectData[2];
+    const detectedLang = detectData[2]; // idioma detectado (ex: "ru", "pt")
 
-    let targetLang = currentLang==='pt'?'pt':'ru';
-    if(detectedLang===targetLang){
-      if(!parentDiv.querySelector('.translated')){
-        const s=document.createElement('small');
-        s.className='translated'; s.style.display='block'; s.style.color='#777'; s.style.marginTop='4px';
-        s.textContent='🔸 Mensagem já está neste idioma';
-        parentDiv.appendChild(s);
+    // Define o idioma alvo com base no idioma atual da interface
+    let targetLang = 'pt';
+    if (currentLang === 'pt') targetLang = 'pt';
+    else targetLang = 'ru';
+
+    // Se o texto já estiver no mesmo idioma da interface, não traduz
+    if (detectedLang === targetLang) {
+      let existing = parentDiv.querySelector('.translated');
+      if (!existing) {
+        const small = document.createElement('small');
+        small.className = 'translated';
+        small.style.display = 'block';
+        small.style.color = '#777';
+        small.style.marginTop = '4px';
+        small.textContent = '🔸 Mensagem já está neste idioma';
+        parentDiv.appendChild(small);
       }
       return;
     }
 
-    const res=await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=${detectedLang}&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}`);
-    const data=await res.json();
-    const translated=data[0].map(item=>item[0]).join('');
+    // Faz a tradução apenas se necessário
+    const res = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=${detectedLang}&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}`);
+    const data = await res.json();
+    const translated = data[0].map(item => item[0]).join('');
 
-    if(!parentDiv.querySelector('.translated')){
-      const s=document.createElement('small');
-      s.className='translated'; s.style.display='block'; s.style.color='#555'; s.style.marginTop='4px';
-      s.textContent='🔸 '+translated;
-      parentDiv.appendChild(s);
+    // Evita duplicar traduções
+    let existing = parentDiv.querySelector('.translated');
+    if (!existing) {
+      const small = document.createElement('small');
+      small.className = 'translated';
+      small.style.display = 'block';
+      small.style.color = '#555';
+      small.style.marginTop = '4px';
+      small.textContent = '🔸 ' + translated;
+      parentDiv.appendChild(small);
     }
-  } catch(err){console.error('Erro ao traduzir:',err); alert('Falha ao traduzir esta mensagem.');}
+  } catch (err) {
+    console.error('Erro ao traduzir:', err);
+    alert('Falha ao traduzir esta mensagem.');
+  }
 }
+
 
 function watchPrivateMessages(){
   db.ref('private').on('child_added',chat=>{
