@@ -308,13 +308,60 @@ function openPrivate(uid,name){
 function detach(){if(activeListener) activeListener.off();}
 sendBtn.onclick=sendMsg; msgInput.addEventListener('keypress',e=>{if(e.key==='Enter')sendMsg();});
 function sendMsg(){const txt=msgInput.value.trim(); if(!txt||!currentUser)return; db.ref(currentChat).push({uid:currentUser.uid,user:currentUser.displayName,text:txt,timestamp:Date.now()}); msgInput.value='';}
-function renderMessage(key,m){
-  const div=document.createElement('div');
-  div.className=m.uid===currentUser?.uid?'msg userMsg':'msg otherMsg';
-  div.innerHTML=`<strong>${m.user}</strong>: ${m.text}<small>${new Date(m.timestamp).toLocaleTimeString()}</small>`;
-  if(m.uid===currentUser?.uid){ const del=document.createElement('button'); del.className='deleteBtn'; del.textContent='🗑'; del.onclick=()=>db.ref(currentChat+'/'+key).remove(); div.appendChild(del);}
-  chatWindow.appendChild(div); chatWindow.scrollTop=chatWindow.scrollHeight;
+function renderMessage(key, m) {
+  const div = document.createElement('div');
+  div.className = m.uid === currentUser?.uid ? 'msg userMsg' : 'msg otherMsg';
+  div.innerHTML = `<strong>${m.user}</strong>: ${m.text}<small>${new Date(m.timestamp).toLocaleTimeString()}</small>`;
+
+  // 🔹 Botão Traduzir
+  const translateBtn = document.createElement('button');
+  translateBtn.textContent = '🌍 Traduzir';
+  translateBtn.style.border = 'none';
+  translateBtn.style.background = 'transparent';
+  translateBtn.style.color = '#007BFF';
+  translateBtn.style.cursor = 'pointer';
+  translateBtn.style.fontSize = '0.8em';
+  translateBtn.style.marginTop = '4px';
+  translateBtn.onclick = () => translateMessage(m.text, div);
+
+  div.appendChild(translateBtn);
+
+  // 🔹 Botão Deletar (somente para o autor)
+  if (m.uid === currentUser?.uid) {
+    const del = document.createElement('button');
+    del.className = 'deleteBtn';
+    del.textContent = '🗑';
+    del.onclick = () => db.ref(currentChat + '/' + key).remove();
+    div.appendChild(del);
+  }
+
+  chatWindow.appendChild(div);
+  chatWindow.scrollTop = chatWindow.scrollHeight;
 }
+async function translateMessage(text, parentDiv) {
+  const lang = currentLang === 'ru' ? 'pt' : 'ru'; // alterna entre russo e português
+  try {
+    const res = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${lang}&dt=t&q=${encodeURIComponent(text)}`);
+    const data = await res.json();
+    const translated = data[0].map(item => item[0]).join('');
+    
+    // evita duplicar traduções
+    let existing = parentDiv.querySelector('.translated');
+    if (!existing) {
+      const small = document.createElement('small');
+      small.className = 'translated';
+      small.style.display = 'block';
+      small.style.color = '#555';
+      small.style.marginTop = '4px';
+      small.textContent = '🔸 ' + translated;
+      parentDiv.appendChild(small);
+    }
+  } catch (err) {
+    console.error('Erro ao traduzir:', err);
+    alert('Falha ao traduzir esta mensagem.');
+  }
+}
+
 
 function watchPrivateMessages(){
   db.ref('private').on('child_added',chat=>{
