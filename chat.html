@@ -339,13 +339,38 @@ function renderMessage(key, m) {
   chatWindow.scrollTop = chatWindow.scrollHeight;
 }
 async function translateMessage(text, parentDiv) {
-  const lang = currentLang === 'ru' ? 'pt' : 'ru'; // alterna entre russo e português
   try {
-    const res = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${lang}&dt=t&q=${encodeURIComponent(text)}`);
+    // Detecta o idioma do texto
+    const detectRes = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=ru&dt=t&q=${encodeURIComponent(text)}`);
+    const detectData = await detectRes.json();
+    const detectedLang = detectData[2]; // idioma detectado (ex: "ru", "pt")
+
+    // Define o idioma alvo com base no idioma atual da interface
+    let targetLang = 'pt';
+    if (currentLang === 'pt') targetLang = 'pt';
+    else targetLang = 'ru';
+
+    // Se o texto já estiver no mesmo idioma da interface, não traduz
+    if (detectedLang === targetLang) {
+      let existing = parentDiv.querySelector('.translated');
+      if (!existing) {
+        const small = document.createElement('small');
+        small.className = 'translated';
+        small.style.display = 'block';
+        small.style.color = '#777';
+        small.style.marginTop = '4px';
+        small.textContent = '🔸 Mensagem já está neste idioma';
+        parentDiv.appendChild(small);
+      }
+      return;
+    }
+
+    // Faz a tradução apenas se necessário
+    const res = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=${detectedLang}&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}`);
     const data = await res.json();
     const translated = data[0].map(item => item[0]).join('');
-    
-    // evita duplicar traduções
+
+    // Evita duplicar traduções
     let existing = parentDiv.querySelector('.translated');
     if (!existing) {
       const small = document.createElement('small');
