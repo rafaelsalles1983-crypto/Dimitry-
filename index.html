@@ -395,14 +395,6 @@ aside {
   }
 }
 
-
-
-
-
-
-
-
- 
 </style>
 </head>
 <body>
@@ -865,22 +857,24 @@ FrasesDeConvercacao: [
       });
     });
 
+    
+    sendBtn.addEventListener('click', sendMessage);
+    msgInput.addEventListener('keypress', e => { if(e.key==='Enter') sendMessage(); });
 
+    // Login
+    document.getElementById('loginBtn').addEventListener('click', () => { alert('Login realizado com sucesso!'); });
+  });
 
 </script>
-
 <script src="script.js"></script>
-
-</script>
-
 <script>
 // BOTAO MODO
+
 document.getElementById('modoBtn').addEventListener('click', () => {
   document.body.classList.toggle('dark-mode');
 });
-</script>
 
-  
+</script>
 <script src="overlay.js"></script>
 
 <footer id="siteFooter">
@@ -916,11 +910,6 @@ modoBtn.addEventListener("click", () => {
 
 </body>
 </html>
-
-
-
-
-
 
 
 
