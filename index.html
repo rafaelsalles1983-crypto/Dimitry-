@@ -847,15 +847,18 @@ profissoes:[
     overlay.classList.add('show');
   }
 
-  function unlockNextModule(currentKey) {
-    const cards = document.querySelectorAll('.lesson-card');
-    for (let i = 0; i < cards.length; i++) {
-      if (cards[i].dataset.key === currentKey && i < cards.length - 1) {
-        cards[i+1].classList.remove('locked');
-        break;
-      }
+const cards = document.querySelectorAll('.lesson-card');
+
+cards.forEach(card => {
+  card.addEventListener('click', () => {
+    const key = card.dataset.key; // pega o data-key do card
+    if(contentData[key]) {
+      openOverlay(contentData[key].map(item => item.phrase)); // ou palavras específicas
+    } else {
+      alert('Módulo não encontrado!');
     }
-  }
+  });
+});
 
     // ===== Inicialização =====
   document.addEventListener('DOMContentLoaded', () => {
@@ -925,6 +928,7 @@ modoBtn.addEventListener("click", () => {
 
 </body>
 </html>
+
 
 
 
