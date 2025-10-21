@@ -394,6 +394,15 @@ aside {
     color: white;
   }
 }
+
+
+
+
+
+
+
+
+ 
 </style>
 </head>
 <body>
@@ -419,27 +428,27 @@ aside {
       <h3>📘 Притяжательные прилагательные</h3>
       <p>Complete este módulo.</p>
     </div>
-    <div class="card lesson-card" data-key="numerais">
+    <div class="card lesson-card locked" data-key="numerais">
       <h3>📘 Числительные</h3>
       <p>Complete este módulo.</p>
     </div>
-    <div class="card lesson-card" data-key="verboSerPresente">
+    <div class="card lesson-card locked" data-key="verboSerPresente">
       <h3>📘 Глагол "ser" (настоящее время)</h3>
       <p>Complete este módulo.</p>
     </div>
-    <div class="card lesson-card" data-key="verboEstarPresente">
+    <div class="card lesson-card locked" data-key="verboEstarPresente">
       <h3>📘 Глагол "estar" (настоящее время)</h3>
       <p>Complete este módulo.</p>
     </div>
-    <div class="card lesson-card" data-key="verboSerPassado">
+    <div class="card lesson-card locked" data-key="verboSerPassado">
       <h3>📘 Глагол "ser" (прошедшее время)</h3>
       <p>Complete este módulo.</p>
     </div>
-    <div class="card lesson-card" data-key="verboEstarPassado">
+    <div class="card lesson-card locked" data-key="verboEstarPassado">
       <h3>📘 Глагол "estar" (прошедшее время)</h3>
       <p>Complete este módulo.</p>
     </div>
-    <div class="card lesson-card" data-key="verboSerFuturo">
+    <div class="card lesson-card locked" data-key="verboSerFuturo">
       <h3>📘 Глагол "ser" (будущее время)</h3>
       <p>Complete este módulo.</p>
     </div>
@@ -447,27 +456,27 @@ aside {
       <h3>📘 Глагол "estar" (будущее время)</h3>
       <p>Complete este módulo.</p>
     </div>
-    <div class="card lesson-card" data-key="quantidades">
+    <div class="card lesson-card locked" data-key="quantidades">
       <h3>📘 Количественные выражения</h3>
       <p>Complete este módulo.</p>
     </div>
-    <div class="card lesson-card" data-key="objetoDireto">
+    <div class="card lesson-card locked" data-key="objetoDireto">
       <h3>📘 Прямое дополнение</h3>
       <p>Complete este módulo.</p>
     </div>
-    <div class="card lesson-card" data-key="tempoPresente">
+    <div class="card lesson-card locked" data-key="tempoPresente">
       <h3>📘 Настоящее время</h3>
       <p>Complete este módulo.</p>
     </div>
-    <div class="card lesson-card" data-key="infinitivo">
+    <div class="card lesson-card locked" data-key="infinitivo">
       <h3>📘 Инфинитив</h3>
       <p>Complete este módulo.</p>
     </div>
-    <div class="card lesson-card" data-key="lugares">
+    <div class="card lesson-card locked" data-key="lugares">
       <h3>📘 Описание мест</h3>
       <p>Complete este módulo.</p>
     </div>
-    <div class="card lesson-card" data-key="profissoes">
+    <div class="card lesson-card locked" data-key="profissoes">
       <h3>📘 Профессии</h3>
       <p>Complete este módulo.</p>
     </div>
@@ -475,15 +484,15 @@ aside {
       <h3>📘 Путешествия</h3>
       <p>Complete este módulo.</p>
     </div>
-    <div class="card lesson-card" data-key="familia">
+    <div class="card lesson-card locked" data-key="familia">
       <h3>📘 Семья</h3>
       <p>Complete este módulo.</p>
     </div>
-    <div class="card lesson-card" data-key="verbosMovimento">
+    <div class="card lesson-card locked" data-key="verbosMovimento">
       <h3>📘 Глаголы движения</h3>
       <p>Complete este módulo.</p>
     </div>
-    <div class="card lesson-card" data-key="FrasesDeConvercacao">
+    <div class="card lesson-card locked" data-key="FrasesDeConvercacao">
       <h3>📘 Разговорные фразы</h3>
       <p>Complete este módulo.</p>
     </div>
@@ -857,8 +866,6 @@ profissoes:[
     });
 
     
-    sendBtn.addEventListener('click', sendMessage);
-    msgInput.addEventListener('keypress', e => { if(e.key==='Enter') sendMessage(); });
 
     // Login
     document.getElementById('loginBtn').addEventListener('click', () => { alert('Login realizado com sucesso!'); });
@@ -868,26 +875,6 @@ profissoes:[
 
 <script src="script.js"></script>
 
-
-<!-- Firebase Scripts -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-
-<script>
-   // Configuração do Firebase
-  const firebaseConfig = {
-    apiKey: "AIzaSyCVt4eQOSUMhtKTUc89lAIM-AwrPakEOOI",
-    authDomain: "clube-eslavo-dimitri.firebaseapp.com",
-    projectId: "clube-eslavo-dimitri",
-    storageBucket: "clube-eslavo-dimitri.firebasestorage.app",
-    messagingSenderId: "696802076277",
-    appId: "1:696802076277:web:3be4a9fb64001e25cefa3c",
-    measurementId: "G-1H63WPQT0V"
-  };
-
-  // Inicializa Firebase
-  firebase.initializeApp(firebaseConfig);
-  const auth = firebase.auth();
 
   // Referências aos elementos
   const loginBtn = document.getElementById('loginBtn');
@@ -1059,7 +1046,6 @@ modoBtn.addEventListener("click", () => {
 
 </body>
 </html>
-
 
 
 
