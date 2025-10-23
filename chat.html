@@ -2,263 +2,271 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Славянский клуб</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Club Eslavo 🌍</title>
 
 <!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
-<link rel="stylesheet" href="chat.css">
 <style>
+:root {
+  --bg: #121212;
+  --text: #fff;
+  --accent: #00aaff;
+  --input-bg: #1e1e1e;
+  --msg-bg: #2a2a2a;
+}
+.light {
+  --bg: #fafafa;
+  --text: #222;
+  --accent: #0077cc;
+  --input-bg: #fff;
+  --msg-bg: #f0f0f0;
+}
 body {
-  font-family: Arial, sans-serif;
-  background: var(--bg, #fff);
-  color: var(--text, #000);
   margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background: var(--bg);
+  color: var(--text);
   display: flex;
   flex-direction: column;
   height: 100vh;
 }
-
 header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px;
-  background: var(--header-bg, #f5f5f5);
-  border-bottom: 1px solid #ccc;
-}
-
-button {
-  cursor: pointer;
-  border: none;
-  padding: 6px 12px;
-  border-radius: 6px;
-  background: #4caf50;
+  background: var(--accent);
   color: white;
+  padding: 10px;
+  text-align: center;
+  font-weight: bold;
 }
-
-.chat-container {
-  display: flex;
+#chat {
   flex: 1;
+  display: flex;
   overflow: hidden;
 }
-
-.users {
-  width: 180px;
-  border-right: 1px solid #ddd;
-  background: #fafafa;
-  overflow-y: auto;
+#userList {
+  width: 200px;
+  background: var(--msg-bg);
   padding: 10px;
+  overflow-y: auto;
 }
-
-.users div {
-  padding: 8px;
-  border-radius: 8px;
-  margin-bottom: 6px;
-  cursor: pointer;
-  background: #eee;
-}
-
-.chat {
+#chatWindow {
   flex: 1;
   display: flex;
   flex-direction: column;
+  justify-content: flex-end;
+  padding: 10px;
+  overflow-y: auto;
 }
-
-#chat-window {
+#messages {
   flex: 1;
   overflow-y: auto;
-  padding: 10px;
-  background: var(--chat-bg, #fdfdfd);
+  padding-bottom: 5px;
 }
-
 .message {
-  padding: 8px;
+  background: var(--msg-bg);
+  padding: 8px 10px;
+  margin-bottom: 8px;
   border-radius: 8px;
-  margin-bottom: 10px;
-  max-width: 75%;
   word-wrap: break-word;
-  position: relative;
 }
-
-.message.own {
-  background: #e0ffe0;
-  align-self: flex-end;
-}
-
-.message.other {
-  background: #fff7d1;
-  align-self: flex-start;
-}
-
-.message small {
-  display: block;
-  font-size: 11px;
-  color: #555;
-}
-
-.translate-btn {
-  background: none;
+.message b { color: var(--accent); }
+input, button {
   border: none;
-  color: #0078ff;
-  font-size: 13px;
-  cursor: pointer;
-  margin-top: 4px;
+  outline: none;
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 15px;
 }
+#inputArea {
+  display: flex;
+  gap: 8px;
+}
+#msgInput {
+  flex: 1;
+  background: var(--input-bg);
+  color: var(--text);
+}
+button {
+  background: var(--accent);
+  color: white;
+  cursor: pointer;
+  transition: 0.3s;
+}
+button:hover { opacity: 0.8; }
 
+.notification {
+  background: var(--accent);
+  color: white;
+  padding: 8px;
+  margin: 5px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+#controls {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+  background: var(--msg-bg);
+}
 .translated {
   display: block;
   margin-top: 5px;
-  color: #555;
-  font-size: 14px;
-  background: #f5f5f5;
-  border-radius: 6px;
-  padding: 5px;
-}
-
-form {
-  display: flex;
-  padding: 10px;
-  border-top: 1px solid #ddd;
-}
-
-form input {
-  flex: 1;
-  padding: 10px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-  margin-right: 10px;
-}
-
-form button {
-  background: #4caf50;
-  color: white;
-  border-radius: 6px;
-  border: none;
-  padding: 8px 12px;
+  font-size: 0.9em;
+  color: #bbb;
 }
 </style>
 </head>
 <body>
+<header>💬 Club Eslavo</header>
 
-<header>
-  <h3>Славянский клуб</h3>
+<div id="controls">
+  <button id="loginBtn">🔑 Entrar com Google</button>
   <div>
-    <button onclick="toggleLang()">🌐 <span id='langLabel'>ru Русский</span></button>
-    <button onclick="logout()">⎋ Выйти</button>
-  </div>
-</header>
-
-<div class="chat-container">
-  <div class="users">
-    <h4 id="users-title">Usuários</h4>
-    <div id="users-list"></div>
-  </div>
-
-  <div class="chat">
-    <div id="chat-window"></div>
-    <form id="chat-form">
-      <input id="msg-input" placeholder="Digite uma mensagem..." autocomplete="off">
-      <button type="submit">Enviar</button>
-    </form>
+    <button id="themeBtn">🌓</button>
+    <button id="langBtn">🌍</button>
   </div>
 </div>
 
+<div id="chat">
+  <div id="userList"><b>Usuários</b><br><small>Entrar para ver</small></div>
+  <div id="chatWindow">
+    <div id="messages"></div>
+    <div id="inputArea">
+      <input id="msgInput" placeholder="Digite sua mensagem...">
+      <button id="sendBtn">Enviar</button>
+    </div>
+  </div>
+</div>
+
+<audio id="msgSound" src="https://cdn.pixabay.com/audio/2022/03/15/audio_0c9a9a8a46.mp3"></audio>
+
 <script>
-// === CONFIG FIREBASE ===
+/* === Firebase Config === */
 const firebaseConfig = {
-  apiKey: "SUA_API_KEY_AQUI",
-  authDomain: "SEU_DOMINIO.firebaseapp.com",
-  databaseURL: "https://SEU_PROJETO.firebaseio.com",
-  projectId: "SEU_PROJETO",
-  storageBucket: "SEU_BUCKET.appspot.com",
-  messagingSenderId: "SEU_ID",
-  appId: "SEU_APP_ID"
+  apiKey: "AIzaSyD...",
+  authDomain: "clubeslavo.firebaseapp.com",
+  databaseURL: "https://clubeslavo-default-rtdb.firebaseio.com",
+  projectId: "clubeslavo",
+  storageBucket: "clubeslavo.appspot.com",
+  messagingSenderId: "1",
+  appId: "1:1:web:1"
 };
 firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
 const auth = firebase.auth();
+const db = firebase.database();
 
+/* === Elementos === */
+const loginBtn = document.getElementById('loginBtn');
+const sendBtn = document.getElementById('sendBtn');
+const msgInput = document.getElementById('msgInput');
+const messagesDiv = document.getElementById('messages');
+const userList = document.getElementById('userList');
+const themeBtn = document.getElementById('themeBtn');
+const langBtn = document.getElementById('langBtn');
+const msgSound = document.getElementById('msgSound');
+
+let currentUser = null;
 let currentLang = 'pt';
-let currentUser = { uid: "anon", displayName: "Visitante" };
 
-// === LOGIN AUTOMÁTICO PARA TESTE ===
-auth.signInAnonymously().then(() => {
-  currentUser = { uid: "uid_" + Math.random().toString(36).substr(2,5), displayName: "Raffa Rius" };
-  startChat();
+/* === Login === */
+loginBtn.onclick = () => {
+  const provider = new firebase.auth.GoogleAuthProvider();
+  auth.signInWithPopup(provider);
+};
+auth.onAuthStateChanged(u => {
+  if (u) {
+    currentUser = u;
+    loginBtn.textContent = "👋 " + u.displayName;
+    loadUsers();
+    listenMessages();
+  }
 });
 
-function toggleLang(){
-  currentLang = currentLang === 'pt' ? 'ru' : 'pt';
-  document.getElementById('langLabel').textContent = currentLang === 'pt' ? 'pt Português' : 'ru Русский';
-  document.getElementById('msg-input').placeholder = currentLang === 'pt' ? 'Digite uma mensagem...' : 'Введите сообщение...';
-  document.querySelector('button[type=submit]').textContent = currentLang === 'pt' ? 'Enviar' : 'Отправить';
-}
+/* === Enviar mensagem === */
+sendBtn.onclick = sendMsg;
+msgInput.addEventListener('keypress', e => {
+  if (e.key === 'Enter') sendMsg();
+});
 
-function logout(){ alert('Logout simulado'); }
-
-// === CHAT ===
-const chatWindow = document.getElementById('chat-window');
-const chatForm = document.getElementById('chat-form');
-const msgInput = document.getElementById('msg-input');
-
-chatForm.addEventListener('submit', e=>{
-  e.preventDefault();
+function sendMsg() {
+  if (!msgInput.value.trim() || !currentUser) return;
   const text = msgInput.value.trim();
-  if(!text) return;
-  db.ref('chat').push({ text, user: currentUser.displayName, uid: currentUser.uid, time: new Date().toLocaleTimeString() });
   msgInput.value = '';
-});
-
-function startChat(){
-  db.ref('chat').on('child_added', snap=>{
-    const msg = snap.val();
-    renderMessage(msg);
+  db.ref('messages').push({
+    uid: currentUser.uid,
+    user: currentUser.displayName,
+    text: text,
+    time: Date.now()
   });
 }
 
-function renderMessage(msg){
-  const div = document.createElement('div');
-  div.className = 'message ' + (msg.uid === currentUser.uid ? 'own' : 'other');
-  div.innerHTML = `<b>${msg.user}:</b> ${msg.text}<br><small>${msg.time}</small>`;
-
-  // === Botão Traduzir ===
-  const translateBtn = document.createElement('button');
-  translateBtn.className = 'translate-btn';
-  translateBtn.textContent = currentLang === 'pt' ? '🌍 Traduzir' : '🌍 Перевести';
-  translateBtn.onclick = () => translateMessage(msg.text, div);
-  div.appendChild(translateBtn);
-
-  chatWindow.appendChild(div);
-  chatWindow.scrollTop = chatWindow.scrollHeight;
+/* === Receber mensagens === */
+function listenMessages() {
+  db.ref('messages').on('child_added', snap => {
+    const msg = snap.val();
+    showMsg(msg);
+    if (msg.uid !== currentUser.uid) msgSound.play();
+  });
 }
 
-// === FUNÇÃO DE TRADUÇÃO ===
-async function translateMessage(text, parentDiv){
+/* === Mostrar mensagem === */
+function showMsg(m) {
+  const div = document.createElement('div');
+  div.className = 'message';
+  div.innerHTML = `<b>${m.user}</b>: ${m.text} <br>
+    <button onclick="translateMessage('${m.text.replace(/'/g,"\\'")}', this.parentElement)">🌍 Traduzir</button>`;
+  messagesDiv.appendChild(div);
+  messagesDiv.scrollTop = messagesDiv.scrollHeight;
+}
+
+/* === Tradução automática === */
+async function translateMessage(text, parent) {
+  const loading = document.createElement('small');
+  loading.className = 'translated';
+  loading.textContent = '⏳ Traduzindo...';
+  parent.appendChild(loading);
   try {
-    const targetLang = currentLang === 'pt' ? 'pt' : 'ru';
-    let existing = parentDiv.querySelector('.translated');
-    if(existing) existing.remove();
-
-    const loading = document.createElement('small');
-    loading.textContent = '🌐 ' + (currentLang === 'pt' ? 'Traduzindo...' : 'Перевод...');
-    loading.className = 'translated';
-    parentDiv.appendChild(loading);
-
     const res = await fetch('https://libretranslate.de/translate', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ q: text, source: 'auto', target: targetLang })
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({q: text, source: 'auto', target: currentLang, format: 'text'})
     });
     const data = await res.json();
     loading.textContent = `🔸 ${data.translatedText}`;
-  } catch(err){
-    console.error(err);
-    alert(currentLang === 'pt' ? 'Falha ao traduzir esta mensagem.' : 'Ошибка перевода.');
+  } catch {
+    loading.textContent = '❌ Erro ao traduzir';
   }
+}
+
+/* === Trocar tema === */
+themeBtn.onclick = () => {
+  document.body.classList.toggle('light');
+};
+
+/* === Trocar idioma === */
+langBtn.onclick = () => {
+  currentLang = currentLang === 'pt' ? 'ru' : 'pt';
+  langBtn.textContent = currentLang === 'pt' ? '🌍' : '🇷🇺';
+  msgInput.placeholder = currentLang === 'pt' ? 'Digite sua mensagem...' : 'Введите сообщение...';
+};
+
+/* === Lista de usuários === */
+function loadUsers() {
+  db.ref('presence/' + currentUser.uid).set({name: currentUser.displayName, online: true});
+  db.ref('presence/' + currentUser.uid).onDisconnect().remove();
+
+  db.ref('presence').on('value', snap => {
+    const users = snap.val() || {};
+    userList.innerHTML = '<b>Usuários</b><br>';
+    for (const [uid, info] of Object.entries(users)) {
+      const p = document.createElement('p');
+      p.textContent = info.name + (uid === currentUser.uid ? ' (você)' : '');
+      userList.appendChild(p);
+    }
+  });
 }
 </script>
 </body>
