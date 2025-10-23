@@ -167,7 +167,6 @@ footer {
   <span id="onlineCount">👥 Usuários online: 0</span>
 </div>
 
-
 <div id="mainContent">
   <div id="userList"></div>
   <div id="chatContainer">
@@ -244,7 +243,7 @@ langBtn.onclick = ()=>{
 updateTexts(currentLang);
 
 /* ===== FIREBASE E CHAT ===== */
-const firebaseConfig={apiKey:"AIzaSyCYJCgfil5HKrCWtB14zwdicDaEcldHU6A", authDomain:"dimitry-rusian.firebaseapp.com", databaseURL:"https://dimitry-rusian-default-rtdb.firebaseio.com", projectId:"dimitry-rusian", storageBucket:"dimitry-rusian.appspot.com", messagingSenderId:"449029666805", appId:"1:449029666805:web:feaf575a7b7e6f234a52bc"};
+const firebaseConfig={apiKey:"AIzaSyCYJCgfil5HKrCWtB14zwdicDaEcldHU6A",authDomain:"dimitry-rusian.firebaseapp.com",databaseURL:"https://dimitry-rusian-default-rtdb.firebaseio.com",projectId:"dimitry-rusian",storageBucket:"dimitry-rusian.appspot.com",messagingSenderId:"449029666805",appId:"1:449029666805:web:feaf575a7b7e6f234a52bc"};
 firebase.initializeApp(firebaseConfig);
 const auth=firebase.auth(), db=firebase.database();
 
@@ -308,6 +307,7 @@ function openPrivate(uid,name){
 function detach(){if(activeListener) activeListener.off();}
 sendBtn.onclick=sendMsg; msgInput.addEventListener('keypress',e=>{if(e.key==='Enter')sendMsg();});
 function sendMsg(){const txt=msgInput.value.trim(); if(!txt||!currentUser)return; db.ref(currentChat).push({uid:currentUser.uid,user:currentUser.displayName,text:txt,timestamp:Date.now()}); msgInput.value='';}
+
 function renderMessage(key, m) {
   const div = document.createElement('div');
   div.className = m.uid === currentUser?.uid ? 'msg userMsg' : 'msg otherMsg';
@@ -315,7 +315,7 @@ function renderMessage(key, m) {
 
   // 🔹 Botão Traduzir
   const translateBtn = document.createElement('button');
-  translateBtn.textContent = '🌍 Traduzir';
+  translateBtn.textContent = currentLang === 'pt' ? '🌍 Traduzir' : '🌍 Перевести';
   translateBtn.style.border = 'none';
   translateBtn.style.background = 'transparent';
   translateBtn.style.color = '#007BFF';
@@ -339,16 +339,19 @@ function renderMessage(key, m) {
   chatWindow.scrollTop = chatWindow.scrollHeight;
 }
 
+/* === 🔥 Função de Tradução Automática === */
 async function translateMessage(text, parentDiv) {
   try {
-    // Define idioma alvo com base na interface
     const targetLang = currentLang === 'pt' ? 'pt' : 'ru';
-
-    // Evita traduzir se já existir
     let existing = parentDiv.querySelector('.translated');
-    if (existing) return;
+    if (existing) existing.remove();
 
-    // Chamada à API do LibreTranslate (CORS-friendly)
+    const loading = document.createElement('small');
+    loading.textContent = '🌐 ' + (currentLang === 'pt' ? 'Traduzindo...' : 'Перевод...');
+    loading.style.color = '#888';
+    loading.className = 'translated';
+    parentDiv.appendChild(loading);
+
     const res = await fetch('https://libretranslate.de/translate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -361,48 +364,42 @@ async function translateMessage(text, parentDiv) {
     });
 
     const data = await res.json();
-    const translated = data.translatedText;
-
-    const small = document.createElement('small');
-    small.className = 'translated';
-    small.style.display = 'block';
-    small.style.color = '#555';
-    small.style.marginTop = '4px';
-    small.textContent = '🔸 ' + translated;
-    parentDiv.appendChild(small);
-
+    loading.textContent = `🔸 ${data.translatedText}`;
+    loading.style.color = '#555';
   } catch (err) {
     console.error('Erro ao traduzir:', err);
-    alert('Falha ao traduzir esta mensagem.');
+    alert(currentLang === 'pt' ? 'Falha ao traduzir esta mensagem.' : 'Не удалось перевести сообщение.');
   }
 }
 
-
+/* === Notificações === */
 function watchPrivateMessages(){
-  db.ref('private').on('child_added',chat=>{
-    const chatId=chat.key;
-    if(!chatId.includes(currentUser.uid)) return;
-    db.ref('private/'+chatId).limitToLast(1).on('child_added',snap=>{
-      const m=snap.val();
-      if(m.uid!==currentUser.uid && currentChat!=='private/'+chatId){
-        const other=chatId.replace(currentUser.uid,'').replace('_','');
-        showNotification(m.user,m.text,other); msgSound.currentTime=0; msgSound.play();
-      }
-    });
+  db.ref('private').on('child_added',chatSnap=>{
+    const chatId=chatSnap.key;
+    if(chatId.includes(currentUser.uid)){
+      db.ref('private/'+chatId).limitToLast(1).on('child_added',msgSnap=>{
+        const msg=msgSnap.val(); if(msg.uid!==currentUser.uid){
+          const otherId=chatId.replace(currentUser.uid,'').replace('_','');
+          showNotification(msg.user, msg.text, otherId);
+        }
+      });
+    }
   });
 }
-
-function showNotification(user,text,uid){
-  removeNotification(uid);
-  const n=document.createElement('div');
-  n.className='notification';
-  n.dataset.uid=uid;
-  n.innerHTML=`<b>${user}</b>: ${text}<button onclick="removeNotification('${uid}')">✖</button>`;
-  notificationContainer.appendChild(n);
+function showNotification(sender, text, uid){
+  if(currentChat.includes(uid)) return;
+  const div=document.createElement('div');
+  div.className='notification';
+  div.innerHTML=`<b>${sender}</b>: ${text}<button onclick="this.parentElement.remove()">×</button>`;
+  div.onclick=()=>{openPrivate(uid,sender); div.remove();};
+  notificationContainer.appendChild(div);
+  msgSound.play();
+  setTimeout(()=>div.remove(),8000);
 }
 function removeNotification(uid){
-  const n=notificationContainer.querySelector(`[data-uid='${uid}']`);
-  if(n) n.remove();
+  notificationContainer.querySelectorAll('.notification').forEach(n=>{
+    if(n.textContent.includes(uid)) n.remove();
+  });
 }
 </script>
 </body>
