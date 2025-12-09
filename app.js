@@ -1,105 +1,20 @@
-// BOTAO MODO
-
-document.getElementById('modoBtn').addEventListener('click', () => {
-  document.body.classList.toggle('dark-mode');
-});
-
-
-// BOTAO MODO
-
-document.getElementById('modoBtn').addEventListener('click', () => {
-  document.body.classList.toggle('dark-mode');
-});
-function openOverlay(wordsArray) {
-  const overlay = document.getElementById('overlayModal');
-  const overlayBody = document.getElementById('overlayBody');
-
-  overlayBody.innerHTML = '';
-
-  wordsArray.forEach(word => {
-    const span = document.createElement('span');
-    span.classList.add('word');
-    span.textContent = word;
-    span.addEventListener('click', () => {
-      span.classList.toggle('selected');
-    });
-    overlayBody.appendChild(span);
-  });
-
-  overlay.classList.add('show'); // <- ESSENCIAL
-}
-// ===== Alternar modo claro/escuro =====
-const modoBtn = document.getElementById("modoBtn");
-const body = document.body;
-
-// Carregar preferência anterior (se existir)
-if (localStorage.getItem("modo") === "escuro") {
-  body.classList.add("dark-mode");
-  modoBtn.textContent = "☀️";
-}
-
-// Evento de clique no botão
-modoBtn.addEventListener("click", () => {
-  body.classList.toggle("dark-mode");
-
-  // Atualiza o ícone e salva preferência
-  if (body.classList.contains("dark-mode")) {
-    modoBtn.textContent = "☀️";
-    localStorage.setItem("modo", "escuro");
-  } else {
-    modoBtn.textContent = "🌙";
-    localStorage.setItem("modo", "claro");
-  }
-});
-
-
-
-
-
-
-// Função para abrir overlay e mostrar palavras
-function openOverlay(wordsArray) {
-  const overlay = document.getElementById('overlayModal');
-  const overlayBody = document.getElementById('overlayBody');
-  
-  overlayBody.innerHTML = ''; // limpa conteúdo anterior
-
-  wordsArray.forEach(word => {
-    const span = document.createElement('span');
-    span.classList.add('word');
-    span.textContent = word;
-    span.addEventListener('click', () => {
-      span.classList.toggle('selected'); // alterna cor ao clicar
-    });
-    overlayBody.appendChild(span);
-  });
-
-  overlay.classList.add('show');
-}
-
-// Fechar overlay
-function closeOverlay() {
-  document.getElementById('overlayModal').classList.remove('show');
-}
-
-
-  // Dados dos módulos
+// Dados dos módulos
 const contentData = {
 
     possessivos:[
-  {title:'вопрос 1', phrase:'Meu amigo vai para a escola.', words:['Мой','друг','идёт','в','школу'], translation:'Meu amigo vai para a escola.', audio:'audio/possessivos1.mp3'},
-  {title:'вопрос 2', phrase:'Minha irmã estuda na universidade.', words:['Моя','сестра','учится','в','университете'], translation:'Minha irmã estuda na universidade.', audio:'audio/possessivos2.mp3'},
-  {title:'вопрос 3', phrase:'Nosso professor fala russo.', words:['Наш','учитель','говорит','по-русски'], translation:'Nosso professor fala russo.', audio:'audio/possessivos3.mp3'},
-  {title:'вопрос 4', phrase:'Sua mãe trabalha no hospital.', words:['Твоя','мама','работает','в','больнице'], translation:'Sua mãe trabalha no hospital.', audio:'audio/possessivos4.mp3'},
-  {title:'вопрос 5', phrase:'Seu pai lê o jornal.', words:['Твой','папа','читает','газету'], translation:'Seu pai lê o jornal.', audio:'audio/possessivos5.mp3'},
-  {title:'вопрос 6', phrase:'Minha casa é grande.', words:['Мой','дом','большой'], translation:'Minha casa é grande.', audio:'audio/possessivos6.mp3'},
-  {title:'вопрос 7', phrase:'Nosso livro está na mesa.', words:['Наша','книга','находится','на','столе'], translation:'Nosso livro está na mesa.', audio:'audio/possessivos7.mp3'},
-  {title:'вопрос 8', phrase:'Meu irmão mora em Moscou.', words:['Мой','брат','живет','в','Москве'], translation:'Meu irmão mora em Moscou.', audio:'audio/possessivos8.mp3'},
-  {title:'вопрос 9', phrase:'Nossa família gosta de viajar.', words:['Наша','семья','любит','путешествовать'], translation:'Nossa família gosta de viajar.', audio:'audio/possessivos9.mp3'},
-  {title:'вопрос 10', phrase:'Seu carro é novo.', words:['Твоя','машина','новая'], translation:'Seu carro é novo.', audio:'audio/possessivos10.mp3'}
+  {title:'Pergunta 1', phrase:'Meu amigo vai para a escola.', words:['Мой','друг','идёт','в','школу'], translation:'Meu amigo vai para a escola.', audio:'audio/possessivos1.mp3'},
+  {title:'Pergunta 2', phrase:'Minha irmã estuda na universidade.', words:['Моя','сестра','учится','в','университете'], translation:'Minha irmã estuda na universidade.', audio:'audio/possessivos2.mp3'},
+  {title:'Pergunta 3', phrase:'Nosso professor fala russo.', words:['Наш','учитель','говорит','по-русски'], translation:'Nosso professor fala russo.', audio:'audio/possessivos3.mp3'},
+  {title:'Pergunta 4', phrase:'Sua mãe trabalha no hospital.', words:['Твоя','мама','работает','в','больнице'], translation:'Sua mãe trabalha no hospital.', audio:'audio/possessivos4.mp3'},
+  {title:'Pergunta 5', phrase:'Seu pai lê o jornal.', words:['Твой','папа','читает','газету'], translation:'Seu pai lê o jornal.', audio:'audio/possessivos5.mp3'},
+  {title:'Pergunta 6', phrase:'Minha casa é grande.', words:['Мой','дом','большой'], translation:'Minha casa é grande.', audio:'audio/possessivos6.mp3'},
+  {title:'Pergunta 7', phrase:'Nosso livro está na mesa.', words:['Наша','книга','находится','на','столе'], translation:'Nosso livro está na mesa.', audio:'audio/possessivos7.mp3'},
+  {title:'Pergunta 8', phrase:'Meu irmão mora em Moscou.', words:['Мой','брат','живет','в','Москве'], translation:'Meu irmão mora em Moscou.', audio:'audio/possessivos8.mp3'},
+  {title:'Pergunta 9', phrase:'Nossa família gosta de viajar.', words:['Наша','семья','любит','путешествовать'], translation:'Nossa família gosta de viajar.', audio:'audio/possessivos9.mp3'},
+  {title:'Pergunta 10', phrase:'Seu carro é novo.', words:['Твоя','машина','новая'], translation:'Seu carro é novo.', audio:'audio/possessivos10.mp3'}
 ],
 
-      numerais: [
+numerais: [
     {title:'Pergunta 1', phrase:'Um livro', words:['Одна','книга'], translation:'Um livro', audio:'audio/01.mp3'},
     {title:'Pergunta 2', phrase:'Dois carros', words:['Две','машины'], translation:'Dois carros', audio:'audio/02.mp3'},
     {title:'Pergunta 3', phrase:'Três casas', words:['Три','дома'], translation:'Três casas', audio:'audio/03.mp3'},
@@ -138,7 +53,7 @@ verboEstarPresente: [
     {title:'Pergunta 10', phrase:'Nós não estamos cansados.', words:['Мы','не','устали.'], translation:'Nós não estamos cansados.', audio:'audio/30.mp3'}
   ],
 
-      verboSerPassado: [
+verboSerPassado: [
     {title:'Pergunta 1', phrase:'Eu fui estudante.', words:['Я','был','студентом.'], translation:'Eu fui estudante.', audio:'audio/31.mp3'},
     {title:'Pergunta 2', phrase:'Tu foste professor.', words:['Ты','был','учителем.'], translation:'Tu foste professor.', audio:'audio/32.mp3'},
     {title:'Pergunta 3', phrase:'Ele foi médico.', words:['Он','был','врачом.'], translation:'Ele foi médico.', audio:'audio/33.mp3'},
@@ -151,7 +66,7 @@ verboEstarPresente: [
     {title:'Pergunta 10', phrase:'Nós não fomos velhos.', words:['Мы','не','были','старыми.'], translation:'Nós não fomos velhos.', audio:'audio/40.mp3'}
   ],
       
-      verboEstarPassado: [
+verboEstarPassado: [
     {title:'Pergunta 1', phrase:'Eu estive em casa.', words:['Я','был','дома.'], translation:'Eu estive em casa.', audio:'audio/41.mp3'},
     {title:'Pergunta 2', phrase:'Tu estiveste cansado.', words:['Ты','был','усталым.'], translation:'Tu estiveste cansado.', audio:'audio/42.mp3'},
     {title:'Pergunta 3', phrase:'Ele esteve no trabalho.', words:['Он','был','на','работе.'], translation:'Ele esteve no trabalho.', audio:'audio/43.mp3'},
@@ -164,7 +79,7 @@ verboEstarPresente: [
     {title:'Pergunta 10', phrase:'Nós não estivemos cansados.', words:['Мы','не','были','усталыми.'], translation:'Nós não estivemos cansados.', audio:'audio/50.mp3'}
   ],
 
-      verboSerFuturo: [
+verboSerFuturo: [
     {title:'Pergunta 1', phrase:'Eu serei estudante.', words:['Я','буду','студентом.'], translation:'Eu serei estudante.', audio:'audio/51.mp3'},
     {title:'Pergunta 2', phrase:'Tu serás professor.', words:['Ты','будешь','учителем.'], translation:'Tu serás professor.', audio:'audio/52.mp3'},
     {title:'Pergunta 3', phrase:'Ele será médico.', words:['Он','будет','врачом.'], translation:'Ele será médico.', audio:'audio/53.mp3'},
@@ -177,7 +92,7 @@ verboEstarPresente: [
     {title:'Pergunta 10', phrase:'Nós não seremos velhos.', words:['Мы','не','будем','старыми.'], translation:'Nós não seremos velhos.', audio:'audio/60.mp3'}
   ],
 
-      verboEstarFuturo: [
+verboEstarFuturo: [
     {title:'Pergunta 1', phrase:'Eu estarei em casa.', words:['Я','буду','дома.'], translation:'Eu estarei em casa.', audio:'audio/61.mp3'},
     {title:'Pergunta 2', phrase:'Tu estarás cansado.', words:['Ты','будешь','усталым.'], translation:'Tu estarás cansado.', audio:'audio/62.mp3'},
     {title:'Pergunta 3', phrase:'Ele estará no trabalho.', words:['Он','будет','на','работе.'], translation:'Ele estará no trabalho.', audio:'audio/63.mp3'},
@@ -190,20 +105,20 @@ verboEstarPresente: [
     {title:'Pergunta 10', phrase:'Nós não estaremos cansados.', words:['Мы','не','будем','усталыми.'], translation:'Nós não estaremos cansados.', audio:'audio/70.mp3'}
   ],
 
-    quantidades:[
-  {title:'вопрос 1', phrase:'Eu tenho duas maçãs.', words:['У','меня','два','яблока'], translation:'Eu tenho duas maçãs.', audio:'audio/quantidades1.mp3'},
-  {title:'вопрос 2', phrase:'Tenho três livros.', words:['У','меня','три','книги'], translation:'Tenho três livros.', audio:'audio/quantidades2.mp3'},
-  {title:'вопрос 3', phrase:'Ele comprou cinco laranjas.', words:['Он','купил','пять','апельсинов'], translation:'Ele comprou cinco laranjas.', audio:'audio/quantidades3.mp3'},
-  {title:'вопрос 4', phrase:'Nós temos sete canetas.', words:['У','нас','семь','ручек'], translation:'Nós temos sete canetas.', audio:'audio/quantidades4.mp3'},
-  {title:'вопрос 5', phrase:'Eles têm uma bicicleta.', words:['У','них','есть','велосипед'], translation:'Eles têm uma bicicleta.', audio:'audio/quantidades5.mp3'},
-  {title:'вопрос 6', phrase:'Tenho uma caneta azul.', words:['У','меня','есть','синяя','ручка'], translation:'Tenho uma caneta azul.', audio:'audio/quantidades6.mp3'},
-  {title:'вопрос 7', phrase:'Temos quatro cadeiras.', words:['У','нас','четыре','стула'], translation:'Temos quatro cadeiras.', audio:'audio/quantidades7.mp3'},
-  {title:'вопрос 8', phrase:'Eles compraram dois livros.', words:['Они','купили','две','книги'], translation:'Eles compraram dois livros.', audio:'audio/quantidades8.mp3'},
-  {title:'вопрос 9', phrase:'Eu preciso de três laranjas.', words:['Мне','нужно','три','апельсина'], translation:'Eu preciso de três laranjas.', audio:'audio/quantidades9.mp3'},
-  {title:'вопрос 10', phrase:'Vocês têm cinco canetas?', words:['У','вас','есть','пять','ручек'], translation:'Vocês têm cinco canetas?', audio:'audio/quantidades10.mp3'}
+quantidades:[
+  {title:'Pergunta 1', phrase:'Eu tenho duas maçãs.', words:['У','меня','два','яблока'], translation:'Eu tenho duas maçãs.', audio:'audio/quantidades1.mp3'},
+  {title:'Pergunta 2', phrase:'Tenho três livros.', words:['У','меня','три','книги'], translation:'Tenho três livros.', audio:'audio/quantidades2.mp3'},
+  {title:'Pergunta 3', phrase:'Ele comprou cinco laranjas.', words:['Он','купил','пять','апельсинов'], translation:'Ele comprou cinco laranjas.', audio:'audio/quantidades3.mp3'},
+  {title:'Pergunta 4', phrase:'Nós temos sete canetas.', words:['У','нас','семь','ручек'], translation:'Nós temos sete canetas.', audio:'audio/quantidades4.mp3'},
+  {title:'Pergunta 5', phrase:'Eles têm uma bicicleta.', words:['У','них','есть','велосипед'], translation:'Eles têm uma bicicleta.', audio:'audio/quantidades5.mp3'},
+  {title:'Pergunta 6', phrase:'Tenho uma caneta azul.', words:['У','меня','есть','синяя','ручка'], translation:'Tenho uma caneta azul.', audio:'audio/quantidades6.mp3'},
+  {title:'Pergunta 7', phrase:'Temos quatro cadeiras.', words:['У','нас','четыре','стула'], translation:'Temos quatro cadeiras.', audio:'audio/quantidades7.mp3'},
+  {title:'Pergunta 8', phrase:'Eles compraram dois livros.', words:['Они','купили','две','книги'], translation:'Eles compraram dois livros.', audio:'audio/quantidades8.mp3'},
+  {title:'Pergunta 9', phrase:'Eu preciso de três laranjas.', words:['Мне','нужно','три','апельсина'], translation:'Eu preciso de três laranjas.', audio:'audio/quantidades9.mp3'},
+  {title:'Pergunta 10', phrase:'Vocês têm cinco canetas?', words:['У','вас','есть','пять','ручек'], translation:'Vocês têm cinco canetas?', audio:'audio/quantidades10.mp3'}
 ],
 
-    objetoDireto:[
+objetoDireto:[
   {title:'Pergunta 1', phrase:'Eu vejo o carro.', words:['Я','вижу','машину'], translation:'Eu vejo o carro.', audio:'audio/objetoDireto1.mp3'},
   {title:'Pergunta 2', phrase:'Ela lê o livro.', words:['Она','читает','книгу'], translation:'Ela lê o livro.', audio:'audio/objetoDireto2.mp3'},
   {title:'Pergunta 3', phrase:'Nós compramos pão.', words:['Мы','покупаем','хлеб'], translation:'Nós compramos pão.', audio:'audio/objetoDireto3.mp3'},
@@ -215,7 +130,7 @@ verboEstarPresente: [
   {title:'Pergunta 9', phrase:'Eu escrevo uma carta.', words:['Я','пишу','письмо'], translation:'Eu escrevo uma carta.', audio:'audio/objetoDireto9.mp3'},
   {title:'Pergunta 10', phrase:'Ele cozinha a comida.', words:['Он','готовит','еду'], translation:'Ele cozinha a comida.', audio:'audio/objetoDireto10.mp3'}
 ],
-    tempoPresente:[
+tempoPresente:[
   {title:'Pergunta 1', phrase:'Eu trabalho todos os dias.', words:['Я','работаю','каждый','день'], translation:'Eu trabalho todos os dias.', audio:'audio/tempoPresente1.mp3'},
   {title:'Pergunta 2', phrase:'Ela estuda na escola.', words:['Она','учится','в','школе'], translation:'Ela estuda na escola.', audio:'audio/tempoPresente2.mp3'},
   {title:'Pergunta 3', phrase:'Nós jogamos futebol.', words:['Мы','играем','в','футбол'], translation:'Nós jogamos futebol.', audio:'audio/tempoPresente3.mp3'},
@@ -227,7 +142,7 @@ verboEstarPresente: [
   {title:'Pergunta 9', phrase:'Eu caminho pela cidade.', words:['Я','гуляю','по','городу'], translation:'Eu caminho pela cidade.', audio:'audio/tempoPresente9.mp3'},
   {title:'Pergunta 10', phrase:'Eles jogam xadrez.', words:['Они','играют','в','шахматы'], translation:'Eles jogam xadrez.', audio:'audio/tempoPresente10.mp3'}
 ],
-   infinitivo:[
+infinitivo:[
   {title:'Pergunta 1', phrase:'Eu quero comer.', words:['Я','хочу','есть'], translation:'Eu quero comer.', audio:'audio/infinitivo1.mp3'},
   {title:'Pergunta 2', phrase:'Ela gosta de ler.', words:['Ей','нравится','читать'], translation:'Ela gosta de ler.', audio:'audio/infinitivo2.mp3'},
   {title:'Pergunta 3', phrase:'Nós precisamos estudar.', words:['Нам','нужно','учиться'], translation:'Nós precisamos estudar.', audio:'audio/infinitivo3.mp3'},
@@ -239,7 +154,7 @@ verboEstarPresente: [
   {title:'Pergunta 9', phrase:'Eu preciso descansar.', words:['Мне','нужно','отдыхать'], translation:'Eu preciso descansar.', audio:'audio/infinitivo9.mp3'},
   {title:'Pergunta 10', phrase:'Eles desejam jogar futebol.', words:['Они','хотят','играть','в','футбол'], translation:'Eles desejam jogar futebol.', audio:'audio/infinitivo10.mp3'}
 ],
-    lugares:[
+lugares:[
   {title:'Pergunta 1', phrase:'O restaurante está perto.', words:['Ресторан','рядом'], translation:'O restaurante está perto.', audio:'audio/lugares1.mp3'},
   {title:'Pergunta 2', phrase:'A escola fica longe.', words:['Школа','далеко'], translation:'A escola fica longe.', audio:'audio/lugares2.mp3'},
   {title:'Pergunta 3', phrase:'O parque é bonito.', words:['Парк','красивый'], translation:'O parque é bonito.', audio:'audio/lugares3.mp3'},
@@ -263,7 +178,7 @@ profissoes:[
   {title:'Pergunta 9', phrase:'Eles são motoristas.', words:['Они','водители'], translation:'Eles são motoristas.', audio:'audio/profissoes9.mp3'},
   {title:'Pergunta 10', phrase:'Ela trabalha como designer.', words:['Она','работает','дизайнером'], translation:'Ela trabalha como designer.', audio:'audio/profissoes10.mp3'}
 ],
-    viagem:[
+viagem:[
   {title:'Pergunta 1', phrase:'Eu vou para Moscou.', words:['Я','еду','в','Москву'], translation:'Eu vou para Moscou.', audio:'audio/viagem1.mp3'},
   {title:'Pergunta 2', phrase:'Ela viaja de avião.', words:['Она','путешествует','на','самолёте'], translation:'Ela viaja de avião.', audio:'audio/viagem2.mp3'},
   {title:'Pergunta 3', phrase:'Nós vamos para a praia.', words:['Мы','едем','на','пляж'], translation:'Nós vamos para a praia.', audio:'audio/viagem3.mp3'},
@@ -275,7 +190,7 @@ profissoes:[
   {title:'Pergunta 9', phrase:'Eu faço check-in.', words:['Я','регистрируюсь'], translation:'Eu faço check-in.', audio:'audio/viagem9.mp3'},
   {title:'Pergunta 10', phrase:'Eles alugam um carro.', words:['Они','арендуют','машину'], translation:'Eles alugam um carro.', audio:'audio/viagem10.mp3'}
 ],
-    familia:[
+familia:[
   {title:'Pergunta 1', phrase:'Meu pai trabalha.', words:['Мой','папа','работает'], translation:'Meu pai trabalha.', audio:'audio/familia1.mp3'},
   {title:'Pergunta 2', phrase:'Minha mãe cozinha.', words:['Моя','мама','готовит'], translation:'Minha mãe cozinha.', audio:'audio/familia2.mp3'},
   {title:'Pergunta 3', phrase:'Meu irmão estuda.', words:['Мой','брат','учится'], translation:'Meu irmão estuda.', audio:'audio/familia3.mp3'},
@@ -287,7 +202,7 @@ profissoes:[
   {title:'Pergunta 9', phrase:'Meus pais moram em São Petersburgo.', words:['Мои','родители','живут','в','Санкт-Петербурге'], translation:'Meus pais moram em São Petersburgo.', audio:'audio/familia9.mp3'},
   {title:'Pergunta 10', phrase:'Nós amamos nossa família.', words:['Мы','любим','нашу','семью'], translation:'Nós amamos nossa família.', audio:'audio/familia10.mp3'}
 ],
-    verbosMovimento:[
+verbosMovimento:[
   {title:'Pergunta 1', phrase:'Eu vou a pé para a escola.', words:['Я','иду','в','школу'], translation:'Eu vou a pé para a escola.', audio:'audio/verbosMovimento1.mp3'},
   {title:'Pergunta 2', phrase:'Ele vai de carro para o trabalho.', words:['Он','едет','на','работу'], translation:'Ele vai de carro para o trabalho.', audio:'audio/verbosMovimento2.mp3'},
   {title:'Pergunta 3', phrase:'Nós vamos de trem para Moscou.', words:['Мы','едем','в','Москву','на','поезде'], translation:'Nós vamos de trem para Moscou.', audio:'audio/verbosMovimento3.mp3'},
@@ -299,7 +214,7 @@ profissoes:[
   {title:'Pergunta 9', phrase:'Ela entra no ônibus.', words:['Она','входит','в','автобус'], translation:'Ela entra no ônibus.', audio:'audio/verbosMovimento9.mp3'},
   {title:'Pergunta 10', phrase:'Eles chegam à estação.', words:['Они','приходят','на','вокзал'], translation:'Eles chegam à estação.', audio:'audio/verbosMovimento10.mp3'}
 ],
-    FrasesDeConvercacao: [
+FrasesDeConvercacao: [
   {title:'Pergunta 1', phrase:'Olá! Qual é o seu nome?', words:['Привет!','Как','тебя','зовут?'], translation:'Olá! Qual é o seu nome?', audio:'audio/01.mp3'},
   {title:'Pergunta 2', phrase:'Meu nome é Anna. E o seu?', words:['Меня','зовут','Анна.','А','тебя?'], translation:'Meu nome é Anna. E o seu?', audio:'audio/02.mp3'},
   {title:'Pergunta 3', phrase:'De onde você é?', words:['Откуда','ты?'], translation:'De onde você é?', audio:'audio/03.mp3'},
@@ -319,136 +234,90 @@ profissoes:[
 
   };
 
-  // ===== Overlay funções =====
-  function closeOverlay() {
-    const overlay = document.getElementById('overlayModal');
-    overlay.classList.remove('show');
-    setTimeout(() => { document.getElementById('overlayBody').innerHTML = ''; }, 300);
-  }
-
-  function openLessonModule(key) {
-    const overlay = document.getElementById('overlayModal');
-    const content = document.getElementById('overlayBody');
-    if (!contentData[key]) { content.innerHTML = `<p>Módulo não encontrado.</p>`; overlay.classList.add('show'); return; }
-
-    const exercises = contentData[key];
-    let currentIndex = 0;
-
-    function renderExercise(index) {
-      const ex = exercises[index];
-      if (!ex) return;
-
-      const shuffled = [...ex.words].sort(() => Math.random() - 0.5);
-
-      content.innerHTML = `
-        <button onclick="closeOverlay()" style="position:absolute; top:10px; right:10px;">Fechar</button>
-        <h2>${ex.title}</h2>
-        <p><strong>Frase em português:</strong> ${ex.translation}</p>
-        <audio controls src="${ex.audio}"></audio>
-        <div id="wordOptions">${shuffled.map(w => `<button class="word-btn">${w}</button>`).join(' ')}</div>
-        <div>
-          <p>Construa a frase em russo:</p>
-          <div id="userAnswer"></div>
-        </div>
-        <button id="checkBtn">Verificar</button>
-      `;
-
-      const userAnswer = [];
-      const userAnswerDiv = document.getElementById('userAnswer');
-
-      document.querySelectorAll('.word-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          userAnswer.push(btn.textContent);
-          userAnswerDiv.textContent = userAnswer.join(' ');
-        });
-      });
-
-      document.getElementById('checkBtn').addEventListener('click', () => {
-        if (JSON.stringify(userAnswer) === JSON.stringify(ex.words)) {
-          alert('✅ Correto!');
-        } else {
-          alert('❌ Errado! A frase correta é: ' + ex.words.join(' '));
-        }
-
-        currentIndex++;
-        if (currentIndex < exercises.length) {
-          renderExercise(currentIndex);
-        } else {
-          alert('🎉 Parabéns, você completou o módulo!');
-          closeOverlay();
-          unlockNextModule(key);
-        }
-      });
-    }
-
-    renderExercise(currentIndex);
-    overlay.classList.add('show');
-  }
-
-  function unlockNextModule(currentKey) {
-    const cards = document.querySelectorAll('.lesson-card');
-    for (let i = 0; i < cards.length; i++) {
-      if (cards[i].dataset.key === currentKey && i < cards.length - 1) {
-        cards[i+1].classList.remove('locked');
-        break;
-      }
-    }
-  }
-
-    // ===== Inicialização =====
-  document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('.lesson-card').forEach(card => {
-      card.addEventListener('click', () => {
-        if (!card.classList.contains('locked')) openLessonModule(card.dataset.key);
-      });
-    });
-
-    
-
-    // Login
-    document.getElementById('loginBtn').addEventListener('click', () => { alert('Login realizado com sucesso!'); });
-  });
 
 
+// Ordem fixa dos módulos
+const moduleOrder = [
+  'possessivos', 'numerais', 'verboSerPresente', 'verboEstarPresente',
+  'verboSerPassado', 'verboEstarPassado', 'verboSerFuturo', 'verboEstarFuturo',
+  'quantidades', 'objetoDireto', 'tempoPresente', 'infinitivo', 'lugares',
+  'profissoes', 'viagem', 'familia', 'verbosMovimento', 'FrasesDeConvercacao'
+];
 
-/* ============================================================
-   SISTEMA DE OVERLAY — ABRIR E FECHAR
-============================================================ */
+// Status de desbloqueio padrão
+const defaultModules = {
+  possessivos: true,
+  numerais: false,
+  verboSerPresente: false,
+  verboEstarPresente: false,
+  verboSerPassado: false,
+  verboEstarPassado: false,
+  verboSerFuturo: false,
+  verboEstarFuturo: false,
+  quantidades: false,
+  objetoDireto: false,
+  tempoPresente: false,
+  infinitivo: false,
+  lugares: false,
+  profissoes: false,
+  viagem: false,
+  familia: false,
+  verbosMovimento: false,
+  FrasesDeConvercacao: false
+};
 
-function openOverlay(wordsArray) {
-  const overlay = document.getElementById('overlayModal');
-  const overlayBody = document.getElementById('overlayBody');
+// Carrega estado salvo no localStorage ou usa padrão
+let unlockedModules = JSON.parse(localStorage.getItem('unlockedModules')) || { ...defaultModules };
+let moduleScores = JSON.parse(localStorage.getItem('moduleScores')) || {}; // { possessivos: 80, numerais: 70, ... }
 
-  overlayBody.innerHTML = '';
-
-  wordsArray.forEach(word => {
-    const span = document.createElement('span');
-    span.classList.add('word');
-    span.textContent = word;
-    span.addEventListener('click', () => {
-      span.classList.toggle('selected');
-    });
-    overlayBody.appendChild(span);
-  });
-
-  overlay.classList.add('show');
+// Salva estado atual
+function saveState() {
+  localStorage.setItem('unlockedModules', JSON.stringify(unlockedModules));
+  localStorage.setItem('moduleScores', JSON.stringify(moduleScores));
 }
 
+// Atualiza barra de progresso de um módulo
+function updateProgressBar(key) {
+  const score = moduleScores[key] || 0;
+  const progressBar = document.querySelector(`.lesson-card[data-key="${key}"] .progress-bar`);
+  if (progressBar) {
+    progressBar.style.width = score + '%';
+    progressBar.textContent = score.toFixed(0) + '%';
+  }
+}
+
+// Desbloqueia próximo módulo com base na ordem fixa
+function unlockNextModule(currentKey) {
+  const currentIndex = moduleOrder.indexOf(currentKey);
+  if (currentIndex >= 0 && currentIndex < moduleOrder.length - 1) {
+    const nextKey = moduleOrder[currentIndex + 1];
+    unlockedModules[nextKey] = true;
+    const nextCard = document.querySelector(`.lesson-card[data-key="${nextKey}"]`);
+    if (nextCard) nextCard.classList.remove('locked');
+  }
+  saveState();
+}
+
+// Restaura desbloqueio com base em pontuações ≥70%
+function restoreUnlocks() {
+  for (const key in moduleScores) {
+    if (moduleScores[key] >= 70) {
+      unlockedModules[key] = true;
+      const card = document.querySelector(`.lesson-card[data-key="${key}"]`);
+      if (card) card.classList.remove('locked');
+    }
+    updateProgressBar(key);
+  }
+}
+
+// Fecha overlay
 function closeOverlay() {
   const overlay = document.getElementById('overlayModal');
   overlay.classList.remove('show');
-
-  setTimeout(() => {
-    document.getElementById('overlayBody').innerHTML = '';
-  }, 300);
+  setTimeout(() => { document.getElementById('overlayBody').innerHTML = ''; }, 300);
 }
 
-
-
-/* ============================================================
-   SISTEMA DE LIÇÕES COM PONTUAÇÃO (EXIGE 70% PARA PASSAR)
-============================================================ */
-
+// Abre módulo
 function openLessonModule(key) {
   const overlay = document.getElementById('overlayModal');
   const content = document.getElementById('overlayBody');
@@ -461,9 +330,8 @@ function openLessonModule(key) {
 
   const exercises = contentData[key];
   let currentIndex = 0;
-
-  let totalExercises = exercises.length;
-  let correctAnswers = 0; // contador de acertos
+  let correctAnswers = 0;
+  const totalExercises = exercises.length;
 
   function renderExercise(index) {
     const ex = exercises[index];
@@ -473,21 +341,14 @@ function openLessonModule(key) {
 
     content.innerHTML = `
       <button onclick="closeOverlay()" style="position:absolute; top:10px; right:10px;">Fechar</button>
-
       <h2>${ex.title}</h2>
       <p><strong>Frase em português:</strong> ${ex.translation}</p>
-
       <audio controls src="${ex.audio}"></audio>
-
-      <div id="wordOptions">
-        ${shuffled.map(w => `<button class="word-btn">${w}</button>`).join(' ')}
-      </div>
-
+      <div id="wordOptions">${shuffled.map(w => `<button class="word-btn">${w}</button>`).join(' ')}</div>
       <div>
         <p>Construa a frase em russo:</p>
         <div id="userAnswer"></div>
       </div>
-
       <button id="checkBtn">Verificar</button>
     `;
 
@@ -495,16 +356,14 @@ function openLessonModule(key) {
     const userAnswerDiv = document.getElementById('userAnswer');
 
     document.querySelectorAll('.word-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
+      btn.onclick = () => {
         userAnswer.push(btn.textContent);
         userAnswerDiv.textContent = userAnswer.join(' ');
-      });
+      };
     });
 
-    document.getElementById('checkBtn').addEventListener('click', () => {
-      const isCorrect = JSON.stringify(userAnswer) === JSON.stringify(ex.words);
-
-      if (isCorrect) {
+    document.getElementById('checkBtn').onclick = () => {
+      if (userAnswer.join(' ') === ex.words.join(' ')) {
         correctAnswers++;
         alert('✅ Correto!');
       } else {
@@ -512,253 +371,69 @@ function openLessonModule(key) {
       }
 
       currentIndex++;
-
       if (currentIndex < exercises.length) {
         renderExercise(currentIndex);
       } else {
         const score = (correctAnswers / totalExercises) * 100;
+        alert(`Você concluiu o módulo com ${score.toFixed(0)}% de acertos!`);
 
-        if (score >= 70) {
-          alert(`🎉 Parabéns! Você concluiu o módulo com ${score.toFixed(0)}% de acertos!`);
-          unlockNextModule(key);
-          closeOverlay();
-        } else {
-          alert(`⚠ Você acertou ${score.toFixed(0)}%.  
-É necessário **mínimo de 70%** para liberar o próximo módulo.`);
+        // Salva pontuação e desbloqueia próximo módulo se ≥70%
+        moduleScores[key] = Math.max(moduleScores[key] || 0, score);
+        updateProgressBar(key);
+        if (score >= 70) unlockNextModule(key);
 
-          closeOverlay();
-        }
+        saveState();
+        closeOverlay();
       }
-    });
+    };
   }
 
   renderExercise(currentIndex);
   overlay.classList.add('show');
 }
 
+// Inicialização
+document.addEventListener('DOMContentLoaded', () => {
+  restoreUnlocks();
 
-
-/* ============================================================
-   DESBLOQUEAR PRÓXIMO MÓDULO
-============================================================ */
-
-function unlockNextModule(currentKey) {
-  const cards = document.querySelectorAll('.lesson-card');
-
-  for (let i = 0; i < cards.length; i++) {
-    if (cards[i].dataset.key === currentKey && i < cards.length - 1) {
-      cards[i + 1].classList.remove('locked');
-      cards[i + 1].style.filter = "none";
-      cards[i + 1].style.opacity = "1";
-      break;
+  document.querySelectorAll('.lesson-card').forEach(card => {
+    // Adiciona barra de progresso se não existir
+    if (!card.querySelector('.progress-container')) {
+      const progressContainer = document.createElement('div');
+      progressContainer.className = 'progress-container';
+      progressContainer.innerHTML = `<div class="progress-bar"></div>`;
+      card.appendChild(progressContainer);
     }
+
+    if (!unlockedModules[card.dataset.key]) card.classList.add('locked');
+    card.onclick = () => {
+      if (unlockedModules[card.dataset.key]) {
+        openLessonModule(card.dataset.key);
+      } else {
+        alert('⚠ Este módulo está bloqueado. Complete os módulos anteriores com pelo menos 70% de acertos.');
+      }
+    };
+
+    updateProgressBar(card.dataset.key);
+  });
+
+  const loginBtn = document.getElementById('loginBtn');
+  if (loginBtn) loginBtn.onclick = () => alert('Login realizado com sucesso!');
+
+  const modoBtn = document.getElementById('modoBtn');
+  if (modoBtn) {
+    let darkMode = false;
+    modoBtn.onclick = () => {
+      darkMode = !darkMode;
+      if(darkMode){
+        document.body.style.backgroundColor = '#121212';
+        document.body.style.color = '#ffffff';
+        modoBtn.textContent = '☀️';
+      } else {
+        document.body.style.backgroundColor = '#ffffff';
+        document.body.style.color = '#000000';
+        modoBtn.textContent = '🌙';
+      }
+    };
   }
-}
-
-
-
-
-
-// =============================
-// SISTEMA DE BLOQUEIO DE MÓDULOS
-// =============================
-
-// lista na ordem exata mostrada no seu HTML
-const moduleOrder = [
-  "possessivos",
-  "numerais",
-  "verboSerPresente",
-  "verboEstarPresente",
-  "verboSerPassado",
-  "verboEstarPassado",
-  "verboSerFuturo",
-  "verboEstarFuturo",
-  "quantidades",
-  "objetoDireto",
-  "tempoPresente",
-  "infinitivo",
-  "lugares",
-  "profissoes",
-  "viagem",
-  "familia",
-  "verbosMovimento",
-  "FrasesDeConvercacao"
-];
-
-// Carrega progresso salvo
-let progress = JSON.parse(localStorage.getItem("progressModules")) || {};
-
-// Se não existir progresso, bloqueia todos exceto o primeiro
-if (Object.keys(progress).length === 0) {
-  moduleOrder.forEach((m, i) => {
-    progress[m] = (i === 0 ? "unlocked" : "locked");
-  });
-  localStorage.setItem("progressModules", JSON.stringify(progress));
-}
-
-// Função que atualiza visualmente quais módulos estão bloqueados
-function updateModuleLocks() {
-  document.querySelectorAll(".lesson-card").forEach(card => {
-    let key = card.dataset.key;
-
-    if (progress[key] === "locked") {
-      card.classList.add("locked");
-      card.innerHTML = "🔒 " + card.innerHTML;
-      card.style.opacity = "0.4";
-      card.style.pointerEvents = "none";
-    } else {
-      card.classList.remove("locked");
-      card.style.opacity = "1";
-      card.style.pointerEvents = "auto";
-    }
-  });
-}
-
-updateModuleLocks();
-
-// Evento ao clicar num módulo
-document.querySelectorAll(".lesson-card").forEach(card => {
-  card.addEventListener("click", () => {
-    let key = card.dataset.key;
-
-    // impede abrir se bloqueado
-    if (progress[key] === "locked") {
-      alert("Complete o módulo anterior para desbloquear este.");
-      return;
-    }
-
-    // abre o módulo normalmente
-    openModule(key);
-  });
 });
-
-// Simula abertura do módulo (você já tem openOverlay, então mantemos)
-function openModule(key) {
-  openOverlay(contentData[key]); // usa seu overlay existente
-}
-
-// =============================
-// FUNÇÃO PARA MARCAR MÓDULO COMO CONCLUÍDO
-// =============================
-
-function concluirModulo(key) {
-  let index = moduleOrder.indexOf(key);
-
-  // marca como concluído
-  progress[key] = "completed";
-
-  // desbloqueia o próximo
-  if (index < moduleOrder.length - 1) {
-    let next = moduleOrder[index + 1];
-    progress[next] = "unlocked";
-  }
-
-  localStorage.setItem("progressModules", JSON.stringify(progress));
-  updateModuleLocks();
-}
-
-
-
-
-
-// ================================
-// SISTEMA DE PROGRESSO DOS MÓDULOS
-// ================================
-
-// 1. Pega todos os módulos na ordem em que aparecem
-const modulos = Array.from(document.querySelectorAll(".lesson-card"));
-
-// 2. Cria uma lista somente com as keys em ordem
-const listaKeys = modulos.map(m => m.dataset.key);
-
-// 3. Carrega progresso salvo ou cria novo
-let progresso = JSON.parse(localStorage.getItem("progressoAulas")) || {
-  ultimoLiberado: listaKeys[0]  // libera só o primeiro módulo no início
-};
-
-// ================================
-// FUNÇÃO: Renderizar bloqueios
-// ================================
-function atualizarModulos() {
-  modulos.forEach((mod, index) => {
-    const key = mod.dataset.key;
-    const ultimoIndex = listaKeys.indexOf(progresso.ultimoLiberado);
-
-    if (index > ultimoIndex) {
-      // BLOQUEADO
-      mod.classList.add("bloqueado");
-      mod.style.opacity = "0.4";
-      mod.style.pointerEvents = "none";
-    } else {
-      // LIBERADO
-      mod.classList.remove("bloqueado");
-      mod.style.opacity = "1";
-      mod.style.pointerEvents = "auto";
-    }
-  });
-}
-
-// ================================
-// ABRIR UM MÓDULO
-// ================================
-modulos.forEach((card) => {
-  card.addEventListener("click", () => {
-    const key = card.dataset.key;
-
-    // Abre um conteúdo simples só pra simular
-    abrirOverlay(`
-      <h2>Módulo: ${key}</h2>
-      <p>Conteúdo do módulo aqui...</p>
-      <button onclick="concluirModulo('${key}')" class="btnFinalizar">
-        ✔ Concluir Módulo
-      </button>
-    `);
-  });
-});
-
-// ================================
-// FUNÇÃO: Concluir módulo
-// ================================
-function concluirModulo(key) {
-  const atualIndex = listaKeys.indexOf(key);
-  const proximoIndex = atualIndex + 1;
-
-  // Se houver próximo módulo, libera
-  if (proximoIndex < listaKeys.length) {
-    progresso.ultimoLiberado = listaKeys[proximoIndex];
-    localStorage.setItem("progressoAulas", JSON.stringify(progresso));
-  }
-
-  closeOverlay();
-  atualizarModulos();
-  alert("Módulo concluído! Próximo liberado.");
-}
-
-// ================================
-// SISTEMA DO OVERLAY
-// ================================
-function abrirOverlay(html) {
-  document.getElementById("overlayBody").innerHTML = html;
-  document.getElementById("overlayModal").style.display = "block";
-}
-
-function closeOverlay() {
-  document.getElementById("overlayModal").style.display = "none";
-}
-
-// ================================
-// INICIALIZAÇÃO
-// ================================
-atualizarModulos();
-
-
-
-
-
-
-
-
-
-
-
-
