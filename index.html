@@ -1,17 +1,41 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="pt">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Сlubeslavo</title>
-<link rel="stylesheet" href="style.css">
+
+<link rel="stylesheet" href="index.css">	
+
+<style>
+/* Barra de progresso */
+.progress-container {
+  width: 100%;
+  background-color: #ddd;
+  border-radius: 5px;
+  overflow: hidden;
+  height: 20px;
+  margin-top: 5px;
+}
+
+.progress-bar {
+  height: 100%;
+  width: 0;
+  background-color: #4caf50;
+  text-align: center;
+  color: #fff;
+  line-height: 20px;
+  font-size: 12px;
+  transition: width 0.5s ease;
+}
+</style>
+
 </head>
 <body>
 <header>
-  <h1>Сlubeslavo <img src="emoji_dimitry.png" alt="Dimitry" class="emoji-head"> </h1>	 
-  <button  id="modoBtn">🌙</button>
+  <h1>Clueslavo <img src="emoji_dimitry.png" alt="Dimitry" class="emoji-head"> </h1>	 
+  <!-- <button class="login" id="modoBtn">🌙</button>  desativado  -->
 </header>
-
 <aside>
   <nav>
     <a href="index.html" class="active">📈 Selecionar</a>
@@ -19,10 +43,9 @@
     <a href="jogo.html">🎮 Jogos</a>
     <a href="complete-a-frase.html">🧩 Complete a Frase</a>
     <a href="quem-somos.html"> Quem somos?</a>
-    <a href="transparencia.html">🧠 Transparência de Anúncios</a>
     <a href="chat.html">💬 Chat</a>
   </nav>
-  <div class="mascote"> Dimitry</div>
+  <div class="mascote"> </div>
 </aside>
 
 <main>
@@ -30,80 +53,97 @@
     <div class="card lesson-card" data-key="possessivos">
       <h3>📘 Adjetivos possessivos</h3>
       <p>Complete este módulo.</p>
+      <div class="progress-container"><div class="progress-bar"></div></div>
     </div>
     <div class="card lesson-card" data-key="numerais">
       <h3>📘 Numerais</h3>
       <p>Complete este módulo.</p>
+      <div class="progress-container"><div class="progress-bar"></div></div>
     </div>
     <div class="card lesson-card" data-key="verboSerPresente">
       <h3>📘 Verbo "ser" (tempo presente)</h3>
       <p>Complete este módulo.</p>
+      <div class="progress-container"><div class="progress-bar"></div></div>
     </div>
     <div class="card lesson-card" data-key="verboEstarPresente">
       <h3>📘 Verbo "estar" (tempo presente)</h3>
       <p>Complete este módulo.</p>
+      <div class="progress-container"><div class="progress-bar"></div></div>
     </div>
     <div class="card lesson-card" data-key="verboSerPassado">
       <h3>📘 Verbo "ser" (passado)</h3>
       <p>Complete este módulo.</p>
+      <div class="progress-container"><div class="progress-bar"></div></div>
     </div>
     <div class="card lesson-card" data-key="verboEstarPassado">
       <h3>📘 Verbo "estar" (passado)</h3>
       <p>Complete este módulo.</p>
+      <div class="progress-container"><div class="progress-bar"></div></div>
     </div>
     <div class="card lesson-card" data-key="verboSerFuturo">
       <h3>📘 Verbo "ser" (futuro)</h3>
       <p>Complete este módulo.</p>
+      <div class="progress-container"><div class="progress-bar"></div></div>
     </div>
     <div class="card lesson-card" data-key="verboEstarFuturo">
       <h3>📘 Verbo "estar" (futuro)</h3>
       <p>Complete este módulo.</p>
+      <div class="progress-container"><div class="progress-bar"></div></div>
     </div>
     <div class="card lesson-card" data-key="quantidades">
       <h3>📘 Expressões quantitativas</h3>
       <p>Complete este módulo.</p>
+      <div class="progress-container"><div class="progress-bar"></div></div>
     </div>
     <div class="card lesson-card" data-key="objetoDireto">
       <h3>📘 Objeto direto</h3>
       <p>Complete este módulo.</p>
+      <div class="progress-container"><div class="progress-bar"></div></div>
     </div>
     <div class="card lesson-card" data-key="tempoPresente">
       <h3>📘 Tempo presente</h3>
       <p>Complete este módulo.</p>
+      <div class="progress-container"><div class="progress-bar"></div></div>
     </div>
     <div class="card lesson-card" data-key="infinitivo">
       <h3>📘 Infinitivo </h3>
       <p>Complete este módulo.</p>
+      <div class="progress-container"><div class="progress-bar"></div></div>
     </div>
     <div class="card lesson-card" data-key="lugares">
       <h3>📘 Descrição dos lugares</h3>
       <p>Complete este módulo.</p>
+      <div class="progress-container"><div class="progress-bar"></div></div>
     </div>
     <div class="card lesson-card" data-key="profissoes">
       <h3>📘 Profissões</h3>
       <p>Complete este módulo.</p>
+      <div class="progress-container"><div class="progress-bar"></div></div>
     </div>
     <div class="card lesson-card" data-key="viagem">
       <h3>📘 Viagens</h3>
       <p>Complete este módulo.</p>
+      <div class="progress-container"><div class="progress-bar"></div></div>
     </div>
     <div class="card lesson-card" data-key="familia">
       <h3>📘 Família</h3>
       <p>Complete este módulo.</p>
+      <div class="progress-container"><div class="progress-bar"></div></div>
     </div>
     <div class="card lesson-card" data-key="verbosMovimento">
       <h3>📘 Verbos de movimento</h3>
       <p>Complete este módulo.</p>
+      <div class="progress-container"><div class="progress-bar"></div></div>
     </div>
     <div class="card lesson-card" data-key="FrasesDeConvercacao">
       <h3>📘 Frases de conversação</h3>
       <p>Complete este módulo.</p>
+      <div class="progress-container"><div class="progress-bar"></div></div>
     </div>
   </div>
 </main>
 
-
-<!-- Overlay único para módulos-->
+<!-- Overlay único para módulos e dicionário -->
 <div id="overlayModal" class="overlay">
   <div class="overlay-content">
     <span class="close-btn" onclick="closeOverlay()">&times;</span>
@@ -111,21 +151,12 @@
   </div>
 </div>
 
+<script src="overlay.js"></script>
+<script src="app.js"></script>
+
 <footer id="siteFooter">
-  © 2025 Славянский клуб — Aprenda Russo e Português com diversão!
+  © 2025 Clubeslavo — Aplicação Web - Russo para iniciantes
 </footer>
-	<script src="app.js"></script>
+
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
